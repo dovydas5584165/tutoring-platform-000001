@@ -446,19 +446,15 @@ export default function TutorDashboard() {
 
 
 <section className="bg-white rounded-xl shadow-lg p-8">
-  <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Statistika</h2>
+  <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Kokybės rodikliai:</h2>
   <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
     <div className="bg-gray-50 rounded-lg p-6 text-center">
       <p className="text-3xl font-bold text-blue-600">92%</p>
-      <p className="mt-1 text-sm text-gray-600">Priėmimo procentas</p>
+      <p className="mt-1 text-sm text-gray-600">Priėmimo procentas, kurio tikimasi</p>
     </div>
     <div className="bg-gray-50 rounded-lg p-6 text-center">
-      <p className="text-3xl font-bold text-blue-600">3h</p>
-      <p className="mt-1 text-sm text-gray-600">Atsakymo greitis</p>
-    </div>
-    <div className="bg-gray-50 rounded-lg p-6 text-center">
-      <p className="text-3xl font-bold text-blue-600">15</p>
-      <p className="mt-1 text-sm text-gray-600">Klientų skaičius</p>
+      <p className="text-3xl font-bold text-blue-600">10 min.</p>
+      <p className="mt-1 text-sm text-gray-600">Optimalus atsakymo greitis</p>
     </div>
   </div>
 </section>
