@@ -49,6 +49,7 @@ export default function TutorDashboard() {
   const [notifLoading, setNotifLoading] = useState(false);
 
   const [orders, setOrders] = useState<Booking[]>([]);
+  const [hiddenBookings, setHiddenBookings] = useState<string[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
 
   // Check user agreement on mount
@@ -394,43 +395,55 @@ export default function TutorDashboard() {
 
   {ordersLoading ? (
     <p className="italic text-gray-500">Kraunama užsakymų informacija...</p>
-  ) : orders.length === 0 ? (
+  ) : orders.filter(order => !hiddenBookings.includes(order.id)).length === 0 ? (
     <p className="text-gray-600 italic">Nėra užsakymų.</p>
   ) : (
     <ul className="space-y-4 max-h-[400px] overflow-y-auto">
-      {orders.map((order) => {
-        // Determine status
-        const statusText = order.confirmed_by_tutor
-          ? "Priimtas"
-          : order.payment_status === "cancelled"
-          ? "Atšauktas"
-          : "Laukiama";
+      {orders
+        .filter(order => !hiddenBookings.includes(order.id))
+        .map((order) => {
+          const statusText = order.confirmed_by_tutor
+            ? "Priimtas"
+            : order.payment_status === "cancelled"
+            ? "Atšauktas"
+            : "Laukiama";
 
-        const statusColor =
-          statusText === "Priimtas"
-            ? "text-green-600"
-            : statusText === "Atšauktas"
-            ? "text-red-600"
-            : "text-yellow-600";
+          const statusColor =
+            statusText === "Priimtas"
+              ? "text-green-600"
+              : statusText === "Atšauktas"
+              ? "text-red-600"
+              : "text-yellow-600";
 
-        return (
-          <li key={order.id} className="border rounded-md p-4 hover:shadow-md transition">
-            <p><strong>Vardas:</strong> {order.student_name}</p>
-            <p><strong>El. paštas:</strong> {order.student_email}</p>
-            <p><strong>Telefonas:</strong> {order.student_phone ?? "Nenurodytas"}</p>
-            {order.topic && <p><strong>Tema:</strong> {order.topic}</p>}
-            <p className="text-xs text-gray-500">Užsakyta: {new Date(order.created_at).toLocaleString("lt-LT")}</p>
+          return (
+            <li
+              key={order.id}
+              className="relative border rounded-md p-4 hover:shadow-md transition"
+            >
+              {/* X button to hide booking */}
+              <button
+                onClick={() => setHiddenBookings(prev => [...prev, order.id])}
+                className="absolute top-2 right-2 text-gray-500 hover:text-red-600 font-bold"
+              >
+                ×
+              </button>
 
-            {/* Status row */}
-            <p className={`font-semibold mt-2 ${statusColor}`}>
-              <strong>Statusas:</strong> {statusText}
-            </p>
-          </li>
-        );
-      })}
+              <p><strong>Vardas:</strong> {order.student_name}</p>
+              <p><strong>El. paštas:</strong> {order.student_email}</p>
+              <p><strong>Telefonas:</strong> {order.student_phone ?? "Nenurodytas"}</p>
+              {order.topic && <p><strong>Tema:</strong> {order.topic}</p>}
+              <p className="text-xs text-gray-500">Užsakyta: {new Date(order.created_at).toLocaleString("lt-LT")}</p>
+
+              <p className={`font-semibold mt-2 ${statusColor}`}>
+                <strong>Statusas:</strong> {statusText}
+              </p>
+            </li>
+          );
+        })}
     </ul>
   )}
 </section>
+
 
 <section className="bg-white rounded-xl shadow-lg p-8">
   <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Statistika</h2>
