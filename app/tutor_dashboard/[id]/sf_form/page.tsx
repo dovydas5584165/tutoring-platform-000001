@@ -11,7 +11,7 @@ const supabaseUrl = "https://yabbhnnhnrainsakhuio.supabase.co";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "REPLACE_ME";
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-/* ─── Komponentas ──────────────────────────────────────────────────────────── */
+/* ─── Component ─────────────────────────────────────────────────────────────── */
 export default function InvoiceGenerator() {
   const pathname = usePathname();
 
@@ -65,7 +65,6 @@ export default function InvoiceGenerator() {
         setPavarde(data.pavarde);
         setHourlyWage(parseFloat(data.hourly_wage) || 0);
 
-        // Autofill IV_NR if present
         if (data.iv_nr) setIndividualNr(data.iv_nr.toString());
       }
     };
@@ -73,50 +72,49 @@ export default function InvoiceGenerator() {
     fetchTutor();
   }, [tutorId]);
 
-  /* --------- Fetch sum from confirmed bookings --------- */
+  /* --------- Fetch confirmed bookings for current month --------- */
   useEffect(() => {
-  if (!tutorId) return;
+    if (!tutorId) return;
 
-  const fetchTutorWage = async () => {
-    // 1. Count confirmed & not cancelled bookings
-    const { data: bookingsData, count, error: bookingsError } = await supabase
-      .from("bookings")
-      .select("id", { count: "exact" })
-      .eq("tutor_id", tutorId)
-      .eq("confirmed_by_tutor", true)
-      .is("cancelled_at", null);
+    const fetchMonthlyWage = async () => {
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
 
-    if (bookingsError) {
-      console.error("Error fetching bookings count:", bookingsError.message);
-      return;
-    }
+      try {
+        // Count confirmed & not cancelled bookings in the current month
+        const { count, error: bookingsError } = await supabase
+          .from("bookings")
+          .select("id", { count: "exact" })
+          .eq("tutor_id", tutorId)
+          .eq("confirmed_by_tutor", true)
+          .is("cancelled_at", null)
+          .gte("created_at", startOfMonth)
+          .lte("created_at", endOfMonth);
 
-    const confirmedOrders = count ?? 0;
+        if (bookingsError) throw bookingsError;
 
-    // 2. Fetch tutor hourly wage from users table
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("hourly_wage")
-      .eq("id", tutorId)
-      .single();
+        // Fetch tutor hourly wage
+        const { data: userData, error: userError } = await supabase
+          .from("users")
+          .select("hourly_wage")
+          .eq("id", tutorId)
+          .single();
 
-    if (userError) {
-      console.error("Error fetching tutor hourly wage:", userError.message);
-      return;
-    }
+        if (userError) throw userError;
 
-    const hourlyWage = userData?.hourly_wage ?? 0;
+        const hourlyWage = userData?.hourly_wage ?? 0;
+        const confirmedOrders = count ?? 0;
+        const totalWage = confirmedOrders * hourlyWage;
 
-    // 3. Calculate total wage
-    const wage = confirmedOrders * hourlyWage;
+        setSuma(totalWage.toFixed(2));
+      } catch (err: any) {
+        console.error("Error fetching monthly wage:", err.message || err);
+      }
+    };
 
-    setSuma(wage.toFixed(2));
-  };
-
-  fetchTutorWage();
-}, [tutorId]);
-
-
+    fetchMonthlyWage();
+  }, [tutorId]);
 
   /* --------- Helper functions --------- */
   const formattedDate = new Date(data).toLocaleDateString("lt-LT", {
@@ -141,7 +139,6 @@ export default function InvoiceGenerator() {
     }
 
     try {
-      // Save IV_NR to DB if it's empty
       const { data: tutorData, error: fetchError } = await supabase
         .from("users")
         .select("iv_nr")
