@@ -105,7 +105,7 @@ export default function StudentDashboard() {
       const { data: bookingData, error: bookingErr } = await supabase
         .from("bookings")
         .select("id, topic, created_at, lesson_slug")
-        .eq("student_email", user.email) // match student by email (since bookings table does not store student_id)
+        .eq("student_email", user.email)
         .is("cancelled_at", null)
         .order("created_at", { ascending: true });
 
@@ -154,6 +154,7 @@ export default function StudentDashboard() {
 
   const chartOptions: ChartOptions<"line"> = {
     responsive: true,
+    maintainAspectRatio: false, // ✅ important for mobile
     plugins: {
       legend: { position: "bottom" },
       title: { display: true, text: "Mėnesio pažymiai" },
@@ -213,6 +214,7 @@ export default function StudentDashboard() {
       </header>
 
       <main className="flex-grow container mx-auto px-4 sm:px-8 py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+        {/* Lessons & Notes */}
         <section className="bg-white rounded shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Artimiausios pamokos</h2>
           <ul className="space-y-3 text-gray-700">
@@ -245,8 +247,13 @@ export default function StudentDashboard() {
           </ul>
         </section>
 
+        {/* Chart */}
         <section className="bg-white rounded shadow p-6 md:col-span-2">
-          <Line data={chartData} options={chartOptions} />
+          <div className="overflow-x-auto">
+            <div className="min-w-[500px] h-[300px] sm:h-[400px]">
+              <Line data={chartData} options={chartOptions} />
+            </div>
+          </div>
         </section>
       </main>
 
