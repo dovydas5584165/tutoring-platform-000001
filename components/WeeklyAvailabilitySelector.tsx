@@ -9,12 +9,12 @@ import {
   setMinutes,
   startOfToday,
   formatISO,
-  addMinutes,
+  addHours,
 } from "date-fns";
 import { supabase } from "@/lib/supabaseClient";
 
 const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08 to 22
-const MINUTES = [0, 45];
+const MINUTES = [0]; // hourly slots
 
 type Slot = {
   date: Date;
@@ -26,7 +26,7 @@ function slotKey({ date, hour, minute }: Slot) {
   return `${date.toDateString()}-${hour}-${minute}`;
 }
 
-export default function TwoWeekAvailabilityCalendar({ userId }: { userId: string }) {
+export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
   const [showConfirm, setShowConfirm] = useState(false);
@@ -46,13 +46,14 @@ export default function TwoWeekAvailabilityCalendar({ userId }: { userId: string
 
   const handleSubmit = async () => {
     setSubmitting(true);
+
     const rows = Array.from(selectedSlots).map((key) => {
       const [dateStr, hourStr, minStr] = key.split("-");
-      const date = new Date(dateStr);
+      const date = new Date(dateStr); // local Lithuanian time
       const hour = parseInt(hourStr);
       const minute = parseInt(minStr);
       const start = setMinutes(setHours(date, hour), minute);
-      const end = addMinutes(start, 45);
+      const end = addHours(start, 1); // 1-hour slot
 
       return {
         user_id: userId,
@@ -67,6 +68,7 @@ export default function TwoWeekAvailabilityCalendar({ userId }: { userId: string
       alert("Laikai išsaugoti!");
       setSelectedSlots(new Set());
     }
+
     setSubmitting(false);
     setShowConfirm(false);
   };
