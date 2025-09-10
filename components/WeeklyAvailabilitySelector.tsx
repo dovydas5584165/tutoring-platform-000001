@@ -12,8 +12,8 @@ import {
 } from "date-fns";
 import { supabase } from "@/lib/supabaseClient";
 
-const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08:00–22:00
-const MINUTES = [0]; // Hourly slots
+const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08 to 22
+const MINUTES = [0]; // New slots only hourly
 
 type Slot = { date: Date; hour: number; minute: number };
 
@@ -21,11 +21,7 @@ function slotKey({ date, hour, minute }: Slot) {
   return `${date.toISOString().split("T")[0]}-${hour}-${minute}`;
 }
 
-export default function HourlyAvailabilityCalendar({
-  userId,
-}: {
-  userId: string;
-}) {
+export default function HourlyAvailabilityCalendar({ userId }: { userId: string }) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
   const [existingSlots, setExistingSlots] = useState<Set<string>>(new Set());
@@ -49,19 +45,20 @@ export default function HourlyAvailabilityCalendar({
         return;
       }
 
-      const preselected = new Set<string>();
+      const allSlots = new Set<string>();
       const booked = new Set<string>();
 
       data.forEach((row: any) => {
         const date = new Date(row.start_time);
-        const key = slotKey({ date, hour: date.getHours(), minute: 0 });
-        preselected.add(key);
+        const key = slotKey({ date, hour: date.getHours(), minute: date.getMinutes() });
+        allSlots.add(key);
         if (row.is_booked) booked.add(key);
       });
 
-      setExistingSlots(preselected);
+      setExistingSlots(allSlots);
       setBookedSlots(booked);
-      setSelectedSlots(preselected); // show previously saved as active
+      // Optionally mark all existing slots as selected visually
+      setSelectedSlots(new Set(allSlots));
     };
 
     fetchAvailability();
@@ -69,7 +66,8 @@ export default function HourlyAvailabilityCalendar({
 
   const toggleSlot = (slot: Slot) => {
     const key = slotKey(slot);
-    if (bookedSlots.has(key)) return; // prevent clicking booked slots
+    // Prevent adding duplicate booked slot (optional)
+    if (bookedSlots.has(key)) return;
 
     setSelectedSlots((prev) => {
       const newSet = new Set(prev);
@@ -81,32 +79,28 @@ export default function HourlyAvailabilityCalendar({
   const handleSubmit = async () => {
     setSubmitting(true);
 
-    const rows = Array.from(selectedSlots).map((key) => {
-      const [dateStr, hourStr, minStr] = key.split("-");
-      const date = new Date(dateStr);
-      const hour = parseInt(hourStr);
-      const minute = parseInt(minStr);
-      const start = setMinutes(setHours(date, hour), minute);
-      const end = setMinutes(setHours(date, hour + 1), minute);
+    // Only create new hourly slots (minute = 0)
+    const rows = Array.from(selectedSlots)
+      .map((key) => {
+        const [dateStr, hourStr] = key.split("-"); // ignore minute for new
+        const date = new Date(dateStr);
+        const hour = parseInt(hourStr);
+        const start = setMinutes(setHours(date, hour), 0);
+        const end = setMinutes(setHours(date, hour + 1), 0);
+        return { user_id: userId, start_time: formatISO(start), end_time: formatISO(end) };
+      });
 
-      return { user_id: userId, start_time: formatISO(start), end_time: formatISO(end) };
-    });
-
-    // ✅ Deduplicate before upsert
+    // Deduplicate
     const uniqueRows = Array.from(
       new Map(rows.map((r) => [`${r.user_id}-${r.start_time}`, r])).values()
     );
 
-    const { error } = await supabase.from("availability").upsert(uniqueRows, {
-      onConflict: ["user_id", "start_time"],
-    });
+    const { error } = await supabase
+      .from("availability")
+      .upsert(uniqueRows, { onConflict: ["user_id", "start_time"] });
 
-    if (error) {
-      alert("Nepavyko išsaugoti: " + error.message);
-    } else {
-      alert("Laikai išsaugoti!");
-      setExistingSlots(new Set(selectedSlots)); // sync state
-    }
+    if (error) alert("Nepavyko išsaugoti: " + error.message);
+    else alert("Laikai išsaugoti!");
 
     setShowConfirm(false);
     setSubmitting(false);
@@ -150,32 +144,55 @@ export default function HourlyAvailabilityCalendar({
                     const key = slotKey({ date: selectedDate, hour, minute });
                     const selected = selectedSlots.has(key);
                     const booked = bookedSlots.has(key);
-                    const label = `${String(hour).padStart(2, "0")}:${String(
-                      minute
-                    ).padStart(2, "0")}`;
+                    const label = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 
                     return (
                       <button
                         key={key}
-                        onClick={() =>
-                          toggleSlot({ date: selectedDate, hour, minute })
-                        }
-                        disabled={booked}
+                        onClick={() => toggleSlot({ date: selectedDate, hour, minute })}
                         aria-pressed={selected}
-                        className={`px-2 py-2 md:px-3 md:py-2 rounded text-sm font-medium transition
-                          ${
-                            booked
-                              ? "bg-red-400 text-white cursor-not-allowed"
-                              : selected
-                              ? "bg-blue-500 text-white"
-                              : "bg-gray-100 hover:bg-gray-200"
-                          }`}
+                        className={`px-2 py-2 md:px-3 md:py-2 rounded text-sm md:text-sm font-medium transition ${
+                          booked
+                            ? "bg-gray-300 cursor-not-allowed text-gray-600"
+                            : selected
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-100 hover:bg-gray-200"
+                        }`}
                       >
                         {label}
                       </button>
                     );
                   })
                 )}
+
+                {/* Render existing 45-min slots */}
+                {Array.from(existingSlots)
+                  .filter((key) => {
+                    const [dateStr, hourStr, minStr] = key.split("-");
+                    return parseInt(minStr) !== 0 && new Date(dateStr).toDateString() === selectedDate.toDateString();
+                  })
+                  .map((key) => {
+                    const [dateStr, hourStr, minStr] = key.split("-");
+                    const date = new Date(dateStr);
+                    const hour = parseInt(hourStr);
+                    const minute = parseInt(minStr);
+                    const booked = bookedSlots.has(key);
+                    const label = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+                    return (
+                      <button
+                        key={key}
+                        onClick={() => toggleSlot({ date, hour, minute })}
+                        aria-pressed={selectedSlots.has(key)}
+                        className={`px-2 py-2 md:px-3 md:py-2 rounded text-sm md:text-sm font-medium transition ${
+                          booked
+                            ? "bg-gray-300 cursor-not-allowed text-gray-600"
+                            : "bg-gray-100 hover:bg-gray-200"
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
               </div>
             </>
           ) : (
