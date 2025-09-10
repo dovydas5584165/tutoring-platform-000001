@@ -13,7 +13,6 @@ import {
 import { supabase } from "@/lib/supabaseClient";
 
 const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08 to 22
-const MINUTES = [0]; // New slots only hourly
 
 type Slot = { date: Date; hour: number; minute: number };
 
@@ -24,15 +23,13 @@ function slotKey({ date, hour, minute }: Slot) {
 export default function HourlyAvailabilityCalendar({ userId }: { userId: string }) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
-  const [existingSlots, setExistingSlots] = useState<Set<string>>(new Set());
-  const [bookedSlots, setBookedSlots] = useState<Set<string>>(new Set());
+  const [existingSlots, setExistingSlots] = useState<Map<string, { isBooked: boolean }>>(new Map());
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const today = startOfToday();
-  const oneMonthLater = addDays(today, 29); // 30 days total
+  const oneMonthLater = addDays(today, 29);
 
-  // Fetch previously saved availability
   useEffect(() => {
     const fetchAvailability = async () => {
       const { data, error } = await supabase
@@ -45,20 +42,16 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
         return;
       }
 
-      const allSlots = new Set<string>();
-      const booked = new Set<string>();
-
+      const slotMap = new Map<string, { isBooked: boolean }>();
       data.forEach((row: any) => {
         const date = new Date(row.start_time);
         const key = slotKey({ date, hour: date.getHours(), minute: date.getMinutes() });
-        allSlots.add(key);
-        if (row.is_booked) booked.add(key);
+        slotMap.set(key, { isBooked: row.is_booked });
       });
 
-      setExistingSlots(allSlots);
-      setBookedSlots(booked);
-      // Optionally mark all existing slots as selected visually
-      setSelectedSlots(new Set(allSlots));
+      setExistingSlots(slotMap);
+      // Pre-select all existing slots visually
+      setSelectedSlots(new Set(slotMap.keys()));
     };
 
     fetchAvailability();
@@ -66,8 +59,8 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
 
   const toggleSlot = (slot: Slot) => {
     const key = slotKey(slot);
-    // Prevent adding duplicate booked slot (optional)
-    if (bookedSlots.has(key)) return;
+    // Only allow toggling new hourly slots (minute=0 and not in existingSlots)
+    if (existingSlots.has(key)) return;
 
     setSelectedSlots((prev) => {
       const newSet = new Set(prev);
@@ -79,10 +72,14 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
   const handleSubmit = async () => {
     setSubmitting(true);
 
-    // Only create new hourly slots (minute = 0)
-    const rows = Array.from(selectedSlots)
+    // Only insert **new hourly slots**
+    const newSlots = Array.from(selectedSlots)
+      .filter((key) => {
+        const [dateStr, hourStr, minStr] = key.split("-");
+        return parseInt(minStr) === 0 && !existingSlots.has(key);
+      })
       .map((key) => {
-        const [dateStr, hourStr] = key.split("-"); // ignore minute for new
+        const [dateStr, hourStr] = key.split("-");
         const date = new Date(dateStr);
         const hour = parseInt(hourStr);
         const start = setMinutes(setHours(date, hour), 0);
@@ -90,20 +87,82 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
         return { user_id: userId, start_time: formatISO(start), end_time: formatISO(end) };
       });
 
-    // Deduplicate
-    const uniqueRows = Array.from(
-      new Map(rows.map((r) => [`${r.user_id}-${r.start_time}`, r])).values()
-    );
+    if (newSlots.length === 0) {
+      alert("Nėra naujų laikų, kuriuos būtų galima pridėti.");
+      setSubmitting(false);
+      setShowConfirm(false);
+      return;
+    }
 
     const { error } = await supabase
       .from("availability")
-      .upsert(uniqueRows, { onConflict: ["user_id", "start_time"] });
+      .upsert(newSlots, { onConflict: ["user_id", "start_time"] });
 
     if (error) alert("Nepavyko išsaugoti: " + error.message);
     else alert("Laikai išsaugoti!");
 
     setShowConfirm(false);
     setSubmitting(false);
+    // Refresh availability
+    setSelectedSlots(new Set([...selectedSlots, ...newSlots.map((s) => slotKey({ date: new Date(s.start_time), hour: new Date(s.start_time).getHours(), minute: 0 }))]));
+  };
+
+  const renderSlotsForSelectedDate = () => {
+    if (!selectedDate) return null;
+    const dateStr = selectedDate.toISOString().split("T")[0];
+
+    // Collect all slots for the selected day (including legacy 45-min slots)
+    const slots: { key: string; hour: number; minute: number; isBooked: boolean; isNewHourly: boolean }[] = [];
+
+    existingSlots.forEach((v, key) => {
+      if (key.startsWith(dateStr)) {
+        const [_, hourStr, minStr] = key.split("-");
+        slots.push({
+          key,
+          hour: parseInt(hourStr),
+          minute: parseInt(minStr),
+          isBooked: v.isBooked,
+          isNewHourly: false,
+        });
+      }
+    });
+
+    // Add hourly slots if not already in existing
+    HOURS.forEach((hour) => {
+      const key = `${dateStr}-${hour}-0`;
+      if (!existingSlots.has(key)) {
+        slots.push({ key, hour, minute: 0, isBooked: false, isNewHourly: true });
+      }
+    });
+
+    // Sort slots by time
+    slots.sort((a, b) => a.hour * 60 + a.minute - (b.hour * 60 + b.minute));
+
+    return (
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(60px,1fr))] gap-2">
+        {slots.map((slot) => {
+          const selected = selectedSlots.has(slot.key);
+          return (
+            <button
+              key={slot.key}
+              onClick={() =>
+                slot.isNewHourly ? toggleSlot({ date: selectedDate, hour: slot.hour, minute: slot.minute }) : undefined
+              }
+              aria-pressed={selected}
+              className={`px-2 py-2 md:px-3 md:py-2 rounded text-sm md:text-sm font-medium transition ${
+                slot.isBooked
+                  ? "bg-gray-300 cursor-not-allowed text-gray-600"
+                  : selected
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-100 hover:bg-gray-200"
+              }`}
+            >
+              {String(slot.hour).padStart(2, "0")}:{String(slot.minute).padStart(2, "0")}
+            </button>
+          );
+        })}
+      </div>
+    );
   };
 
   return (
@@ -113,7 +172,6 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
       </h2>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Calendar */}
         <div className="w-full md:w-1/2 overflow-x-auto">
           <DayPicker
             mode="single"
@@ -126,7 +184,6 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
           />
         </div>
 
-        {/* Time Slots */}
         <div className="w-full md:w-1/2">
           {selectedDate ? (
             <>
@@ -138,62 +195,7 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
                   day: "numeric",
                 })}
               </h3>
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(60px,1fr))] gap-2">
-                {HOURS.map((hour) =>
-                  MINUTES.map((minute) => {
-                    const key = slotKey({ date: selectedDate, hour, minute });
-                    const selected = selectedSlots.has(key);
-                    const booked = bookedSlots.has(key);
-                    const label = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => toggleSlot({ date: selectedDate, hour, minute })}
-                        aria-pressed={selected}
-                        className={`px-2 py-2 md:px-3 md:py-2 rounded text-sm md:text-sm font-medium transition ${
-                          booked
-                            ? "bg-gray-300 cursor-not-allowed text-gray-600"
-                            : selected
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-100 hover:bg-gray-200"
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })
-                )}
-
-                {/* Render existing 45-min slots */}
-                {Array.from(existingSlots)
-                  .filter((key) => {
-                    const [dateStr, hourStr, minStr] = key.split("-");
-                    return parseInt(minStr) !== 0 && new Date(dateStr).toDateString() === selectedDate.toDateString();
-                  })
-                  .map((key) => {
-                    const [dateStr, hourStr, minStr] = key.split("-");
-                    const date = new Date(dateStr);
-                    const hour = parseInt(hourStr);
-                    const minute = parseInt(minStr);
-                    const booked = bookedSlots.has(key);
-                    const label = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => toggleSlot({ date, hour, minute })}
-                        aria-pressed={selectedSlots.has(key)}
-                        className={`px-2 py-2 md:px-3 md:py-2 rounded text-sm md:text-sm font-medium transition ${
-                          booked
-                            ? "bg-gray-300 cursor-not-allowed text-gray-600"
-                            : "bg-gray-100 hover:bg-gray-200"
-                        }`}
-                      >
-                        {label}
-                      </button>
-                    );
-                  })}
-              </div>
+              {renderSlotsForSelectedDate()}
             </>
           ) : (
             <p className="text-gray-500 text-center md:text-left mt-2">
@@ -203,7 +205,6 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
         </div>
       </div>
 
-      {/* Save Button */}
       <div className="mt-6 flex justify-center md:justify-end">
         <button
           onClick={() => setShowConfirm(true)}
@@ -214,7 +215,6 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
         </button>
       </div>
 
-      {/* Confirmation Modal */}
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50 p-4">
           <div className="bg-white p-6 rounded-lg max-w-md shadow-xl w-full">
