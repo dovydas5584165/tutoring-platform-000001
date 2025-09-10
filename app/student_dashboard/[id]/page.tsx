@@ -27,9 +27,8 @@ ChartJS.register(
   Legend
 );
 
-/* Lithuanian month names, index matches numeric month 1–12 */
 const LT_MONTHS = [
-  "", // placeholder for index 0
+  "",
   "Sausis",
   "Vasaris",
   "Kovas",
@@ -45,14 +44,14 @@ const LT_MONTHS = [
 ];
 
 interface Lesson {
-  id: number;
+  id: string;
   title: string;
   date: string;
 }
-interface Assignment {
-  id: number;
-  title: string;
-  dueDate: string;
+interface Note {
+  id: string;
+  pastabos: string;
+  created_at: string;
 }
 
 export default function StudentDashboard() {
@@ -60,6 +59,8 @@ export default function StudentDashboard() {
 
   const [months, setMonths] = useState<number[]>([]);
   const [grades, setGrades] = useState<number[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [notes, setNotes] = useState<Note[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -72,34 +73,65 @@ export default function StudentDashboard() {
         return;
       }
 
-      const { data, error } = await supabase
+      // ---- Fetch grades ----
+      const { data: gradeData, error: gradeErr } = await supabase
         .from("grades")
         .select("grade, created_at")
         .eq("student_id", user.id);
 
-      if (error) {
-        console.error("Grade fetch:", error.message);
-        return;
-      }
+      if (gradeErr) {
+        console.error("Grade fetch:", gradeErr.message);
+      } else {
+        const m: number[] = [];
+        const g: number[] = [];
 
-      const m: number[] = [];
-      const g: number[] = [];
+        (gradeData as { grade: number; created_at: string }[]).forEach(
+          ({ grade, created_at }) => {
+            m.push(new Date(created_at).getMonth() + 1);
+            g.push(grade);
+          }
+        );
 
-      (data as { grade: number; created_at: string }[]).forEach(
-        ({ grade, created_at }) => {
-          m.push(new Date(created_at).getMonth() + 1); // 1–12
-          g.push(grade);
+        if (m.length === 1) {
+          m.push(m[0] + 0.2);
+          g.push(g[0]);
         }
-      );
 
-      /* Ensure a line if only one data point */
-      if (m.length === 1) {
-        m.push(m[0] + 0.2); // slight x-offset
-        g.push(g[0]);
+        setMonths(m);
+        setGrades(g);
       }
 
-      setMonths(m);
-      setGrades(g);
+      // ---- Fetch bookings (lessons) ----
+      const { data: bookingData, error: bookingErr } = await supabase
+        .from("bookings")
+        .select("id, topic, created_at, lesson_slug")
+        .eq("student_email", user.email) // match student by email (since bookings table does not store student_id)
+        .is("cancelled_at", null)
+        .order("created_at", { ascending: true });
+
+      if (bookingErr) {
+        console.error("Bookings fetch:", bookingErr.message);
+      } else {
+        const mappedLessons: Lesson[] = (bookingData ?? []).map((b) => ({
+          id: b.id,
+          title: b.topic || b.lesson_slug || "Pamoka",
+          date: new Date(b.created_at).toLocaleDateString("lt-LT"),
+        }));
+        setLessons(mappedLessons);
+      }
+
+      // ---- Fetch notes ----
+      const { data: noteData, error: noteErr } = await supabase
+        .from("notes")
+        .select("id, pastabos, created_at")
+        .eq("student_id", user.id)
+        .order("created_at", { ascending: false });
+
+      if (noteErr) {
+        console.error("Notes fetch:", noteErr.message);
+      } else {
+        setNotes(noteData ?? []);
+      }
     })();
   }, []);
 
@@ -115,7 +147,7 @@ export default function StudentDashboard() {
         tension: 0.3,
         pointRadius: 5,
         pointHoverRadius: 7,
-        clip: false
+        clip: false,
       },
     ],
   };
@@ -147,16 +179,6 @@ export default function StudentDashboard() {
       },
     },
   };
-
-  const upcomingLessons: Lesson[] = [
-    { id: 1, title: "Įvadas į R ir RStudio", date: "2025-07-01" },
-    { id: 2, title: "Statistikos pagrindai", date: "2025-07-05" },
-    { id: 3, title: "Excel duomenų analizė", date: "2025-07-10" },
-  ];
-  const assignmentsDue: Assignment[] = [
-    { id: 1, title: "R programavimo namų darbai", dueDate: "2025-07-03" },
-    { id: 2, title: "Matlab užduočių rinkinys", dueDate: "2025-07-07" },
-  ];
 
   const handleLogout = async () => {
     const { error } = await supabase.auth.signOut();
@@ -194,24 +216,32 @@ export default function StudentDashboard() {
         <section className="bg-white rounded shadow p-6">
           <h2 className="text-xl font-semibold mb-4">Artimiausios pamokos</h2>
           <ul className="space-y-3 text-gray-700">
-            {upcomingLessons.map((lesson) => (
-              <li key={lesson.id} className="border-b border-gray-200 pb-2">
-                <div className="font-semibold">{lesson.title}</div>
-                <div className="text-sm text-gray-500">Data: {lesson.date}</div>
-              </li>
-            ))}
+            {lessons.length > 0 ? (
+              lessons.map((lesson) => (
+                <li key={lesson.id} className="border-b border-gray-200 pb-2">
+                  <div className="font-semibold">{lesson.title}</div>
+                  <div className="text-sm text-gray-500">Data: {lesson.date}</div>
+                </li>
+              ))
+            ) : (
+              <li className="text-gray-500">Nėra suplanuotų pamokų.</li>
+            )}
           </ul>
 
-          <h2 className="text-xl font-semibold mt-8 mb-4">Artimiausi darbai</h2>
+          <h2 className="text-xl font-semibold mt-8 mb-4">Pastabos</h2>
           <ul className="space-y-3 text-gray-700">
-            {assignmentsDue.map((assignment) => (
-              <li key={assignment.id} className="border-b border-gray-200 pb-2">
-                <div className="font-semibold">{assignment.title}</div>
-                <div className="text-sm text-red-600">
-                  Terminas: {assignment.dueDate}
-                </div>
-              </li>
-            ))}
+            {notes.length > 0 ? (
+              notes.map((note) => (
+                <li key={note.id} className="border-b border-gray-200 pb-2">
+                  <div className="text-sm">{note.pastabos}</div>
+                  <div className="text-xs text-gray-400">
+                    {new Date(note.created_at).toLocaleDateString("lt-LT")}
+                  </div>
+                </li>
+              ))
+            ) : (
+              <li className="text-gray-500">Nėra pastabų.</li>
+            )}
           </ul>
         </section>
 
@@ -221,7 +251,7 @@ export default function StudentDashboard() {
       </main>
 
       <footer className="bg-white border-t border-gray-200 text-center py-4 text-sm text-gray-500">
-        © 2025 Tiksliukai.lt
+        © 2025 Tiksliukai.lt
       </footer>
     </div>
   );
