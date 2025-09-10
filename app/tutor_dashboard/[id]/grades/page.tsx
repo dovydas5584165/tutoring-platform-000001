@@ -16,14 +16,14 @@ type Lesson = {
   name: string;
 };
 
-export default function GradeForm() {
+export default function GradeAndNotesForm() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [selectedLessonId, setSelectedLessonId] = useState<string>("");
   const [grade, setGrade] = useState<string>("");
 
-  // pastabos independent
+  // Notes
   const [pastabos, setPastabos] = useState<string>("");
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function GradeForm() {
     setGrade("");
   };
 
-  // Handle pastabos submission independently
+  // Handle pastabos submission
   const handlePastabosSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -95,8 +95,21 @@ export default function GradeForm() {
       return;
     }
 
+    // Get logged-in tutor
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      alert("Nepavyko nustatyti dėstytojo. Bandykite dar kartą.");
+      return;
+    }
+
+    // Insert into notes
     const { error } = await supabase.from("notes").insert({
       student_id: selectedUserId,
+      tutor_id: user.id, // 👈 only tutor_id
       pastabos,
     });
 
