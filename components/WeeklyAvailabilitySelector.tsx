@@ -12,7 +12,7 @@ import {
 } from "date-fns";
 import { supabase } from "@/lib/supabaseClient";
 
-const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08 to 22
+const HOURS = Array.from({ length: 15 }, (_, i) => i + 8); // 08:00–22:00
 const MINUTES = [0]; // Hourly slots
 
 type Slot = { date: Date; hour: number; minute: number };
@@ -21,10 +21,15 @@ function slotKey({ date, hour, minute }: Slot) {
   return `${date.toISOString().split("T")[0]}-${hour}-${minute}`;
 }
 
-export default function HourlyAvailabilityCalendar({ userId }: { userId: string }) {
+export default function HourlyAvailabilityCalendar({
+  userId,
+}: {
+  userId: string;
+}) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>();
   const [selectedSlots, setSelectedSlots] = useState<Set<string>>(new Set());
   const [existingSlots, setExistingSlots] = useState<Set<string>>(new Set());
+  const [bookedSlots, setBookedSlots] = useState<Set<string>>(new Set());
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -54,8 +59,9 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
         if (row.is_booked) booked.add(key);
       });
 
-      setExistingSlots(booked);
-      setSelectedSlots(preselected);
+      setExistingSlots(preselected);
+      setBookedSlots(booked);
+      setSelectedSlots(preselected); // show previously saved as active
     };
 
     fetchAvailability();
@@ -63,7 +69,7 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
 
   const toggleSlot = (slot: Slot) => {
     const key = slotKey(slot);
-    if (existingSlots.has(key)) return;
+    if (bookedSlots.has(key)) return; // prevent clicking booked slots
 
     setSelectedSlots((prev) => {
       const newSet = new Set(prev);
@@ -86,12 +92,21 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
       return { user_id: userId, start_time: formatISO(start), end_time: formatISO(end) };
     });
 
-    const { error } = await supabase.from("availability").upsert(rows, {
+    // ✅ Deduplicate before upsert
+    const uniqueRows = Array.from(
+      new Map(rows.map((r) => [`${r.user_id}-${r.start_time}`, r])).values()
+    );
+
+    const { error } = await supabase.from("availability").upsert(uniqueRows, {
       onConflict: ["user_id", "start_time"],
     });
 
-    if (error) alert("Nepavyko išsaugoti: " + error.message);
-    else alert("Laikai išsaugoti!");
+    if (error) {
+      alert("Nepavyko išsaugoti: " + error.message);
+    } else {
+      alert("Laikai išsaugoti!");
+      setExistingSlots(new Set(selectedSlots)); // sync state
+    }
 
     setShowConfirm(false);
     setSubmitting(false);
@@ -134,22 +149,27 @@ export default function HourlyAvailabilityCalendar({ userId }: { userId: string 
                   MINUTES.map((minute) => {
                     const key = slotKey({ date: selectedDate, hour, minute });
                     const selected = selectedSlots.has(key);
-                    const disabled = existingSlots.has(key);
-                    const label = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+                    const booked = bookedSlots.has(key);
+                    const label = `${String(hour).padStart(2, "0")}:${String(
+                      minute
+                    ).padStart(2, "0")}`;
 
                     return (
                       <button
                         key={key}
-                        onClick={() => toggleSlot({ date: selectedDate, hour, minute })}
-                        disabled={disabled}
+                        onClick={() =>
+                          toggleSlot({ date: selectedDate, hour, minute })
+                        }
+                        disabled={booked}
                         aria-pressed={selected}
-                        className={`px-2 py-2 md:px-3 md:py-2 rounded text-sm md:text-sm font-medium transition ${
-                          selected
-                            ? "bg-blue-500 text-white"
-                            : disabled
-                            ? "bg-gray-300 cursor-not-allowed"
-                            : "bg-gray-100 hover:bg-gray-200"
-                        }`}
+                        className={`px-2 py-2 md:px-3 md:py-2 rounded text-sm font-medium transition
+                          ${
+                            booked
+                              ? "bg-red-400 text-white cursor-not-allowed"
+                              : selected
+                              ? "bg-blue-500 text-white"
+                              : "bg-gray-100 hover:bg-gray-200"
+                          }`}
                       >
                         {label}
                       </button>
