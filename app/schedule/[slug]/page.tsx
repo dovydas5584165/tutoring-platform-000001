@@ -461,7 +461,6 @@ export default function ScheduleLanding() {
       )}
        {/* Section 7: Mūsų Mokytojai */}
 <motion.section
-  ref={teacherRef}
   initial={{ opacity: 0, y: 60 }}
   whileInView={{ opacity: 1, y: 0 }}
   viewport={{ once: true }}
