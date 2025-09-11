@@ -9,32 +9,6 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   const router = useRouter();
 
-  // --- Refs ---
-  const firstSectionRef = useRef<HTMLElement>(null);
-
-  // --- Scroll function ---
-  const scrollToVideo = () => {
-    videoRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  return (
-    <main>
-      {/* First Section */}
-      <section ref={firstSectionRef} className="relative ...">
-        {/* content */}
-        <button onClick={scrollToVideo} className="absolute bottom-6 right-6 ...">
-          Plačiau ⬇️
-        </button>
-      </section>
-
-      {/* Video Section */}
-      <section className="...">
-        <video ref={videoRef} ... />
-      </section>
-    </main>
-  );
-}
-
   // === State & Refs ===
   const [showHeader, setShowHeader] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -42,10 +16,15 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const lastScrollY = useRef(0);
+  const firstSectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const teacherRef = useRef<HTMLDivElement>(null);
 
-  // === Scroll header hide/show ===
+  // === Scroll functions ===
+  const scrollToVideo = () => videoRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToTeachers = () => teacherRef.current?.scrollIntoView({ behavior: "smooth" });
+
+  // === Header hide/show ===
   useEffect(() => {
     const handleScroll = () => {
       setShowHeader(window.scrollY <= lastScrollY.current || window.scrollY < 10);
@@ -57,38 +36,34 @@ export default function Home() {
 
   // === Video auto play/pause ===
   useEffect(() => {
-  const videoEl = videoRef.current;
-  if (!videoEl) return;
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
-  // Make sure video is ready to play
-  videoEl.muted = true;
-  videoEl.playsInline = true;
-  videoEl.pause();
-  videoEl.currentTime = 0;
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-          videoEl.play().catch(() => {
-            // Autoplay might fail, ignore
-          });
-        } else {
-          videoEl.pause();
-        }
-      });
-    },
-    { threshold: 0.5 }
-  );
-
-  observer.observe(videoEl);
-
-  return () => {
-    observer.disconnect();
+    videoEl.muted = true;
+    videoEl.playsInline = true;
     videoEl.pause();
-  };
-}, []);
+    videoEl.currentTime = 0;
 
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            videoEl.play().catch(() => {});
+          } else {
+            videoEl.pause();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(videoEl);
+
+    return () => {
+      observer.disconnect();
+      videoEl.pause();
+    };
+  }, []);
 
   // === Auth check ===
   useEffect(() => {
