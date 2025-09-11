@@ -222,23 +222,25 @@ export default function Home() {
 </section>
 
 
-
         {/* Section 2: Hero video */}
-        <motion.section
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 to-white snap-start px-6 py-20"
-        >
-          <video
-            ref={videoRef}
-            className="w-full max-w-6xl rounded-none"
-            muted
-            playsInline
-            src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/videos/60d7accd-ab26-4a57-b66a-462e1f6d0e0b.mov"
-          />
-        </motion.section>
+<motion.section
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  className="w-full min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-100 to-white snap-start px-6 py-20 relative"
+>
+  <video
+    ref={videoRef}
+    className="w-full max-w-6xl h-auto object-cover rounded-lg shadow-lg"
+    muted
+    playsInline
+    controls={false}
+    preload="auto"
+    src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/videos/60d7accd-ab26-4a57-b66a-462e1f6d0e0b.mov"
+  />
+</motion.section>
+
 
         <motion.section
   initial={{ opacity: 0, y: 60 }}
