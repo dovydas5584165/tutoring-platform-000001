@@ -95,7 +95,8 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const scrollToTeachers = () => teacherRef.current?.scrollIntoView({ behavior: "smooth" });
+  // === Scroll to video function ===
+  const scrollToVideo = () => videoRef.current?.scrollIntoView({ behavior: "smooth" });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -132,7 +133,7 @@ export default function Home() {
     return <div className="text-5xl font-extrabold text-blue-600 select-none">{count}+</div>;
   }
 
-  return (
+  return(
     <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans">
       {/* Header */}
       <header
