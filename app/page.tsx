@@ -9,6 +9,32 @@ import { Button } from "@/components/ui/button";
 export default function Home() {
   const router = useRouter();
 
+  // --- Refs ---
+  const firstSectionRef = useRef<HTMLElement>(null);
+
+  // --- Scroll function ---
+  const scrollToVideo = () => {
+    videoRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  return (
+    <main>
+      {/* First Section */}
+      <section ref={firstSectionRef} className="relative ...">
+        {/* content */}
+        <button onClick={scrollToVideo} className="absolute bottom-6 right-6 ...">
+          Plačiau ⬇️
+        </button>
+      </section>
+
+      {/* Video Section */}
+      <section className="...">
+        <video ref={videoRef} ... />
+      </section>
+    </main>
+  );
+}
+
   // === State & Refs ===
   const [showHeader, setShowHeader] = useState(true);
   const [user, setUser] = useState<any>(null);
@@ -199,21 +225,33 @@ export default function Home() {
       {/* Main content */}
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
         {/* Section 1: Lessons */}
-        <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white">
-          <div className="h-24"></div> {/* spacer for header */}
+<section
+  ref={firstSectionRef}
+  className="relative w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white"
+>
   <h1 className="text-5xl font-extrabold mb-10 text-center">Pasirinkite pamoką</h1>
-  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl">
     {lessons.map((lesson) => (
       <Button
         key={lesson.slug}
-        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
+        className="w-full min-w-0 px-6 py-4 text-xl font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
         onClick={() => router.push(`/schedule/${lesson.slug}`)}
       >
         {lesson.name}
       </Button>
     ))}
   </div>
+
+  {/* Scroll Button */}
+  <button
+    onClick={scrollToVideo}
+    className="absolute bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg animate-bounce transition-transform duration-300 hover:scale-110"
+    aria-label="Scroll to video section"
+  >
+    Plačiau ⬇️
+  </button>
 </section>
+
 
 
         {/* Section 2: Hero video */}
@@ -229,6 +267,7 @@ export default function Home() {
             className="w-full max-w-6xl rounded-none"
             muted
             playsInline
+            preload="auto"
             src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/videos/60d7accd-ab26-4a57-b66a-462e1f6d0e0b.mov"
           />
         </motion.section>
@@ -252,18 +291,38 @@ export default function Home() {
 
         {/* Section 4: Apie mus */}
         <motion.section
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="w-full min-h-screen flex flex-col justify-center items-center bg-blue-50 snap-start px-6 py-20"
-        >
-          <h2 className="text-5xl font-extrabold mb-8 text-center">Apie mus</h2>
-          <p className="max-w-3xl text-xl text-gray-700 leading-relaxed text-center">
-            Tiksliukai.lt – tai platforma, sukurta padėti mokiniams rasti aukštos kokybės korepetitorius.
-            Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir patogesnis kiekvienam mokiniui Lietuvoje.
-          </p>
-        </motion.section>
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  className="w-full min-h-screen flex flex-col justify-center items-center bg-blue-50 snap-start px-6 py-20"
+>
+  <h2 className="text-5xl font-extrabold mb-8 text-center">Apie mus</h2>
+  <p className="max-w-3xl text-xl text-gray-700 leading-relaxed text-center mb-6">
+    Tiksliukai.lt – tai platforma, sukurta padėti mokiniams rasti aukštos kokybės korepetitorius.
+    Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir patogesnis kiekvienam mokiniui Lietuvoje.
+  </p>
+
+  {/* Social links */}
+  <div className="flex gap-6">
+    <a
+      href="https://www.instagram.com/tiksliukai.lt/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-pink-500 hover:text-pink-600 text-2xl font-bold"
+    >
+      Instagram
+    </a>
+    <a
+      href="https://www.facebook.com/tiksliukai"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-600 hover:text-blue-700 text-2xl font-bold"
+    >
+      Facebook
+    </a>
+  </div>
+</motion.section>
 
         {/* Section 5: Misija ir vizija */}
 <motion.section
