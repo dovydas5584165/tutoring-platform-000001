@@ -4,80 +4,69 @@ import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, animate } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
-import { Button } from "@/components/ui/button"; // <-- Import your Button component
-const [showHeader, setShowHeader] = useState(true);
-const lastScrollY = useRef(0);
-
-useEffect(() => {
-  const handleScroll = () => {
-    if (window.scrollY > lastScrollY.current) {
-      setShowHeader(false); // hide header on scroll down
-    } else {
-      setShowHeader(true); // show header on scroll up
-    }
-    lastScrollY.current = window.scrollY;
-  };
-
-  window.addEventListener("scroll", handleScroll);
-  return () => window.removeEventListener("scroll", handleScroll);
-}, []);
-
-
-
-const lessons = [
-  { name: "IT", slug: "it" },
-  { name: "Matematika", slug: "matematika" },
-  { name: "Fizika", slug: "fizika" },
-  { name: "Biologija", slug: "biologija" },
-  { name: "Chemija", slug: "chemija" },
-  { name: "Anglų k.", slug: "anglu-k" },
-];
-
-function AnimatedNumber({ value }: { value: number }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    const controls = animate(0, value, {
-      duration: 1.5,
-      onUpdate(latest) {
-        setCount(Math.floor(latest));
-      },
-    });
-    return () => controls.stop();
-  }, [value]);
-
-  return (
-    <div className="text-5xl font-extrabold text-blue-600 select-none">{count}+</div>
-  );
-}
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const router = useRouter();
-  const teacherRef = useRef<HTMLDivElement>(null);
+
+  // === State & Refs ===
+  const [showHeader, setShowHeader] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const lastScrollY = useRef(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const teacherRef = useRef<HTMLDivElement>(null);
+
+  // === Scroll header hide/show ===
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowHeader(window.scrollY <= lastScrollY.current || window.scrollY < 10);
+      lastScrollY.current = window.scrollY;
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // === Video auto play/pause ===
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            videoEl.play().catch(() => {});
+          } else {
+            videoEl.pause();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(videoEl);
+    return () => observer.disconnect();
+  }, []);
+
+  // === Auth check ===
   useEffect(() => {
     const checkAuth = async () => {
       try {
         const { data: { user }, error } = await supabase.auth.getUser();
-
         if (user && !error) {
           setUser(user);
-
           const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('role, vardas, pavarde')
-            .eq('id', user.id)
+            .from("users")
+            .select("role, vardas, pavarde")
+            .eq("id", user.id)
             .single();
-
-          if (!userError && userData) {
-            setUserRole(userData.role);
-          }
+          if (!userError && userData) setUserRole(userData.role);
         }
-      } catch (error) {
-        console.error('Error checking auth:', error);
+      } catch (err) {
+        console.error("Error checking auth:", err);
       } finally {
         setLoading(false);
       }
@@ -85,11 +74,11 @@ export default function Home() {
 
     checkAuth();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
         setUser(session.user);
         checkAuth();
-      } else if (event === 'SIGNED_OUT') {
+      } else if (event === "SIGNED_OUT") {
         setUser(null);
         setUserRole(null);
       }
@@ -98,9 +87,7 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const scrollToTeachers = () => {
-    teacherRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollToTeachers = () => teacherRef.current?.scrollIntoView({ behavior: "smooth" });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -108,79 +95,98 @@ export default function Home() {
     setUserRole(null);
   };
 
+  const lessons = [
+    { name: "IT", slug: "it" },
+    { name: "Matematika", slug: "matematika" },
+    { name: "Fizika", slug: "fizika" },
+    { name: "Biologija", slug: "biologija" },
+    { name: "Chemija", slug: "chemija" },
+    { name: "Anglų k.", slug: "anglu-k" },
+  ];
+
   const stats = [
     { icon: "📚", number: 1000, label: "pravestų pamokų" },
     { icon: "😊", number: 100, label: "laimingų klientų" },
     { icon: "🔟", number: 10, label: "gerų pažymių lietus" },
   ];
 
+  function AnimatedNumber({ value }: { value: number }) {
+    const [count, setCount] = useState(0);
+    useEffect(() => {
+      const controls = animate(0, value, {
+        duration: 1.5,
+        onUpdate(latest) {
+          setCount(Math.floor(latest));
+        },
+      });
+      return () => controls.stop();
+    }, [value]);
+    return <div className="text-5xl font-extrabold text-blue-600 select-none">{count}+</div>;
+  }
+
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans">
       {/* Header */}
-<header
-  className={`fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${
-    showHeader ? "translate-y-0" : "-translate-y-full"
-  }`}
->
-  <div className="flex justify-between items-center px-4 sm:px-8 py-3">
-    <div className="text-2xl font-extrabold tracking-tight">Tiksliukai.lt</div>
-    <nav>
-      {loading ? (
-        <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
-      ) : user ? (
-        <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-600">Hello, {user.email}</span>
-          {userRole === 'tutor' && (
-            <Button
-              onClick={() => router.push('/tutor_dashboard')}
-              className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
-            >
-              Tutor Dashboard
-            </Button>
-          )}
-          {userRole === 'client' && (
-            <Button
-              onClick={() => router.push('/student_dashboard')}
-              className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
-            >
-              Student Dashboard
-            </Button>
-          )}
-          <Button
-            onClick={handleLogout}
-            className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-1 text-sm"
-          >
-            Logout
-          </Button>
+      <header
+        className={`fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${
+          showHeader ? "translate-y-0" : "-translate-y-full"
+        }`}
+      >
+        <div className="flex justify-between items-center px-4 sm:px-8 py-3">
+          <div className="text-2xl font-extrabold tracking-tight">Tiksliukai.lt</div>
+          <nav>
+            {loading ? (
+              <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+            ) : user ? (
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600">Hello, {user.email}</span>
+                {userRole === "tutor" && (
+                  <Button
+                    onClick={() => router.push("/tutor_dashboard")}
+                    className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
+                  >
+                    Tutor Dashboard
+                  </Button>
+                )}
+                {userRole === "client" && (
+                  <Button
+                    onClick={() => router.push("/student_dashboard")}
+                    className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
+                  >
+                    Student Dashboard
+                  </Button>
+                )}
+                <Button
+                  onClick={handleLogout}
+                  className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-1 text-sm"
+                >
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => router.push("/auth/log-in")}
+                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm"
+                >
+                  Log In
+                </Button>
+                <Button
+                  onClick={() => router.push("/auth")}
+                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm"
+                >
+                  Sign Up
+                </Button>
+              </div>
+            )}
+          </nav>
         </div>
-      ) : (
-        <div className="flex gap-2">
-          <Button
-            onClick={() => router.push("/auth/log-in")}
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm"
-          >
-            Log In
-          </Button>
-          <Button
-            onClick={() => router.push("/auth")}
-            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm"
-          >
-            Sign Up
-          </Button>
-        </div>
-      )}
-    </nav>
-  </div>
-</header>
-
-
+      </header>
 
       {/* Main content */}
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
-        {/* Section 1: Pasirink pamoką */}
-        <section
-         className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white"
-        >
+        {/* Section 1: Lessons */}
+        <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white">
           <h1 className="text-5xl font-extrabold mb-10 text-center">Pasirinkite pamoką</h1>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl">
             {lessons.map((lesson) => (
@@ -188,10 +194,9 @@ export default function Home() {
                 key={lesson.slug}
                 className="w-full min-w-0 px-6 py-4 text-xl font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
                 onClick={() => router.push(`/schedule/${lesson.slug}`)}
-                >
+              >
                 {lesson.name}
               </Button>
-
             ))}
           </div>
         </section>
@@ -205,15 +210,12 @@ export default function Home() {
           className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 to-white snap-start px-6 py-20"
         >
           <video
+            ref={videoRef}
             className="w-full max-w-6xl rounded-none"
-            autoPlay
             muted
             playsInline
             src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/videos/60d7accd-ab26-4a57-b66a-462e1f6d0e0b.mov"
           />
-          <Button onClick={scrollToTeachers} className="mt-10 px-6 py-3 text-lg">
-            Mūsų mokytojai
-          </Button>
         </motion.section>
 
         <motion.section
@@ -230,9 +232,6 @@ export default function Home() {
     Pasirink pamoką, rezervuok ją apmokėdamas, gauk nuorodą į pamoką.
   </p>
 </motion.section>
-
-
-        {/* Additional sections remain unchanged, only headers, text, and layout preserved */}
 
         
 
