@@ -16,15 +16,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const lastScrollY = useRef(0);
-  const firstSectionRef = useRef<HTMLElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const teacherRef = useRef<HTMLDivElement>(null);
 
-  // === Scroll functions ===
-  const scrollToVideo = () => videoRef.current?.scrollIntoView({ behavior: "smooth" });
-  const scrollToTeachers = () => teacherRef.current?.scrollIntoView({ behavior: "smooth" });
-
-  // === Header hide/show ===
+  // === Scroll header hide/show ===
   useEffect(() => {
     const handleScroll = () => {
       setShowHeader(window.scrollY <= lastScrollY.current || window.scrollY < 10);
@@ -36,34 +31,38 @@ export default function Home() {
 
   // === Video auto play/pause ===
   useEffect(() => {
-    const videoEl = videoRef.current;
-    if (!videoEl) return;
+  const videoEl = videoRef.current;
+  if (!videoEl) return;
 
-    videoEl.muted = true;
-    videoEl.playsInline = true;
+  // Make sure video is ready to play
+  videoEl.muted = true;
+  videoEl.playsInline = true;
+  videoEl.pause();
+  videoEl.currentTime = 0;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          videoEl.play().catch(() => {
+            // Autoplay might fail, ignore
+          });
+        } else {
+          videoEl.pause();
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
+
+  observer.observe(videoEl);
+
+  return () => {
+    observer.disconnect();
     videoEl.pause();
-    videoEl.currentTime = 0;
+  };
+}, []);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            videoEl.play().catch(() => {});
-          } else {
-            videoEl.pause();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(videoEl);
-
-    return () => {
-      observer.disconnect();
-      videoEl.pause();
-    };
-  }, []);
 
   // === Auth check ===
   useEffect(() => {
@@ -199,17 +198,17 @@ export default function Home() {
 
       {/* Main content */}
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
-        {/* Section 1: Lessons */}
-<section
-  ref={firstSectionRef}
-  className="relative w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white"
->
+        const scrollToVideo = () => videoRef.current?.scrollIntoView({ behavior: "smooth" });
+
+{/* Section 1: Lessons */}
+<section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white">
+  <div className="h-24"></div> {/* spacer for header */}
   <h1 className="text-5xl font-extrabold mb-10 text-center">Pasirinkite pamoką</h1>
-  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl">
+  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
     {lessons.map((lesson) => (
       <Button
         key={lesson.slug}
-        className="w-full min-w-0 px-6 py-4 text-xl font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
+        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
         onClick={() => router.push(`/schedule/${lesson.slug}`)}
       >
         {lesson.name}
@@ -228,7 +227,6 @@ export default function Home() {
 </section>
 
 
-
         {/* Section 2: Hero video */}
         <motion.section
           initial={{ opacity: 0, y: 60 }}
@@ -242,7 +240,6 @@ export default function Home() {
             className="w-full max-w-6xl rounded-none"
             muted
             playsInline
-            preload="auto"
             src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/videos/60d7accd-ab26-4a57-b66a-462e1f6d0e0b.mov"
           />
         </motion.section>
@@ -265,7 +262,7 @@ export default function Home() {
         
 
         {/* Section 4: Apie mus */}
-        <motion.section
+<motion.section
   initial={{ opacity: 0, y: 60 }}
   whileInView={{ opacity: 1, y: 0 }}
   viewport={{ once: true }}
