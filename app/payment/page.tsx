@@ -205,11 +205,13 @@ function PaymentContent() {
                     </div>
                     <div className="ml-3">
                       <h3 className="text-sm font-medium text-yellow-800">
-                        Laukiama korepetitoriaus patvirtinimo
+                        Informacija apie mokėjimą
                       </h3>
                       <p className="text-sm text-yellow-700 mt-1">
                         Jūsų mokėjimas bus apdorotas dabar, tačiau korepetitorius turi patvirtinti rezervaciją. 
-                        Sąskaita bus atsiųsta el. paštu, o korepetitorius susisieks tiesiogiai po patvirtinimo.
+                        Korepetitorius atsiųs pamokos nuorodą į nurodytą el. paštą apie 30 min prieš pamoką.
+                        Jei korepetitorius negalėtų nei pamokos pravesti nei perkelti, Stripe automatiškai grąžins Jūsų pinigus ne ilgiau nei per 3 darbo dienas.
+                        Vėlavimo atveju, nepranešus iš anksto, korepetitorius gali atsijungti po 10 min laukimo.
                       </p>
                     </div>
                   </div>
