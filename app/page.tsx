@@ -31,25 +31,38 @@ export default function Home() {
 
   // === Video auto play/pause ===
   useEffect(() => {
-    const videoEl = videoRef.current;
-    if (!videoEl) return;
+  const videoEl = videoRef.current;
+  if (!videoEl) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            videoEl.play().catch(() => {});
-          } else {
-            videoEl.pause();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
+  // Make sure video is ready to play
+  videoEl.muted = true;
+  videoEl.playsInline = true;
+  videoEl.pause();
+  videoEl.currentTime = 0;
 
-    observer.observe(videoEl);
-    return () => observer.disconnect();
-  }, []);
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          videoEl.play().catch(() => {
+            // Autoplay might fail, ignore
+          });
+        } else {
+          videoEl.pause();
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
+
+  observer.observe(videoEl);
+
+  return () => {
+    observer.disconnect();
+    videoEl.pause();
+  };
+}, []);
+
 
   // === Auth check ===
   useEffect(() => {
@@ -187,19 +200,21 @@ export default function Home() {
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
         {/* Section 1: Lessons */}
         <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white">
-          <h1 className="text-5xl font-extrabold mb-10 text-center">Pasirinkite pamoką</h1>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl">
-            {lessons.map((lesson) => (
-              <Button
-                key={lesson.slug}
-                className="w-full min-w-0 px-6 py-4 text-xl font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
-                onClick={() => router.push(`/schedule/${lesson.slug}`)}
-              >
-                {lesson.name}
-              </Button>
-            ))}
-          </div>
-        </section>
+          <div className="h-24"></div> {/* spacer for header */}
+  <h1 className="text-5xl font-extrabold mb-10 text-center">Pasirinkite pamoką</h1>
+  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
+    {lessons.map((lesson) => (
+      <Button
+        key={lesson.slug}
+        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
+        onClick={() => router.push(`/schedule/${lesson.slug}`)}
+      >
+        {lesson.name}
+      </Button>
+    ))}
+  </div>
+</section>
+
 
         {/* Section 2: Hero video */}
         <motion.section
