@@ -7,6 +7,8 @@ import { format, isSameDay, parseISO, addDays } from "date-fns";
 import { lt } from "date-fns/locale";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { motion } from "framer-motion";
+
 
 type Availability = {
   id: number;
@@ -457,6 +459,80 @@ export default function ScheduleLanding() {
           loading={bookingSubmitting}
         />
       )}
+       {/* Section 7: Mūsų Mokytojai */}
+<motion.section
+  ref={teacherRef}
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  className="w-full min-h-screen flex flex-col justify-center items-center bg-white snap-start px-6 py-32"
+>
+  <h2 className="text-5xl font-extrabold mb-12 text-center">Mūsų Mokytojai</h2>
+
+  <div className="flex gap-8 justify-center flex-wrap max-w-6xl mx-auto">
+    {[
+      {
+        name: "Justė Giedraitytė",
+        subject: "Matematika, anglų kalba",
+        experience: "2 metai",
+        description: "Esu Justė, politikos mokslų studentė iš Vilniaus. Ne visada mylėjau matematiką ir prisiekinėjau sau, jog nieko bendro su tuo neturėsiu ateityje. Tačiau ilgainiui, su daug sunkaus darbo, pamilau matematiką ir net vienus savo gyvenimo metus ją studijavau! Tas, manau, ir yra unikalu apie mane - žinau, kaip paaiškinti užduotis, taip, kad net visiškai žalias suprastų:) ",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/IMG_5420.jpeg",
+      },
+      {
+        name: "Aleksandras Šileika",
+        subject: "Matematika",
+        experience: "1 metai",
+        description: "Esu matematikos korepetitorius, studijuojantis matematiką Bonos universitete (Vokietijoje). Iš matematikos VBE gavau 100 balų. Puikiai suprantu atnaujintą bendrąją ugdymo programą ir žinau, kokie iššūkiai laukia mokinių ruošiantis kontroliniams, NMPP, PUPP ar VBE.",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/E0Tsj4D9OTOfOSOhS6zfFxwscH4sVtb8INL9xPp4.jpg",
+      },
+      {
+        name: "Darija Stanislavovaitė",
+        subject: "IT",
+        experience: "1 metai",
+        description: "Draugiška mokytoja, kuri moko per praktinius pavyzdžius. Darija yra VGTU studentė ir informatikos korepetitorė.",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/da.jpg",
+      },
+      {
+        name: "Nomeda Sabienė",
+        subject: "Chemija, biologija, fizika",
+        experience: "15 metų",
+        description: "Esu aplinkos chemijos ir ekologijos mokslų daktarė, gamtos mokslus suprantu kaip vientisą nedalomą/holistinę visumą. Galiu paaiškinti įvairius chemijos, fizikos, biologijos klausimus iš visų šių mokslų pozicijų. Ilgametė pedagoginė patirtis leidžia suteikti pagrindus sunkiau besimokantiems, ruošti moksleivius olimpiadoms ir VBE. Mano moto: kartu lengviau! ",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/20200624_203645-1.jpg",
+      },
+      {
+        name: "Kajus Tutor",
+        subject: "Matematika, fizika",
+        experience: "2 metai",
+        description: "Esu Kajus, mokau matematiką ir fiziką. Mėgstu paaiškinti sudėtingas temas paprastai ir suprantamai, kad kiekvienas mokinys galėtų jas įsisavinti.",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/anon.avif",
+      },
+      {
+        name: "Kristina Balnytė",
+        subject: "Matematika, anglų kalba",
+        experience: "2 metai",
+        description: "Esu matematikos ir lietuvių kalbos korepetitorė. Padedu pasiruošti atsiskaitymams, kontroliniams darbams, atlikti namų darbus ar pagilinti žinias. Kiekvienam mokiniui taikau individualią mokymo strategiją, nes žinau, kad vieno „stebuklingo“ metodo nėra. Mano tikslas - ne tik geresni pažymiai, bet ir augantis pasitikėjimas savimi. Jei ieškote korepetitoriaus, kuris aiškiai paaiškina, palaiko ir motyvuoja, mielai padėsiu jūsų vaikui žengti pirmyn.",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
+      },
+    ].map((teacher, i) => (
+      <div
+        key={i}
+        className="w-72 bg-blue-50 rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
+      >
+        <img
+          src={teacher.img}
+          alt={teacher.name}
+          className="h-40 w-40 object-cover rounded-full mb-4"
+        />
+        <h3 className="text-xl font-bold mb-2 text-center">{teacher.name}</h3>
+        <p className="text-gray-600 text-sm text-center mb-2">
+          Specializacija: {teacher.subject} <br /> Patirtis: {teacher.experience}
+        </p>
+        <p className="text-gray-700 text-sm text-center">{teacher.description}</p>
+      </div>
+    ))}
+  </div>
+</motion.section>
     </div>
   );
 }
