@@ -232,7 +232,7 @@ export default function Home() {
 >
   <video
     ref={videoRef}
-    className="w-full max-w-6xl h-auto object-cover rounded-lg shadow-lg"
+    className="w-full max-w-6xl h-auto object-cover"
     muted
     playsInline
     controls={false}
