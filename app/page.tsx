@@ -5,6 +5,23 @@ import { useRouter } from "next/navigation";
 import { motion, animate } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button"; // <-- Import your Button component
+const [showHeader, setShowHeader] = useState(true);
+const lastScrollY = useRef(0);
+
+useEffect(() => {
+  const handleScroll = () => {
+    if (window.scrollY > lastScrollY.current) {
+      setShowHeader(false); // hide header on scroll down
+    } else {
+      setShowHeader(true); // show header on scroll up
+    }
+    lastScrollY.current = window.scrollY;
+  };
+
+  window.addEventListener("scroll", handleScroll);
+  return () => window.removeEventListener("scroll", handleScroll);
+}, []);
+
 
 
 const lessons = [
@@ -100,55 +117,62 @@ export default function Home() {
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans">
       {/* Header */}
-<header className="flex justify-between items-center px-4 sm:px-8 py-4 border-b border-gray-200 shadow-sm sticky top-0 bg-white z-50">
-  <div className="text-2xl font-extrabold tracking-tight">Tiksliukai.lt</div>
-  <nav>
-    {loading ? (
-      <div className="animate-pulse bg-gray-200 h-10 w-32 rounded"></div>
-    ) : user ? (
-      <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 gap-2">
-        <span className="text-sm text-gray-600">Hello, {user.email}</span>
-        {userRole === 'tutor' && (
+<header
+  className={`fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${
+    showHeader ? "translate-y-0" : "-translate-y-full"
+  }`}
+>
+  <div className="flex justify-between items-center px-4 sm:px-8 py-3">
+    <div className="text-2xl font-extrabold tracking-tight">Tiksliukai.lt</div>
+    <nav>
+      {loading ? (
+        <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
+      ) : user ? (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-gray-600">Hello, {user.email}</span>
+          {userRole === 'tutor' && (
+            <Button
+              onClick={() => router.push('/tutor_dashboard')}
+              className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
+            >
+              Tutor Dashboard
+            </Button>
+          )}
+          {userRole === 'client' && (
+            <Button
+              onClick={() => router.push('/student_dashboard')}
+              className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
+            >
+              Student Dashboard
+            </Button>
+          )}
           <Button
-            onClick={() => router.push('/tutor_dashboard')}
-            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+            onClick={handleLogout}
+            className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-1 text-sm"
           >
-            Tutor Dashboard
+            Logout
           </Button>
-        )}
-        {userRole === 'client' && (
+        </div>
+      ) : (
+        <div className="flex gap-2">
           <Button
-            onClick={() => router.push('/student_dashboard')}
-            className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
+            onClick={() => router.push("/auth/log-in")}
+            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm"
           >
-            Student Dashboard
+            Log In
           </Button>
-        )}
-        <Button
-          onClick={handleLogout}
-          className="bg-gray-200 text-gray-700 hover:bg-gray-300 w-full sm:w-auto"
-        >
-          Logout
-        </Button>
-      </div>
-    ) : (
-      <div className="flex flex-col sm:flex-row gap-2">
-        <Button
-          onClick={() => router.push("/auth/log-in")}
-          className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
-        >
-          Log In
-        </Button>
-        <Button
-          onClick={() => router.push("/auth")}
-          className="bg-blue-600 hover:bg-blue-700 w-full sm:w-auto"
-        >
-          Sign Up
-        </Button>
-      </div>
-    )}
-  </nav>
+          <Button
+            onClick={() => router.push("/auth")}
+            className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm"
+          >
+            Sign Up
+          </Button>
+        </div>
+      )}
+    </nav>
+  </div>
 </header>
+
 
 
       {/* Main content */}
