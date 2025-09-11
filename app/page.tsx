@@ -17,7 +17,6 @@ export default function Home() {
 
   const lastScrollY = useRef(0);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const teacherRef = useRef<HTMLDivElement>(null);
 
   // === Scroll header hide/show ===
   useEffect(() => {
@@ -31,38 +30,34 @@ export default function Home() {
 
   // === Video auto play/pause ===
   useEffect(() => {
-  const videoEl = videoRef.current;
-  if (!videoEl) return;
+    const videoEl = videoRef.current;
+    if (!videoEl) return;
 
-  // Make sure video is ready to play
-  videoEl.muted = true;
-  videoEl.playsInline = true;
-  videoEl.pause();
-  videoEl.currentTime = 0;
-
-  const observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-          videoEl.play().catch(() => {
-            // Autoplay might fail, ignore
-          });
-        } else {
-          videoEl.pause();
-        }
-      });
-    },
-    { threshold: 0.5 }
-  );
-
-  observer.observe(videoEl);
-
-  return () => {
-    observer.disconnect();
+    videoEl.muted = true;
+    videoEl.playsInline = true;
     videoEl.pause();
-  };
-}, []);
+    videoEl.currentTime = 0;
 
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            videoEl.play().catch(() => {});
+          } else {
+            videoEl.pause();
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(videoEl);
+
+    return () => {
+      observer.disconnect();
+      videoEl.pause();
+    };
+  }, []);
 
   // === Auth check ===
   useEffect(() => {
