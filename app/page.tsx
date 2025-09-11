@@ -17,6 +17,7 @@ export default function Home() {
 
   const lastScrollY = useRef(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const teacherRef = useRef<HTMLDivElement>(null);
 
   // === Scroll header hide/show ===
   useEffect(() => {
@@ -30,34 +31,38 @@ export default function Home() {
 
   // === Video auto play/pause ===
   useEffect(() => {
-    const videoEl = videoRef.current;
-    if (!videoEl) return;
+  const videoEl = videoRef.current;
+  if (!videoEl) return;
 
-    videoEl.muted = true;
-    videoEl.playsInline = true;
+  // Make sure video is ready to play
+  videoEl.muted = true;
+  videoEl.playsInline = true;
+  videoEl.pause();
+  videoEl.currentTime = 0;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+          videoEl.play().catch(() => {
+            // Autoplay might fail, ignore
+          });
+        } else {
+          videoEl.pause();
+        }
+      });
+    },
+    { threshold: 0.5 }
+  );
+
+  observer.observe(videoEl);
+
+  return () => {
+    observer.disconnect();
     videoEl.pause();
-    videoEl.currentTime = 0;
+  };
+}, []);
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            videoEl.play().catch(() => {});
-          } else {
-            videoEl.pause();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(videoEl);
-
-    return () => {
-      observer.disconnect();
-      videoEl.pause();
-    };
-  }, []);
 
   // === Auth check ===
   useEffect(() => {
@@ -95,8 +100,7 @@ export default function Home() {
     return () => subscription.unsubscribe();
   }, []);
 
-  // === Scroll to video function ===
-  const scrollToVideo = () => videoRef.current?.scrollIntoView({ behavior: "smooth" });
+  const scrollToTeachers = () => teacherRef.current?.scrollIntoView({ behavior: "smooth" });
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -133,7 +137,7 @@ export default function Home() {
     return <div className="text-5xl font-extrabold text-blue-600 select-none">{count}+</div>;
   }
 
-  return(
+  return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans">
       {/* Header */}
       <header
@@ -194,12 +198,11 @@ export default function Home() {
 
       {/* Main content */}
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
-        const scrollToVideo = () => videoRef.current?.scrollIntoView({ behavior: "smooth" });
-
-{/* Section 1: Lessons */}
-<section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white">
+        {/* Section 1: Lessons */}
+        <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white relative">
   <div className="h-24"></div> {/* spacer for header */}
   <h1 className="text-5xl font-extrabold mb-10 text-center">Pasirinkite pamoką</h1>
+
   <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
     {lessons.map((lesson) => (
       <Button
@@ -212,15 +215,12 @@ export default function Home() {
     ))}
   </div>
 
-  {/* Scroll Button */}
-  <button
-    onClick={scrollToVideo}
-    className="absolute bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg animate-bounce transition-transform duration-300 hover:scale-110"
-    aria-label="Scroll to video section"
-  >
-    Plačiau ⬇️
-  </button>
+  {/* Bottom-right text */}
+  <div className="absolute bottom-4 right-4 text-gray-500 text-sm">
+    Plačiau apačioje:
+  </div>
 </section>
+
 
 
         {/* Section 2: Hero video */}
@@ -258,7 +258,7 @@ export default function Home() {
         
 
         {/* Section 4: Apie mus */}
-<motion.section
+        <motion.section
   initial={{ opacity: 0, y: 60 }}
   whileInView={{ opacity: 1, y: 0 }}
   viewport={{ once: true }}
@@ -277,7 +277,7 @@ export default function Home() {
       href="https://www.instagram.com/tiksliukai.lt/"
       target="_blank"
       rel="noopener noreferrer"
-      className="text-pink-500 hover:text-pink-600 text-2xl font-bold"
+      className="text-pink-500 hover:text-pink-600 text-2xl font-bold transition-colors"
     >
       Instagram
     </a>
@@ -285,12 +285,13 @@ export default function Home() {
       href="https://www.facebook.com/tiksliukai"
       target="_blank"
       rel="noopener noreferrer"
-      className="text-blue-600 hover:text-blue-700 text-2xl font-bold"
+      className="text-blue-600 hover:text-blue-700 text-2xl font-bold transition-colors"
     >
       Facebook
     </a>
   </div>
 </motion.section>
+
 
         {/* Section 5: Misija ir vizija */}
 <motion.section
