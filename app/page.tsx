@@ -222,27 +222,6 @@ export default function Home() {
   </div>
 </section>
 
-
-        {/* Section 2: Hero video */}
-<motion.section
-  initial={{ opacity: 0, y: 60 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true }}
-  transition={{ duration: 0.8 }}
-  className="w-full min-h-screen flex justify-center items-center bg-gradient-to-br from-blue-100 to-white snap-start px-6 py-20 relative"
->
-  <video
-    ref={videoRef}
-    className="w-full max-w-6xl h-auto object-cover"
-    muted
-    playsInline
-    controls={false}
-    preload="auto"
-    src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/videos/60d7accd-ab26-4a57-b66a-462e1f6d0e0b.mp4"
-  />
-</motion.section>
-
-
         <motion.section
   initial={{ opacity: 0, y: 60 }}
   whileInView={{ opacity: 1, y: 0 }}
@@ -251,10 +230,11 @@ export default function Home() {
   className="w-full min-h-screen flex flex-col justify-center items-center bg-white snap-start px-6 py-20"
 >
   <h2 className="text-5xl font-extrabold mb-8 text-center">
-    Tobulėk čia ir dabar🚀
+    Kaip veikia sistema?🚀
   </h2>
   <p className="max-w-2xl text-xl text-gray-700 leading-relaxed text-center">
-    Pasirink pamoką, rezervuok ją apmokėdamas, gauk nuorodą į pamoką.
+    Tobulėk čia ir dabar: pasirink mokytoją, rezervuok pamoką apmokėdamas ir gauk nuorodą į ją el. paštu.
+    Greita, efektyvu, patikima.
   </p>
 </motion.section>
 
