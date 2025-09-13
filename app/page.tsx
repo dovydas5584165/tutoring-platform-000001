@@ -238,7 +238,7 @@ export default function Home() {
     playsInline
     controls={false}
     preload="auto"
-    src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/videos/60d7accd-ab26-4a57-b66a-462e1f6d0e0b.mov"
+    src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/videos/60d7accd-ab26-4a57-b66a-462e1f6d0e0b.mp4"
   />
 </motion.section>
 
