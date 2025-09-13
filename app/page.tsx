@@ -1,6 +1,5 @@
 "use client";
 
-import Head from "next/head";
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, animate } from "framer-motion";
@@ -19,21 +18,6 @@ export default function Home() {
   const lastScrollY = useRef(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const teacherRef = useRef<HTMLDivElement>(null);
-
-  <Head>
-        {/* Google Analytics 4 */}
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-CP50RV65SV"></script>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-CP50RV65SV');
-            `,
-          }}
-        />
-      </Head>
 
   // === Scroll header hide/show ===
   useEffect(() => {
@@ -154,6 +138,7 @@ export default function Home() {
   }
 
   return (
+
     <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans">
       {/* Header */}
       <header
