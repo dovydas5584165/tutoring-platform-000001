@@ -226,14 +226,14 @@ export default function Home() {
 
           {/* === Reviews Section (above pasirinkite pamoką) === */}
           {/* === Reviews Section (Above "Pasirinkite pamoką") === */}
-<div className="w-full py-6 mb-12 bg-white">
-  {/* Shared auto-scrolling marquee for all devices */}
+{/* === Reviews Section (Above "Pasirinkite pamoką") === */}
+<div className="w-full py-6 mb-12 bg-white overflow-hidden">
   <motion.div
     className="flex gap-6"
     animate={{ x: ["0%", "-100%"] }}
-    transition={{ repeat: Infinity, duration: 60, ease: "linear" }}
+    transition={{ repeat: Infinity, duration: 90, ease: "linear" }}
   >
-    {reviews.map((review, i) => (
+    {[...reviews, ...reviews].map((review, i) => (
       <div
         key={i}
         className="min-w-[280px] max-w-xs sm:min-w-[300px] sm:max-w-sm p-4 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
@@ -243,6 +243,7 @@ export default function Home() {
     ))}
   </motion.div>
 </div>
+
 
 
           <h1 className="text-5xl font-extrabold mb-10 text-center">
@@ -267,10 +268,6 @@ export default function Home() {
             tiksliųjų mokslų.
           </p>
 
-          {/* Bottom-right text */}
-          <div className="absolute bottom-4 right-4 text-gray-500 text-sm">
-            Plačiau apačioje:
-          </div>
         </section>
 
         <motion.section
