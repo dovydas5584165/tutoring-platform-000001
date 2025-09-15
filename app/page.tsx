@@ -231,7 +231,7 @@ export default function Home() {
   <motion.div
     className="flex gap-6"
     animate={{ x: ["0%", "-100%"] }}
-    transition={{ repeat: Infinity, duration: 90, ease: "linear" }}
+    transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
   >
     {[...reviews, ...reviews].map((review, i) => (
       <div
