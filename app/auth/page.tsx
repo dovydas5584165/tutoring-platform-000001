@@ -106,7 +106,7 @@ export default function RegistracijaPage() {
             <option value="" disabled>
               Pasirinkite rolę
             </option>
-            <option value="tutor">Mokytojas</option>
+            {/*<option value="tutor">Mokytojas</option>*/}
             <option value="client">Klientas</option>
           </select>
 
