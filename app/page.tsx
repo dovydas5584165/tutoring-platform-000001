@@ -217,9 +217,6 @@ export default function Home() {
           </nav>
         </div>
       </header>
-
-      {/* Main content */}
-      <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
         {/* Section 1: Lessons */}
         {/* Main content */}
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
