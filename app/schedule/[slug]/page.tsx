@@ -9,7 +9,6 @@ import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { motion } from "framer-motion";
 
-
 type Availability = {
   id: number;
   user_id: string;
@@ -249,6 +248,7 @@ export default function ScheduleLanding() {
 
   const totalPrice = selectedSlots.length * 25; // €25 / 45 min
 
+  // ✅ UPDATED: skip modal for recurring users
   const handleBookingConfirmAll = () => {
     if (selectedSlots.length === 0) {
       alert("Pasirinkite bent vieną pamoką prieš užsakant.");
@@ -261,19 +261,29 @@ export default function ScheduleLanding() {
       return;
     }
 
-    setShowBookingModal(true);
+    const savedInfo = localStorage.getItem("bookingInfo");
+    if (savedInfo) {
+      handleBookingInfoSubmit(JSON.parse(savedInfo)); // recurring user
+    } else {
+      setShowBookingModal(true); // new user
+    }
   };
 
+  // ✅ UPDATED: save info + still send notifications
   const handleBookingInfoSubmit = async (info: BookingInfo) => {
-    const emailTrimmed = (info.email || '').trim();
+    const emailTrimmed = (info.email || "").trim();
     const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailTrimmed);
     if (!isValidEmail) {
-      alert('Prašome įvesti galiojantį el. paštą.');
+      alert("Prašome įvesti galiojantį el. paštą.");
       return;
     }
+
     setBookingSubmitting(true);
 
     try {
+      // Save info so modal won’t show again
+      localStorage.setItem("bookingInfo", JSON.stringify(info));
+
       const slotIds = selectedSlots.map((slot) => slot.id);
       const tutorId = selectedSlots.length > 0 ? selectedSlots[0].user_id : null;
 
@@ -295,30 +305,24 @@ export default function ScheduleLanding() {
 
       if (error || !bookingData) throw error || new Error("Nepavyko sukurti užsakymo");
 
-      // Mark slots as booked
-      for (const slot of selectedSlots) {
-        const { error: updateError } = await supabase
-          .from("availability")
-          .update({ is_booked: true })
-          .eq("id", slot.id);
-        if (updateError) throw updateError;
-      }
-
-      // Create tutor notifications for each slot
+      // Send tutor notifications
       const notificationsData = selectedSlots.map((slot) => ({
         user_id: slot.user_id,
-        message: `Ar sutinki vesti pamoką ${slug} ${format(parseISO(slot.start_time), "yyyy-MM-dd HH:mm")}?${info.topic ? ` Tema: "${info.topic}"` : ""}`,
+        message: `Ar sutinki vesti pamoką ${slug} ${format(
+          parseISO(slot.start_time),
+          "yyyy-MM-dd HH:mm"
+        )}?${info.topic ? ` Tema: "${info.topic}"` : ""}`,
         is_read: false,
         booking_id: bookingData.id,
       }));
 
       await supabase.from("notifications").insert(notificationsData);
 
-      // Emails will be sent after successful payment via webhook or success page fallback
-
       setShowBookingModal(false);
       setSelectedSlots([]);
-      setAvailabilities((prev) => prev.filter((s) => !selectedSlots.some(sel => sel.id === s.id)));
+      setAvailabilities((prev) =>
+        prev.filter((s) => !selectedSlots.some((sel) => sel.id === s.id))
+      );
 
       router.push(`/payment?booking_id=${bookingData.id}`);
     } catch (err) {
@@ -327,7 +331,7 @@ export default function ScheduleLanding() {
       setBookingSubmitting(false);
     }
   };
-
+  
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans px-6 py-10 max-w-5xl mx-auto">
       <header className="mb-8">
