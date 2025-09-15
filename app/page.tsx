@@ -122,7 +122,28 @@ export default function Home() {
     { icon: "😊", number: 100, label: "laimingų klientų" },
     { icon: "🔟", number: 10, label: "gerų pažymių lietus" },
   ];
-
+  const reviews = [
+    "Vaiko pažymiai pagerėjo nuo 7 iki 9 – mama Inga",
+    "Puikūs mokytojai padėjo pasiruošti egzaminams – tėtis Tomas",
+    "Mokytis tapo įdomu ir smagu – mokinė Greta",
+    "Individualus dėmesys davė puikių rezultatų – mama Asta",
+    "Matematikos baimė dingo po kelių pamokų – mokinys Lukas",
+    "Chemija tapo suprantama – mokinė Emilija",
+    "Sūnus gavo 90 iš matematikos VBE – tėtis Darius",
+    "Mokytoja labai kantri ir motyvuojanti – mama Lina",
+    "Anglų kalbos žinios šoktelėjo aukštyn – mokinė Monika",
+    "Pasitikėjimas savimi išaugo – mama Jurgita",
+    "Fizika pradėjo patikti – mokinys Mantas",
+    "Puiki platforma, paprasta naudotis – mama Rasa",
+    "Matematika dabar atrodo lengva – mokinė Gabija",
+    "Dukros pažymiai pagerėjo per mėnesį – tėtis Paulius",
+    "Vaikas pats noriai jungiasi į pamokas – mama Jolanta",
+    "Sūnus pradėjo mėgti mokslą – mama Kristina",
+    "Biologija tapo mėgstamiausia pamoka – mokinė Austėja",
+    "Chemijos kontroliniai nebebaisu – mokinys Karolis",
+    "Labai rekomenduoju visiems tėvams – tėtis Vytautas",
+    "Tikrai verta – mama Eglė",
+  ];
   function AnimatedNumber({ value }: { value: number }) {
     const [count, setCount] = useState(0);
     useEffect(() => {
@@ -200,27 +221,72 @@ export default function Home() {
       {/* Main content */}
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
         {/* Section 1: Lessons */}
+        {/* Main content */}
+      <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
+        {/* Section 1: Lessons */}
         <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white relative">
-  <div className="h-24"></div> {/* spacer for header */}
-  <h1 className="text-5xl font-extrabold mb-10 text-center">Pasirinkite pamoką</h1>
+          <div className="h-24"></div> {/* spacer for header */}
 
-  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
-    {lessons.map((lesson) => (
-      <Button
-        key={lesson.slug}
-        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
-        onClick={() => router.push(`/schedule/${lesson.slug}`)}
-      >
-        {lesson.name}
-      </Button>
-    ))}
-  </div>
+          {/* === Reviews Section (above pasirinkite pamoką) === */}
+          <div className="w-full py-6 mb-12 bg-gradient-to-r from-blue-50 via-white to-blue-50">
+            {/* Desktop / Tablet: Auto-scroll marquee */}
+            <div className="hidden sm:block overflow-hidden">
+              <motion.div
+                className="flex gap-6"
+                animate={{ x: ["0%", "-100%"] }}
+                transition={{ repeat: Infinity, duration: 60, ease: "linear" }}
+              >
+                {reviews.map((review, i) => (
+                  <div
+                    key={i}
+                    className="min-w-[300px] max-w-sm p-4 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+                  >
+                    <p className="text-gray-700 text-base italic">“{review}”</p>
+                  </div>
+                ))}
+              </motion.div>
+            </div>
 
-  {/* Bottom-right text */}
-  <div className="absolute bottom-4 right-4 text-gray-500 text-sm">
-    Plačiau apačioje:
-  </div>
-</section>
+            {/* Mobile: Swipeable carousel */}
+            <div className="sm:hidden overflow-x-auto flex gap-4 px-4 snap-x snap-mandatory scrollbar-hide">
+              {reviews.map((review, i) => (
+                <div
+                  key={i}
+                  className="snap-center min-w-[80%] p-4 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+                >
+                  <p className="text-gray-700 text-base italic">“{review}”</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <h1 className="text-5xl font-extrabold mb-10 text-center">
+            Pasirinkite pamoką
+          </h1>
+
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
+            {lessons.map((lesson) => (
+              <Button
+                key={lesson.slug}
+                className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
+                onClick={() => router.push(`/schedule/${lesson.slug}`)}
+              >
+                {lesson.name}
+              </Button>
+            ))}
+          </div>
+
+          {/* Educational project text */}
+          <p className="mt-8 text-center text-gray-600 text-lg max-w-xl">
+            Studentų edukacinis projektas, skirtas skatinti jaunimą mokytis
+            tiksliųjų mokslų.
+          </p>
+
+          {/* Bottom-right text */}
+          <div className="absolute bottom-4 right-4 text-gray-500 text-sm">
+            Plačiau apačioje:
+          </div>
+        </section>
 
         <motion.section
   initial={{ opacity: 0, y: 60 }}
