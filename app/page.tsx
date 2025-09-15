@@ -225,37 +225,25 @@ export default function Home() {
           <div className="h-24"></div> {/* spacer for header */}
 
           {/* === Reviews Section (above pasirinkite pamoką) === */}
-          <div className="w-full py-6 mb-12 bg-gradient-to-r from-blue-50 via-white to-blue-50">
-            {/* Desktop / Tablet: Auto-scroll marquee */}
-            <div className="hidden sm:block overflow-hidden">
-              <motion.div
-                className="flex gap-6"
-                animate={{ x: ["0%", "-100%"] }}
-                transition={{ repeat: Infinity, duration: 60, ease: "linear" }}
-              >
-                {reviews.map((review, i) => (
-                  <div
-                    key={i}
-                    className="min-w-[300px] max-w-sm p-4 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
-                  >
-                    <p className="text-gray-700 text-base italic">“{review}”</p>
-                  </div>
-                ))}
-              </motion.div>
-            </div>
+          {/* === Reviews Section (Above "Pasirinkite pamoką") === */}
+<div className="w-full py-6 mb-12 bg-white">
+  {/* Shared auto-scrolling marquee for all devices */}
+  <motion.div
+    className="flex gap-6"
+    animate={{ x: ["0%", "-100%"] }}
+    transition={{ repeat: Infinity, duration: 60, ease: "linear" }}
+  >
+    {reviews.map((review, i) => (
+      <div
+        key={i}
+        className="min-w-[280px] max-w-xs sm:min-w-[300px] sm:max-w-sm p-4 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+      >
+        <p className="text-gray-700 text-base italic text-center">“{review}”</p>
+      </div>
+    ))}
+  </motion.div>
+</div>
 
-            {/* Mobile: Swipeable carousel */}
-            <div className="sm:hidden overflow-x-auto flex gap-4 px-4 snap-x snap-mandatory scrollbar-hide">
-              {reviews.map((review, i) => (
-                <div
-                  key={i}
-                  className="snap-center min-w-[80%] p-4 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
-                >
-                  <p className="text-gray-700 text-base italic">“{review}”</p>
-                </div>
-              ))}
-            </div>
-          </div>
 
           <h1 className="text-5xl font-extrabold mb-10 text-center">
             Pasirinkite pamoką
