@@ -200,18 +200,20 @@ export default function Home() {
               </div>
             ) : (
               <div className="flex gap-2">
-                <Button
+                <button
                   onClick={() => router.push("/auth/log-in")}
                   className="text-black px-4 py-2 text-sm"
                 >
                   Log In
-                </Button>
-                <Button
+                </button>
+
+                <button
                   onClick={() => router.push("/auth")}
                   className="text-black px-4 py-2 text-sm"
                 >
                   Sign Up
-                </Button>
+                </button>
+
               </div>
             )}
           </nav>
