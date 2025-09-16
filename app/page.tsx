@@ -200,26 +200,27 @@ export default function Home() {
               </div>
             ) : (
               <div className="flex gap-2">
-                <Button
-                  onClick={() => router.push("/auth/log-in")}
-                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm"
-                >
-                  Log In
-                </Button>
-                <Button
-                  onClick={() => router.push("/auth")}
-                  className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-sm"
-                >
-                  Sign Up
-                </Button>
-              </div>
+  <Button
+    onClick={() => router.push("/auth/log-in")}
+    className="bg-transparent text-black hover:text-blue-600 px-4 py-2 text-sm shadow-none"
+  >
+    Log In
+  </Button>
+  <Button
+    onClick={() => router.push("/auth")}
+    className="bg-transparent text-black hover:text-blue-600 px-4 py-2 text-sm shadow-none"
+  >
+    Sign Up
+  </Button>
+</div>
+
             )}
           </nav>
         </div>
       </header>
         {/* Section 1: Lessons */}
-        {/* Main content */}
-      <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white">
+      {/* Main content */}
+<section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white">
   <div className="h-24"></div> {/* spacer for header */}
 
   {/* Title */}
@@ -227,13 +228,13 @@ export default function Home() {
     Pasirinkite pamoką
   </h1>
 
-  {/* Educational project text (moved right after H1) */}
+  {/* Educational project text (directly after H1) */}
   <p className="mb-8 text-center text-gray-600 text-lg max-w-xl">
     Patikimi ir patyrę korepetitoriai, greitas ir patogus procesas.
   </p>
 
   {/* Lessons grid */}
-  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
+  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl mb-12">
     {lessons.map((lesson) => (
       <Button
         key={lesson.slug}
@@ -244,8 +245,9 @@ export default function Home() {
       </Button>
     ))}
   </div>
-  {/* Reviews Section */}
-  <div className="w-full py-4 mb-6 flex justify-center">
+
+  {/* Reviews Section (near bottom) */}
+  <div className="w-full py-4 mt-auto flex justify-center">
     <motion.div
       className="flex gap-4 max-w-2xl"
       animate={{ x: ["0%", "-100%"] }}
@@ -254,7 +256,7 @@ export default function Home() {
       {[...reviews, ...reviews].map((review, i) => (
         <div
           key={i}
-          className="min-w-[220px] max-w-xs p-3 bg-white/90 rounded-xl shadow border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+          className="min-w-[220px] max-w-xs p-3 bg-white rounded-xl shadow border border-gray-100 hover:shadow-lg transition-shadow duration-300"
         >
           <p className="text-gray-700 text-sm italic text-center">“{review}”</p>
         </div>
@@ -262,6 +264,7 @@ export default function Home() {
     </motion.div>
   </div>
 </section>
+
 
         <motion.section
   initial={{ opacity: 0, y: 60 }}
@@ -291,7 +294,7 @@ export default function Home() {
 >
   <h2 className="text-5xl font-extrabold mb-8 text-center">Apie mus</h2>
   <p className="max-w-3xl text-xl text-gray-700 leading-relaxed text-center mb-6">
-    Tiksliukai.lt – tai platforma, sukurta padėti mokiniams rasti aukštos kokybės korepetitorius.
+    Tiksliukai.lt – studentų sukurtas edukacinis projektas.
     Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir patogesnis kiekvienam mokiniui Lietuvoje.
   </p>
 
