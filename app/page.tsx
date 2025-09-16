@@ -219,56 +219,49 @@ export default function Home() {
       </header>
         {/* Section 1: Lessons */}
         {/* Main content */}
-      <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
-        {/* Section 1: Lessons */}
-        <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white relative">
-          <div className="h-24"></div> {/* spacer for header */}
+      <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white">
+  <div className="h-24"></div> {/* spacer for header */}
 
-          {/* === Reviews Section (above pasirinkite pamoką) === */}
-          {/* === Reviews Section (Above "Pasirinkite pamoką") === */}
-{/* === Reviews Section (Above "Pasirinkite pamoką") === */}
-<div className="w-full py-6 mb-12 bg-white overflow-hidden">
-  <motion.div
-    className="flex gap-6"
-    animate={{ x: ["0%", "-100%"] }}
-    transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-  >
-    {[...reviews, ...reviews].map((review, i) => (
-      <div
-        key={i}
-        className="min-w-[280px] max-w-xs sm:min-w-[300px] sm:max-w-sm p-4 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+  {/* Title */}
+  <h1 className="text-5xl font-extrabold mb-4 text-center">
+    Pasirinkite pamoką
+  </h1>
+
+  {/* Educational project text (moved right after H1) */}
+  <p className="mb-8 text-center text-gray-600 text-lg max-w-xl">
+    Patikimi ir patyrę korepetitoriai, greitas ir patogus procesas.
+  </p>
+
+  {/* Lessons grid */}
+  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
+    {lessons.map((lesson) => (
+      <Button
+        key={lesson.slug}
+        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
+        onClick={() => router.push(`/schedule/${lesson.slug}`)}
       >
-        <p className="text-gray-700 text-base italic text-center">“{review}”</p>
-      </div>
+        {lesson.name}
+      </Button>
     ))}
-  </motion.div>
-</div>
-
-
-
-          <h1 className="text-5xl font-extrabold mb-10 text-center">
-            Pasirinkite pamoką
-          </h1>
-
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
-            {lessons.map((lesson) => (
-              <Button
-                key={lesson.slug}
-                className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
-                onClick={() => router.push(`/schedule/${lesson.slug}`)}
-              >
-                {lesson.name}
-              </Button>
-            ))}
-          </div>
-
-          {/* Educational project text */}
-          <p className="mt-8 text-center text-gray-600 text-lg max-w-xl">
-            Studentų edukacinis projektas, skirtas skatinti jaunimą mokytis
-            tiksliųjų mokslų.
-          </p>
-
-        </section>
+  </div>
+  {/* Reviews Section */}
+  <div className="w-full py-4 mb-6 flex justify-center">
+    <motion.div
+      className="flex gap-4 max-w-2xl"
+      animate={{ x: ["0%", "-100%"] }}
+      transition={{ repeat: Infinity, duration: 15, ease: "linear" }} // faster
+    >
+      {[...reviews, ...reviews].map((review, i) => (
+        <div
+          key={i}
+          className="min-w-[220px] max-w-xs p-3 bg-white/90 rounded-xl shadow border border-gray-100 hover:shadow-lg transition-shadow duration-300"
+        >
+          <p className="text-gray-700 text-sm italic text-center">“{review}”</p>
+        </div>
+      ))}
+    </motion.div>
+  </div>
+</section>
 
         <motion.section
   initial={{ opacity: 0, y: 60 }}
