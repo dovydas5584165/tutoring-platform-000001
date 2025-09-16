@@ -161,7 +161,7 @@ export default function Home() {
   return (
 
     <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans">
-       {/* Header */}
+      {/* Header */}
       <header
         className={`fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${
           showHeader ? "translate-y-0" : "-translate-y-full"
@@ -176,16 +176,25 @@ export default function Home() {
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600">Hello, {user.email}</span>
                 {userRole === "tutor" && (
-                  <Button onClick={() => router.push("/tutor_dashboard")} className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm">
+                  <Button
+                    onClick={() => router.push("/tutor_dashboard")}
+                    className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
+                  >
                     Tutor Dashboard
                   </Button>
                 )}
                 {userRole === "client" && (
-                  <Button onClick={() => router.push("/student_dashboard")} className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm">
+                  <Button
+                    onClick={() => router.push("/student_dashboard")}
+                    className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
+                  >
                     Student Dashboard
                   </Button>
                 )}
-                <Button onClick={handleLogout} className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-1 text-sm">
+                <Button
+                  onClick={handleLogout}
+                  className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-1 text-sm"
+                >
                   Logout
                 </Button>
               </div>
@@ -193,33 +202,37 @@ export default function Home() {
               <div className="flex gap-2">
                 <Button
                   onClick={() => router.push("/auth/log-in")}
-                  className="bg-transparent border-none shadow-none p-0 m-0 text-black hover:bg-transparent hover:text-black"
+                  className="text-black px-4 py-2 text-sm"
                 >
                   Log In
                 </Button>
                 <Button
                   onClick={() => router.push("/auth")}
-                  className="bg-transparent border-none shadow-none p-0 m-0 text-black hover:bg-transparent hover:text-black"
+                  className="text-black px-4 py-2 text-sm"
                 >
-                 Sign Up
+                  Sign Up
                 </Button>
-            </div>
-
+              </div>
             )}
           </nav>
         </div>
       </header>
         {/* Section 1: Lessons */}
-      {/* Main content */}
-      <main className="flex flex-col flex-grow mt-24">
+        {/* Main content */}
+      <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
         {/* Section 1: Lessons */}
-        <section className="w-full flex flex-col justify-center items-center px-4">
-          <h1 className="text-5xl font-extrabold mb-4 text-center">Pasirinkite pamoką</h1>
-          <p className="mb-8 text-center text-gray-600 text-lg max-w-xl">
-            Patikimi ir patyrę korepetitoriai, greitas ir patogus procesas.
+        <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white relative">
+          <div className="h-24"></div> {/* spacer for header */}
+
+          <h1 className="text-5xl font-extrabold mb-10 text-center">
+            Pasirinkite pamoką
+          </h1>
+          {/* Educational project text */}
+          <p className="mt-8 text-center text-gray-600 text-lg max-w-xl">
+            Patikimi tiksliųjų mokslų korepetitoriai ir patogi sistema.
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl mb-12">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full max-w-4xl">
             {lessons.map((lesson) => (
               <Button
                 key={lesson.slug}
@@ -230,31 +243,27 @@ export default function Home() {
               </Button>
             ))}
           </div>
-
-          {/* Reviews carousel */}
-<section className="w-full h-10 overflow-hidden flex items-center">
+           {/* === Reviews Section (above pasirinkite pamoką) === */}
+          {/* === Reviews Section (Above "Pasirinkite pamoką") === */}
+{/* === Reviews Section (Above "Pasirinkite pamoką") === */}
+<div className="w-full py-3 mb-12 bg-white overflow-hidden">
   <motion.div
-    className="flex gap-4"
-    animate={{ x: ["0%", "-50%"] }} // scroll left by half since items are duplicated
-    transition={{
-      repeat: Infinity,
-      duration: 15, // adjust speed
-      ease: "linear",
-    }}
+    className="flex gap-6"
+    animate={{ x: ["0%", "-100%"] }}
+    transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
   >
     {[...reviews, ...reviews].map((review, i) => (
       <div
         key={i}
-        className="min-w-[220px] max-w-xs p-1 bg-white rounded-xl shadow border border-gray-100"
+        className="min-w-[280px] max-w-xs sm:min-w-[300px] sm:max-w-sm p-4 bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-lg transition-shadow duration-300"
       >
-        <p className="text-gray-700 text-xs italic text-center truncate">
-          “{review}”
-        </p>
+        <p className="text-gray-700 text-base italic text-center">“{review}”</p>
       </div>
     ))}
   </motion.div>
-</section>
+</div>
 
+        </section>
 
         <motion.section
   initial={{ opacity: 0, y: 60 }}
@@ -284,7 +293,7 @@ export default function Home() {
 >
   <h2 className="text-5xl font-extrabold mb-8 text-center">Apie mus</h2>
   <p className="max-w-3xl text-xl text-gray-700 leading-relaxed text-center mb-6">
-    Tiksliukai.lt – studentų sukurtas edukacinis projektas.
+    Tiksliukai.lt – tai studentų edukacinis projektas.
     Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir patogesnis kiekvienam mokiniui Lietuvoje.
   </p>
 
