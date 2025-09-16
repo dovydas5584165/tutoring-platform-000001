@@ -191,13 +191,20 @@ export default function Home() {
               </div>
             ) : (
               <div className="flex gap-2">
-                <Button onClick={() => router.push("/auth/log-in")} className="bg-transparent text-black hover:text-blue-600 px-4 py-2 text-sm shadow-none">
+                <Button
+                  onClick={() => router.push("/auth/log-in")}
+                  className="bg-transparent border-none shadow-none p-0 m-0 text-black hover:bg-transparent hover:text-black"
+                >
                   Log In
                 </Button>
-                <Button onClick={() => router.push("/auth")} className="bg-transparent text-black hover:text-blue-600 px-4 py-2 text-sm shadow-none">
-                  Sign Up
+                <Button
+                  onClick={() => router.push("/auth")}
+                  className="bg-transparent border-none shadow-none p-0 m-0 text-black hover:bg-transparent hover:text-black"
+                >
+                 Sign Up
                 </Button>
-              </div>
+            </div>
+
             )}
           </nav>
         </div>
@@ -225,23 +232,29 @@ export default function Home() {
           </div>
 
           {/* Reviews carousel */}
-          <div className="w-full py-4 flex justify-center">
-            <motion.div
-              className="flex gap-4 max-w-2xl"
-              animate={{ x: ["0%", "-100%"] }}
-              transition={{ repeat: Infinity, duration: 15, ease: "linear" }}
-            >
-              {[...reviews, ...reviews].map((review, i) => (
-                <div
-                  key={i}
-                  className="min-w-[220px] max-w-xs p-3 bg-white rounded-xl shadow border border-gray-100 hover:shadow-lg transition-shadow duration-300"
-                >
-                  <p className="text-gray-700 text-sm italic text-center">“{review}”</p>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
+<section className="w-full h-10 overflow-hidden flex items-center">
+  <motion.div
+    className="flex gap-4"
+    animate={{ x: ["0%", "-50%"] }} // scroll left by half since items are duplicated
+    transition={{
+      repeat: Infinity,
+      duration: 15, // adjust speed
+      ease: "linear",
+    }}
+  >
+    {[...reviews, ...reviews].map((review, i) => (
+      <div
+        key={i}
+        className="min-w-[220px] max-w-xs p-1 bg-white rounded-xl shadow border border-gray-100"
+      >
+        <p className="text-gray-700 text-xs italic text-center truncate">
+          “{review}”
+        </p>
+      </div>
+    ))}
+  </motion.div>
+</section>
+
 
         <motion.section
   initial={{ opacity: 0, y: 60 }}
