@@ -249,7 +249,7 @@ export default function Home() {
     className="max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center relative overflow-hidden"
   >
     <p className="text-2xl font-bold mb-6 text-gray-800">
-      ❓ Kas didesnis: 20% nuo 50 ar 50% iš 20?
+      ❓ Kas didesnis: 20% nuo 50 ar 50% nuo 20?
     </p>
 
     {/* Quiz Choices */}
@@ -264,7 +264,7 @@ export default function Home() {
         onClick={() => setSelected("50% iš 20")}
         className="w-full bg-blue-600 hover:bg-blue-700 text-white"
       >
-        50% iš 20
+        50% nuo 20
       </Button>
     </div>
 
