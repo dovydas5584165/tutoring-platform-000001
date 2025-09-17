@@ -226,7 +226,8 @@ export default function Home() {
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
 
 
-        {/* === Hero/Landing Section: Percent Puzzle Game === */}
+        
+{/* === Hero/Landing Section: Percent Puzzle Game === */}
 <section className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-purple-500 text-white snap-start px-6">
   {/* Main Headline */}
   <motion.h1
@@ -245,27 +246,50 @@ export default function Home() {
     transition={{ duration: 1 }}
     className="max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center relative overflow-hidden"
   >
-    <p className="text-2xl font-bold mb-4 text-gray-800">❓ Kas didesnis: 20% nuo 50 ar 50% iš 20?</p>
+    <p className="text-2xl font-bold mb-6 text-gray-800">
+      ❓ Kas didesnis: 20% nuo 50 ar 50% iš 20?
+    </p>
+
+    {/* Quiz Choices */}
+    <div className="flex flex-col gap-4 mb-6">
+      <Button
+        onClick={() => setSelected("20% nuo 50")}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+      >
+        20% nuo 50
+      </Button>
+      <Button
+        onClick={() => setSelected("50% iš 20")}
+        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+      >
+        50% iš 20
+      </Button>
+    </div>
 
     {/* Reveal Animation */}
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.8, duration: 0.8 }}
-      className="text-xl text-gray-700 font-semibold mb-2"
-    >
-      👉 Abu skaitmenys vienodi — <span className="text-blue-600 font-bold">10</span>
-    </motion.div>
+    {selected && (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="text-lg text-gray-700 font-semibold mb-2"
+      >
+        👉 Abu atsakymai yra vienodi —{" "}
+        <span className="text-blue-600 font-bold">10</span> 🎉
+      </motion.div>
+    )}
 
-    <motion.p
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1.6, duration: 0.8 }}
-      className="mt-4 text-gray-600 text-sm"
-    >
-      Kartais matematika nustebina simetrija — tai, kas atrodo sudėtinga, gali būti akivaizdu!
-      Tai pirmasis 10-ukas, kurį matote, bet tikrai ne paskutinis!
-    </motion.p>
+    {selected && (
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.4, duration: 0.8 }}
+        className="mt-4 text-gray-600 text-sm"
+      >
+        Kartais matematika nustebina simetrija — tai, kas atrodo sudėtinga,
+        gali būti akivaizdu!
+      </motion.p>
+    )}
 
     {/* Decorative Shapes */}
     <div className="absolute top-0 left-0 w-16 h-16 bg-yellow-400 rounded-full opacity-30 animate-pulse"></div>
@@ -280,6 +304,7 @@ export default function Home() {
     Atrask pamokas 🚀
   </Button>
 </section>
+
 
        {/* Section 1: Lessons */}
 <section
