@@ -276,7 +276,7 @@ export default function Home() {
         transition={{ duration: 0.6 }}
         className="text-lg text-gray-700 font-semibold mb-2"
       >
-        👉 Abu atsakymai yra vienodi —{" "}
+        👉 Abiejais atvejais atsakymas yra —{" "}
         <span className="text-blue-600 font-bold">10</span> 🎉
       </motion.div>
     )}
@@ -288,8 +288,7 @@ export default function Home() {
         transition={{ delay: 0.4, duration: 0.8 }}
         className="mt-4 text-gray-600 text-sm"
       >
-        Kartais matematika nustebina simetrija — tai, kas atrodo sudėtinga,
-        gali būti akivaizdu!
+        Tai yra pirmasis 10-ukas, kurį pamatėte su mumis, bet tikrai ne paskutinis!
       </motion.p>
     )}
 
