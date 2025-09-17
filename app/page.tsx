@@ -18,6 +18,9 @@ export default function Home() {
   const lastScrollY = useRef(0);
   const videoRef = useRef<HTMLVideoElement>(null);
   const teacherRef = useRef<HTMLDivElement>(null);
+  const lessonsRef = useRef<HTMLDivElement>(null);
+  const scrollToLessons = () => lessonsRef.current?.scrollIntoView({ behavior: "smooth" });
+
 
   // === Scroll header hide/show ===
   useEffect(() => {
@@ -221,7 +224,65 @@ export default function Home() {
       </header>
         {/* Main content */}
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
+
+
+        {/* === Hero/Landing Section: Percent Puzzle Game === */}
+<section className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-600 to-purple-500 text-white snap-start px-6">
+  {/* Main Headline */}
+  <motion.h1
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.8 }}
+    className="text-6xl font-extrabold mb-6 text-center"
+  >
+    Tiksliukai 
+  </motion.h1>
+
+  {/* Puzzle Card */}
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 1 }}
+    className="max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center relative overflow-hidden"
+  >
+    <p className="text-2xl font-bold mb-4 text-gray-800">❓ Kas didesnis: 20% nuo 50 ar 50% iš 20?</p>
+
+    {/* Reveal Animation */}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.8, duration: 0.8 }}
+      className="text-xl text-gray-700 font-semibold mb-2"
+    >
+      👉 Abu skaitmenys vienodi — <span className="text-blue-600 font-bold">10</span>
+    </motion.div>
+
+    <motion.p
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 1.6, duration: 0.8 }}
+      className="mt-4 text-gray-600 text-sm"
+    >
+      Kartais matematika nustebina simetrija — tai, kas atrodo sudėtinga, gali būti akivaizdu!
+      Tai pirmasis 10-ukas, kurį matote, bet tikrai ne paskutinis!
+    </motion.p>
+
+    {/* Decorative Shapes */}
+    <div className="absolute top-0 left-0 w-16 h-16 bg-yellow-400 rounded-full opacity-30 animate-pulse"></div>
+    <div className="absolute bottom-0 right-0 w-20 h-20 bg-pink-400 rounded-full opacity-30 animate-pulse"></div>
+  </motion.div>
+
+  {/* Single CTA */}
+  <Button
+    onClick={scrollToLessons}
+    className="px-8 py-4 text-lg font-semibold rounded-full bg-yellow-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
+  >
+    Atrask pamokas 🚀
+  </Button>
+</section>
+
        {/* Section 1: Lessons */}
+ref={lessonsRef}
 <section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white relative">
   <div className="h-24"></div> {/* spacer for header */}
 
