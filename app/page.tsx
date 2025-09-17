@@ -20,6 +20,8 @@ export default function Home() {
   const teacherRef = useRef<HTMLDivElement>(null);
   const lessonsRef = useRef<HTMLDivElement>(null);
   const scrollToLessons = () => lessonsRef.current?.scrollIntoView({ behavior: "smooth" });
+  const [selected, setSelected] = useState<string | null>(null);
+
 
 
   // === Scroll header hide/show ===
