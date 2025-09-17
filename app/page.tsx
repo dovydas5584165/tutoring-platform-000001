@@ -282,8 +282,10 @@ export default function Home() {
 </section>
 
        {/* Section 1: Lessons */}
-ref={lessonsRef}
-<section className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white relative">
+<section
+  ref={lessonsRef}
+  className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white relative"
+>  
   <div className="h-24"></div> {/* spacer for header */}
 
   {/* Section title */}
