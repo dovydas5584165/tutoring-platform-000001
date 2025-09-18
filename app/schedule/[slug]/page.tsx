@@ -132,6 +132,23 @@ export default function ScheduleLanding() {
   const [bookingLoading, setBookingLoading] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [lessonPrice, setLessonPrice] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchPrice = async () => {
+    const { data, error } = await supabase
+      .from("price")
+      .select("amount")
+      .single();
+
+    if (!error && data) {
+      setLessonPrice(Number(data.amount));
+        }
+    };
+
+  fetchPrice();
+    }, []);
+
 
   useEffect(() => {
     const fetchTeachersByLesson = async () => {
@@ -246,7 +263,7 @@ export default function ScheduleLanding() {
     }
   };
 
-  const totalPrice = selectedSlots.length * 25; // €25 / 45 min
+  const totalPrice = selectedSlots.length * (lessonPrice ?? 25); // €25 / 45 min
 
   // ✅ UPDATED: skip modal for recurring users
   const handleBookingConfirmAll = () => {
@@ -354,7 +371,7 @@ export default function ScheduleLanding() {
       {teachers.length > 0 ? (
         teachers.map((t) => (
           <option key={t.id} value={t.id}>
-            {t.vardas} {t.pavarde} – €25/45min
+            {t.vardas} {t.pavarde} – €{lessonPrice ?? 25}/45min
           </option>
         ))
       ) : loading ? (
@@ -414,7 +431,7 @@ export default function ScheduleLanding() {
                       {slotTutor.vardas} {slotTutor.pavarde}
                     </p>
                   )}
-                  <p className="text-xs mt-1 text-gray-600">€25/45min</p>
+                  <p className="text-xs mt-1 text-gray-600">€{lessonPrice ?? 25}/45min</p>
                 </div>
               );
             })}
@@ -436,7 +453,7 @@ export default function ScheduleLanding() {
                       {format(parseISO(slot.start_time), "yyyy-MM-dd HH:mm")}
                     </p>
                   </div>
-                  <div className="font-semibold text-blue-700">€25.00</div>
+                  <div className="font-semibold text-blue-700">€{(lessonPrice ?? 25).toFixed(2)}</div>
                 </li>
               ))}
             </ul>
