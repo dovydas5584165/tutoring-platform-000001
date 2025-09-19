@@ -455,7 +455,7 @@ export default function Home() {
     >
       {/* Apie mus */}
       <div className="text-center max-w-3xl mb-16">
-        <h2 className="text-5xl font-extrabold mb-6">Apie mus</h2>
+        <h2 className="text-5xl font-extrabold mb-6 text-gradient bg-clip-text text-transparent from-blue-500 via-purple-500 to-pink-500">Apie mus</h2>
         <p className="text-xl text-gray-700 leading-relaxed mb-6">
           Tiksliukai.lt – tai studentų edukacinis projektas. <br />
           Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir
@@ -483,35 +483,35 @@ export default function Home() {
 </div>
       </div>
 
-      {/* FAQ Accordion */}
-      <div className="w-full max-w-3xl space-y-4">
-        <h2 className="text-5xl font-extrabold mb-6 text-center">DUK</h2>
-        {faqData.map((faq, index) => (
-          <div
-            key={index}
-            className={`faq-item border rounded-lg overflow-hidden transition-all duration-300 ${
-              activeIndex === index ? "bg-white shadow-md" : "bg-blue-50"
-            }`}
-          >
-            <button
-              className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
-              aria-expanded={activeIndex === index}
-              onClick={() => toggleFAQ(index)}
-            >
-              <span>{faq.question}</span>
-              <span className="text-gray-500 text-xl">
-                {activeIndex === index ? "−" : "+"}
-              </span>
-            </button>
-            {activeIndex === index && (
-              <div className="faq-answer p-4 border-t border-gray-200 text-gray-700">
-                <p>{faq.answer}</p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </motion.section>
+      {/* FAQ Accordion styled like Tip Boxes */}
+<div className="w-full max-w-3xl space-y-4">
+  <h2 className="text-5xl font-extrabold mb-6 text-center">DUK</h2>
+  {faqData.map((faq, index) => (
+    <div
+      key={index}
+      className={`transition-all duration-300 rounded-lg overflow-hidden 
+        border-l-4 ${activeIndex === index ? "bg-white border-blue-400 shadow-md" : "bg-blue-50 border-blue-400 shadow-sm"}
+      `}
+    >
+      <button
+        className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
+        aria-expanded={activeIndex === index}
+        onClick={() => toggleFAQ(index)}
+      >
+        <span>{faq.question}</span>
+        <span className="text-gray-500 text-xl">
+          {activeIndex === index ? "−" : "+"}
+        </span>
+      </button>
+      {activeIndex === index && (
+        <div className="faq-answer p-4 border-t border-gray-200 text-gray-700">
+          <p>{faq.answer}</p>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
 
 
         {/* Section 5: Misija ir vizija */}
