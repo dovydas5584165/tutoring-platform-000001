@@ -365,13 +365,42 @@ export default function Home() {
   className="w-full min-h-screen flex flex-col justify-center items-center bg-white snap-start px-6 py-20"
 >
   <h2 className="text-5xl font-extrabold mb-8 text-center">
-    Kaip veikia sistema?🚀
+    Kaip veikia sistema? 🚀
   </h2>
-  <p className="max-w-2xl text-xl text-gray-700 leading-relaxed text-center">
-    Tobulėk čia ir dabar: pasirink mokytoją, rezervuok pamoką apmokėdamas ir gauk nuorodą į ją el. paštu.
-    Greita, efektyvu, patikima.
+
+  <p className="max-w-2xl text-xl text-gray-700 leading-relaxed text-center mb-10">
+    Tobulėk čia ir dabar:
   </p>
+
+  {/* Step List */}
+  <div className="max-w-xl space-y-6 mb-8">
+    {[
+      { num: 1, text: "Pasirink mokytoją iš mūsų patikrintos komandos." },
+      { num: 2, text: "Rezervuok pamoką patogiu laiku." },
+      { num: 3, text: "Apmokėk saugiai per mūsų sistemą." },
+      { num: 4, text: "Gauk nuorodą el. paštu ir junkis prie pamokos!" },
+    ].map((step, i) => (
+      <div key={i} className="flex items-start gap-4">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-400 text-black flex items-center justify-center font-bold text-lg shadow-md">
+          {step.num}
+        </div>
+        <p className="text-lg text-gray-800 leading-relaxed">
+          <strong>{step.text.split(" ")[0]}</strong>{" "}
+          {step.text.split(" ").slice(1).join(" ")}
+        </p>
+      </div>
+    ))}
+  </div>
+
+  {/* Tip Box */}
+  <div className="max-w-xl bg-yellow-50 border-l-4 border-yellow-400 text-gray-800 p-4 rounded-lg shadow-sm">
+    <p className="text-base">
+      <strong>Ar žinojote?:</strong> Galite rezervuoti visas mėnesio pamokas iškart.
+    </p>
+  </div>
 </motion.section>
+
+
 
         
 
