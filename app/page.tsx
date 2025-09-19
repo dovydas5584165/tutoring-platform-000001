@@ -490,7 +490,7 @@ export default function Home() {
           <div
             key={index}
             className={`faq-item border rounded-lg overflow-hidden transition-all duration-300 ${
-              activeIndex === index ? 
+              activeIndex === index 
                 ? "bg-white border-blue-400 shadow-md"
                 : "bg-blue-50 border-blue-400 text-gray-800 p-4 shadow-sm"
               }
@@ -507,7 +507,7 @@ export default function Home() {
               </span>
             </button>
             {activeIndex === index && (
-              <div className="ffaq-answer p-4 text-gray-700 border-t border-gray-200">
+              <div className="faq-answer p-4 text-gray-700 border-t border-gray-200">
                 <p>{faq.answer}</p>
               </div>
             )}
