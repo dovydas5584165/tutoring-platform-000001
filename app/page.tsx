@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { motion, animate } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button";
-import { FaInstagram, FaFacebook } from "react-icons/fa6";
 
 
 export default function Home() {
@@ -464,26 +463,24 @@ export default function Home() {
         </p>
 
         {/* Social links */}
-        <div className="flex justify-center gap-8">
-          <a
-            href="https://www.instagram.com/tiksliukai.lt/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-pink-500 hover:text-pink-600 transition-colors"
-          >
-            <FaInstagram className="text-3xl" />
-            <span className="font-semibold text-lg">Instagram</span>
-          </a>
-          <a
-            href="https://www.facebook.com/tiksliukai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-          >
-            <FaFacebook className="text-3xl" />
-            <span className="font-semibold text-lg">Facebook</span>
-          </a>
-        </div>
+<div className="flex justify-center gap-8">
+  <a
+    href="https://www.instagram.com/tiksliukai.lt/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-pink-500 hover:text-pink-600 font-semibold text-lg transition-colors"
+  >
+    Instagram
+  </a>
+  <a
+    href="https://www.facebook.com/tiksliukai"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 hover:text-blue-700 font-semibold text-lg transition-colors"
+  >
+    Facebook
+  </a>
+</div>
       </div>
 
       {/* FAQ Accordion */}
