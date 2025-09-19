@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, animate } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button";
+import { FaInstagram, FaFacebook } from "react-icons/fa";
 
 export default function Home() {
   const router = useRouter();
@@ -21,8 +22,47 @@ export default function Home() {
   const lessonsRef = useRef<HTMLDivElement>(null);
   const scrollToLessons = () => lessonsRef.current?.scrollIntoView({ behavior: "smooth" });
   const [selected, setSelected] = useState<string | null>(null);
+  const toggleFAQ = (index: number) => setActiveIndex(activeIndex === index ? null : index);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
 
+  const faqData = [
+  {
+    question: "Kokia pamokos kaina ir trukmė?",
+    answer:
+      "Vienos individualios pamokos trukmė – 45 minutės, o kaina – 25 €. Tai viena geriausių kainų už individualų dėmesį.",
+  },
+  {
+    question: "Kaip vyksta pamokos?",
+    answer:
+      "Pamokos vyksta nuotoliu per Google Meets platformą.",
+  },
+  {
+    question: "Kokių klasių moksleiviams skirtos pamokos?",
+    answer:
+      "Pamokos skirtos 1–12 klasių moksleiviams.",
+  },
+  {
+    question: "Kaip gausiu prisijungimą prie pamokos?",
+    answer:
+      "Mokytojas atsiųs Jums pamokos nuorodą apie 30 min. iki pamokos",
+  },
+  {
+    question: "Kaip galima atsiskaityti už pamokas?",
+    answer:
+      "Galite atsisakityti Apple Pay, Google Pay ar kortele",
+  },
+  {
+    question: "Kas nutiks, jei mokytojas atšauks pamoką?",
+    answer:
+      "Tokiu atveju pinigai bus grąžinti automatiškai",
+  },
+  {
+    question: "Kas nutiks, jei vėluosiu?",
+    answer:
+      "Mokytojas palauks Jūsų iki 10 minučių. Jei vėlavimas ilgesnis, pamokos trukmė gali būti sutrumpinta arba perkelta į kitą laiką.",
+  },
+];
 
   // === Scroll header hide/show ===
   useEffect(() => {
@@ -149,6 +189,7 @@ export default function Home() {
     "Labai rekomenduoju visiems tėvams – tėtis Vytautas",
     "Tikrai verta – mama Eglė",
   ];
+  
   function AnimatedNumber({ value }: { value: number }) {
     const [count, setCount] = useState(0);
     useEffect(() => {
@@ -381,7 +422,7 @@ export default function Home() {
       { num: 4, text: "Gauk nuorodą el. paštu ir junkis prie pamokos!" },
     ].map((step, i) => (
       <div key={i} className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-yellow-400 text-black flex items-center justify-center font-bold text-lg shadow-md">
+        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-400 text-black flex items-center justify-center font-bold text-lg shadow-md">
           {step.num}
         </div>
         <p className="text-lg text-gray-800 leading-relaxed">
@@ -393,7 +434,7 @@ export default function Home() {
   </div>
 
   {/* Tip Box */}
-  <div className="max-w-xl bg-yellow-50 border-l-4 border-yellow-400 text-gray-800 p-4 rounded-lg shadow-sm">
+  <div className="max-w-xl bg-blue-50 border-l-4 border-blue-400 text-gray-800 p-4 rounded-lg shadow-sm">
     <p className="text-base">
       <strong>Ar žinojote?:</strong> Galite rezervuoti visas mėnesio pamokas iškart.
     </p>
@@ -406,38 +447,73 @@ export default function Home() {
 
         {/* Section 4: Apie mus */}
         <motion.section
-  initial={{ opacity: 0, y: 60 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true }}
-  transition={{ duration: 0.8 }}
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-blue-50 snap-start px-6 py-20"
->
-  <h2 className="text-5xl font-extrabold mb-8 text-center">Apie mus</h2>
-  <p className="max-w-3xl text-xl text-gray-700 leading-relaxed text-center mb-6">
-    Tiksliukai.lt – tai studentų edukacinis projektas.
-    Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir patogesnis kiekvienam mokiniui Lietuvoje.
-  </p>
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      className="w-full flex flex-col items-center bg-blue-50 px-6 py-20"
+    >
+      {/* Apie mus */}
+      <div className="text-center max-w-3xl mb-16">
+        <h2 className="text-5xl font-extrabold mb-6">Apie mus</h2>
+        <p className="text-xl text-gray-700 leading-relaxed mb-6">
+          Tiksliukai.lt – tai studentų edukacinis projektas. <br />
+          Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir
+          patogesnis kiekvienam mokiniui Lietuvoje.
+        </p>
 
-  {/* Social links */}
-  <div className="flex gap-6">
-    <a
-      href="https://www.instagram.com/tiksliukai.lt/"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-pink-500 hover:text-pink-600 text-2xl font-bold transition-colors"
-    >
-      Instagram
-    </a>
-    <a
-      href="https://www.facebook.com/tiksliukai"
-      target="_blank"
-      rel="noopener noreferrer"
-      className="text-blue-600 hover:text-blue-700 text-2xl font-bold transition-colors"
-    >
-      Facebook
-    </a>
-  </div>
-</motion.section>
+        {/* Social links */}
+        <div className="flex justify-center gap-8">
+          <a
+            href="https://www.instagram.com/tiksliukai.lt/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-pink-500 hover:text-pink-600 transition-colors"
+          >
+            <FaInstagram className="text-3xl" />
+            <span className="font-semibold text-lg">Instagram</span>
+          </a>
+          <a
+            href="https://www.facebook.com/tiksliukai"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
+          >
+            <FaFacebook className="text-3xl" />
+            <span className="font-semibold text-lg">Facebook</span>
+          </a>
+        </div>
+      </div>
+
+      {/* FAQ Accordion */}
+      <div className="w-full max-w-3xl space-y-4">
+        <h2 className="text-5xl font-extrabold mb-6 text-center">DUK</h2>
+        {faqData.map((faq, index) => (
+          <div
+            key={index}
+            className={`faq-item border rounded-lg overflow-hidden transition-all duration-300 ${
+              activeIndex === index ? "bg-white shadow-md" : "bg-blue-50"
+            }`}
+          >
+            <button
+              className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
+              aria-expanded={activeIndex === index}
+              onClick={() => toggleFAQ(index)}
+            >
+              <span>{faq.question}</span>
+              <span className="text-gray-500 text-xl">
+                {activeIndex === index ? "−" : "+"}
+              </span>
+            </button>
+            {activeIndex === index && (
+              <div className="faq-answer p-4 border-t border-gray-200 text-gray-700">
+                <p>{faq.answer}</p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </motion.section>
 
 
         {/* Section 5: Misija ir vizija */}
