@@ -456,7 +456,7 @@ export default function Home() {
       {/* Apie mus */}
       <div className="text-center max-w-3xl mb-16">
         <h2 className="text-5xl font-extrabold mb-6">Apie mus</h2>
-        <p className="text-xl text-gray-700 leading-relaxed mb-6 p-6 bg-blue-50 rounded-xl shadow-md border-l-4 border-blue-400">
+        <p className="text-xl text-white-700 leading-relaxed mb-6 p-6 bg-blue-50 rounded-xl shadow-md border-l-4 border-blue-400">
           Tiksliukai.lt – tai studentų edukacinis projektas. <br />
           Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir
           patogesnis kiekvienam mokiniui Lietuvoje.
@@ -654,18 +654,39 @@ export default function Home() {
 
 
         {/* Section 3: Kam man registruotis */}
-        <motion.section
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 to-white snap-start px-6 py-20"
-        >
-          <h2 className="text-5xl font-extrabold mb-8 text-center">Kam man registruotis?</h2>
-          <p className="max-w-2xl text-xl text-gray-700 leading-relaxed text-center">
-            Užsiregistravę galėsite stebėti vaiko progresą ir matyti, ką jis mokosi. 📈
-          </p>
-        </motion.section>
+<motion.section
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 to-white snap-start px-6 py-20"
+>
+  <div className="max-w-4xl w-full bg-white rounded-2xl shadow-lg p-10 flex flex-col items-center gap-10">
+    <h2 className="text-5xl font-extrabold text-center mb-4">Kam man registruotis?</h2>
+    <p className="text-lg text-gray-700 text-center mb-6 max-w-2xl">
+      Užsiregistravę galėsite stebėti vaiko progresą, pamokų rezultatus ir mokymosi tendencijas. 📊
+    </p>
+
+    {/* Mini Graph / Analytical bars */}
+    <div className="w-full flex justify-between items-end gap-4 h-40">
+      {[70, 50, 90, 60, 80].map((value, i) => (
+        <div key={i} className="flex flex-col items-center">
+          <div
+            className="w-8 bg-blue-500 rounded-t-xl transition-all duration-500"
+            style={{ height: `${value}%` }}
+          ></div>
+          <span className="mt-2 text-sm text-gray-600">{value}%</span>
+        </div>
+      ))}
+    </div>
+
+    {/* CTA Button */}
+    <button className="mt-6 px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-full shadow-md transition-transform transform hover:scale-105">
+      Registruotis dabar
+    </button>
+  </div>
+</motion.section>
+
       </main>
 
       {/* Footer */}
