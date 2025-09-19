@@ -484,36 +484,33 @@ export default function Home() {
       </div>
 
       {/* FAQ Accordion */}
-      <div className="w-full max-w-3xl space-y-4">
-        <h2 className="text-5xl font-extrabold mb-6 text-center">DUK</h2>
-        {faqData.map((faq, index) => (
-          <div
-            key={index}
-            className={`faq-item border rounded-lg overflow-hidden transition-all duration-300 ${
-              activeIndex === index 
-                ? "bg-white border-blue-400 shadow-md"
-                : "bg-blue-50 border-blue-400 text-gray-800 p-4 shadow-sm"
-              }
-            `}
-          >
-            <button
-              className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
-              aria-expanded={activeIndex === index}
-              onClick={() => toggleFAQ(index)}
-            >
-              <span>{faq.question}</span>
-              <span className="text-gray-500 text-xl">
-                {activeIndex === index ? "−" : "+"}
-              </span>
-            </button>
-            {activeIndex === index && (
-              <div className="faq-answer p-4 text-gray-700 border-t border-gray-200">
-                <p>{faq.answer}</p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+      {/* FAQ Accordion */}
+<div className="w-full max-w-3xl space-y-4">
+  <h2 className="text-5xl font-extrabold mb-6 text-center">DUK</h2>
+  {faqData.map((faq, index) => (
+    <div
+      key={index}
+      className={`faq-item bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300`}
+    >
+      <button
+        className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
+        aria-expanded={activeIndex === index}
+        onClick={() => toggleFAQ(index)}
+      >
+        <span>{faq.question}</span>
+        <span className="text-gray-500 text-xl">
+          {activeIndex === index ? "−" : "+"}
+        </span>
+      </button>
+      {activeIndex === index && (
+        <div className="faq-answer p-4 border-t border-gray-200 text-gray-700">
+          <p>{faq.answer}</p>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
     </motion.section>
 
 
