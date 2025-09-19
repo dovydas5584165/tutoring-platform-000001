@@ -453,7 +453,6 @@ export default function Home() {
       transition={{ duration: 0.8 }}
       className="w-full flex flex-col items-center bg-blue-50 px-6 py-20"
     >
-      {/* Apie mus */}
       <div className="text-center max-w-3xl mb-16">
         <h2 className="text-5xl font-extrabold mb-6 text-gradient bg-clip-text text-transparent from-blue-500 via-purple-500 to-pink-500">Apie mus</h2>
         <p className="text-xl text-gray-700 leading-relaxed mb-6">
@@ -463,25 +462,25 @@ export default function Home() {
         </p>
 
         {/* Social links */}
-<div className="flex justify-center gap-8">
-  <a
+    <div className="flex justify-center gap-8">
+      <a
     href="https://www.instagram.com/tiksliukai.lt/"
     target="_blank"
     rel="noopener noreferrer"
     className="text-pink-500 hover:text-pink-600 font-semibold text-lg transition-colors"
-  >
+      >
     Instagram
-  </a>
-  <a
+      </a>
+      <a
     href="https://www.facebook.com/tiksliukai"
     target="_blank"
     rel="noopener noreferrer"
     className="text-blue-600 hover:text-blue-700 font-semibold text-lg transition-colors"
-  >
+      >
     Facebook
-  </a>
-</div>
-      </div>
+      </a>
+    </div>
+    </div>
 
       {/* FAQ Accordion styled like Tip Boxes */}
 <div className="w-full max-w-3xl space-y-4">
