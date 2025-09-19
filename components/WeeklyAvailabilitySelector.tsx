@@ -49,11 +49,11 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
 
     const rows = Array.from(selectedSlots).map((key) => {
       const [dateStr, hourStr, minStr] = key.split("-");
-      const date = new Date(dateStr); // local Lithuanian time
+      const date = new Date(dateStr);
       const hour = parseInt(hourStr);
       const minute = parseInt(minStr);
       const start = setMinutes(setHours(date, hour), minute);
-      const end = addHours(start, 1); // 1-hour slot
+      const end = addHours(start, 1);
 
       return {
         user_id: userId,
@@ -74,12 +74,12 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="p-6 bg-white rounded-3xl shadow-xl max-w-4xl mx-auto relative">
+    <div className="p-6 bg-white rounded-[50px] shadow-lg max-w-4xl mx-auto relative">
       <h2 className="text-xl font-semibold mb-4 text-center">Pasirinkite datas ir laikus</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Calendar */}
-        <div className="w-full md:w-auto rounded-3xl overflow-hidden shadow-inner p-4 bg-blue-50">
+        <div className="w-full md:w-auto rounded-[50px] overflow-hidden">
           <DayPicker
             mode="single"
             selected={selectedDate}
@@ -87,7 +87,6 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
             fromDate={today}
             toDate={twoWeeksLater}
             weekStartsOn={1}
-            className="rounded-3xl"
           />
         </div>
 
@@ -95,7 +94,7 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
         <div>
           {selectedDate ? (
             <>
-              <h3 className="text-md font-semibold mb-3 text-center">
+              <h3 className="text-md font-semibold mb-2 text-center">
                 {selectedDate.toLocaleDateString("lt-LT", {
                   weekday: "long",
                   year: "numeric",
@@ -103,7 +102,7 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
                   day: "numeric",
                 })}
               </h3>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(70px,1fr))] gap-3">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2">
                 {HOURS.map((hour) =>
                   MINUTES.map((minute) => {
                     const key = slotKey({ date: selectedDate, hour, minute });
@@ -117,8 +116,8 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
                         onClick={() => toggleSlot({ date: selectedDate, hour, minute })}
                         className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                           selected
-                            ? "bg-blue-500 text-white shadow-lg scale-105"
-                            : "bg-blue-100 text-gray-800 hover:bg-blue-200"
+                            ? "bg-blue-500 text-white shadow-md scale-105"
+                            : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                         }`}
                       >
                         {label}
@@ -139,7 +138,7 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
           <button
             onClick={() => setShowConfirm(true)}
             disabled={selectedSlots.size === 0}
-            className="px-6 py-3 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-all"
+            className="px-6 py-3 bg-green-500 text-white rounded-full shadow-md hover:bg-green-600 transition-all"
           >
             Išsaugoti pasirinkimus
           </button>
@@ -148,7 +147,7 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
 
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-3xl max-w-md shadow-2xl">
+          <div className="bg-white p-6 rounded-[50px] max-w-md shadow-xl">
             <h3 className="text-lg font-semibold mb-3">Ar tikrai norite pasirinkti visus šiuos laikus?</h3>
             <p className="text-sm text-gray-600 mb-4">
               Pažymėtus laikus atsiradus užsakymui turėsite pamoką pravesti.
