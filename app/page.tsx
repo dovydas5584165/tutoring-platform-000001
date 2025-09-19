@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { motion, animate } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button";
-import { FaInstagram, FaFacebook } from "react-icons/fa";
+import { FaInstagram, FaFacebook } from "react-icons/fa6";
+
 
 export default function Home() {
   const router = useRouter();
