@@ -384,7 +384,7 @@ export default function ScheduleLanding() {
 </header>
 
 
-      <div className="border rounded-lg p-4 shadow-lg mb-8">
+      <div className="p-4 mb-8 bg-white rounded-3xl shadow-md">
         <DayPicker
           mode="single"
           selected={selectedDate}
@@ -420,8 +420,8 @@ export default function ScheduleLanding() {
               return (
                 <div
                   key={slot.id}
-                  className={`relative p-4 border rounded-lg shadow-sm cursor-pointer text-center select-none ${
-                    isSelected ? "bg-blue-100 border-blue-500" : "hover:bg-gray-50"
+                  className={`relative p-4 bg-white rounded-2xl shadow-md cursor-pointer text-center select-none transition ${
+                    isSelected ? "bg-blue-100" : "hover:bg-gray-50"
                   }`}
                   onClick={() => toggleSlotSelection(slot)}
                 >
@@ -439,7 +439,7 @@ export default function ScheduleLanding() {
         )}
       </div>
 
-      <div className="mt-12 border-t pt-6 max-w-md">
+      <div className="mt-12 pt-6 max-w-md bg-white rounded-2xl shadow-md p-6">
         <h2 className="text-2xl font-semibold mb-4">Jūsų pasirinktos pamokos</h2>
         {selectedSlots.length === 0 ? (
           <p>Jūs dar nepasirinkote pamokų. Jei kyla neaiškumų, galite skambinti +37060395532</p> // hard coded number 
@@ -447,7 +447,7 @@ export default function ScheduleLanding() {
           <>
             <ul className="mb-4 space-y-2">
               {selectedSlots.map((slot) => (
-                <li key={slot.id} className="flex justify-between border rounded p-3 shadow-sm">
+                <li key={slot.id} className="flex justify-between rounded-2xl p-3 shadow-md bg-white">
                   <div>
                     <p className="font-medium">
                       {format(parseISO(slot.start_time), "yyyy-MM-dd HH:mm")}
