@@ -342,7 +342,7 @@ export default function Home() {
     <motion.div
       className="flex gap-4"
       animate={{ x: ["0%", "-50%"] }} // scroll half width for seamless loop
-      transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
+      transition={{ repeat: Infinity, duration: 50, ease: "linear" }}
     >
       {[...reviews, ...reviews].map((review, i) => (
         <div
@@ -538,7 +538,7 @@ export default function Home() {
             Patirtis: {teacher.experience}
           </span>
           <span className="bg-yellow-50 text-yellow-600 px-3 py-1 rounded-full text-xs font-medium">
-            {teacher.languages}
+            Kalbos, kuriomis galimos pamokos: {teacher.languages}
           </span>
         </div>
 
