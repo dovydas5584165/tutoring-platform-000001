@@ -28,7 +28,7 @@ export default function Home() {
 
   const faqData = [
   {
-    question: "Kokia pamokos kaina ir trukmė?",
+    question: "Kokia yra pamokos kaina ir trukmė?",
     answer:
       "Vienos individualios pamokos trukmė – 45 minutės, o kaina – 25 €. Tai viena geriausių kainų už individualų dėmesį.",
   },
