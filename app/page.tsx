@@ -652,7 +652,7 @@ export default function Home() {
 
 
 
-       {/* Section 3: Kam man registruotis */}
+      {/* Section 3: Kam man registruotis */}
 <motion.section
   initial={{ opacity: 0, y: 60 }}
   whileInView={{ opacity: 1, y: 0 }}
@@ -660,24 +660,11 @@ export default function Home() {
   transition={{ duration: 0.8 }}
   className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 to-white snap-start px-4 py-16 sm:px-6 lg:px-20"
 >
-  <div className="w-full max-w-3xl bg-white rounded-2xl shadow-lg p-6 sm:p-10 flex flex-col items-center gap-8">
+  <div className="w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6">
     <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">Kam man registruotis?</h2>
-    <p className="text-base sm:text-lg text-gray-700 text-center mb-6 max-w-2xl">
-      Užsiregistravę galėsite stebėti vaiko progresą, pamokų rezultatus ir mokymosi tendencijas. 📊
+    <p className="text-base sm:text-lg text-gray-700 text-center max-w-2xl">
+      Užsiregistravę galėsite stebėti vaiko progresą, pamokų rezultatus ir mokymosi tendencijas.
     </p>
-
-    {/* Responsive Mini Graph */}
-    <div className="w-full flex justify-between items-end gap-2 sm:gap-4 h-32 sm:h-40">
-      {[70, 50, 90, 60, 80].map((value, i) => (
-        <div key={i} className="flex flex-col items-center w-1/6 sm:w-10">
-          <div
-            className="w-full bg-blue-500 rounded-t-xl transition-all duration-500"
-            style={{ height: `${value}%` }}
-          ></div>
-          <span className="mt-1 text-xs sm:text-sm text-gray-600">{value}%</span>
-        </div>
-      ))}
-    </div>
   </div>
 </motion.section>
 
