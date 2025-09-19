@@ -420,8 +420,8 @@ export default function ScheduleLanding() {
               return (
                 <div
                   key={slot.id}
-                  className={`relative p-4 bg-white rounded-2xl shadow-md cursor-pointer text-center select-none transition ${
-                    isSelected ? "bg-blue-100" : "hover:bg-gray-50"
+                  className={`relative p-4 rounded-2xl shadow-md cursor-pointer text-center select-none transition ${
+                    isSelected ? "bg-blue-100" : "bg-white hover:bg-gray-50"
                   }`}
                   onClick={() => toggleSlotSelection(slot)}
                 >
