@@ -74,11 +74,12 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
   };
 
   return (
-    <div className="p-6 bg-white rounded-xl shadow-lg max-w-4xl mx-auto relative">
-      <h2 className="text-xl font-semibold mb-4">Pasirinkite datas ir laikus</h2>
+    <div className="p-6 bg-white rounded-3xl shadow-xl max-w-4xl mx-auto relative">
+      <h2 className="text-xl font-semibold mb-4 text-center">Pasirinkite datas ir laikus</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="w-full md:w-auto">
+        {/* Calendar */}
+        <div className="w-full md:w-auto rounded-3xl overflow-hidden shadow-inner p-4 bg-blue-50">
           <DayPicker
             mode="single"
             selected={selectedDate}
@@ -86,13 +87,15 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
             fromDate={today}
             toDate={twoWeeksLater}
             weekStartsOn={1}
+            className="rounded-3xl"
           />
         </div>
 
+        {/* Time Slots */}
         <div>
           {selectedDate ? (
             <>
-              <h3 className="text-md font-semibold mb-2">
+              <h3 className="text-md font-semibold mb-3 text-center">
                 {selectedDate.toLocaleDateString("lt-LT", {
                   weekday: "long",
                   year: "numeric",
@@ -100,7 +103,7 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
                   day: "numeric",
                 })}
               </h3>
-              <div className="grid grid-cols-[repeat(auto-fit,minmax(80px,1fr))] gap-2">
+              <div className="grid grid-cols-[repeat(auto-fit,minmax(70px,1fr))] gap-3">
                 {HOURS.map((hour) =>
                   MINUTES.map((minute) => {
                     const key = slotKey({ date: selectedDate, hour, minute });
@@ -112,10 +115,10 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
                       <button
                         key={key}
                         onClick={() => toggleSlot({ date: selectedDate, hour, minute })}
-                        className={`px-3 py-2 rounded text-sm font-medium transition ${
+                        className={`px-3 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
                           selected
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-100 hover:bg-gray-200"
+                            ? "bg-blue-500 text-white shadow-lg scale-105"
+                            : "bg-blue-100 text-gray-800 hover:bg-blue-200"
                         }`}
                       >
                         {label}
@@ -126,41 +129,41 @@ export default function TwoWeekHourlyCalendar({ userId }: { userId: string }) {
               </div>
             </>
           ) : (
-            <p className="text-gray-500">Pasirinkite dieną kalendoriuje</p>
+            <p className="text-gray-500 text-center mt-2">Pasirinkite dieną kalendoriuje</p>
           )}
         </div>
       </div>
 
-      <div className="mt-6">
-        <button
-          onClick={() => setShowConfirm(true)}
-          disabled={selectedSlots.size === 0}
-          className="px-6 py-3 bg-green-600 text-white rounded-md hover:bg-green-700 transition disabled:bg-gray-400"
-        >
-          Išsaugoti pasirinkimus
-        </button>
-      </div>
+      {selectedSlots.size > 0 && (
+        <div className="mt-6 flex justify-center">
+          <button
+            onClick={() => setShowConfirm(true)}
+            disabled={selectedSlots.size === 0}
+            className="px-6 py-3 bg-green-500 text-white rounded-full shadow-lg hover:bg-green-600 transition-all"
+          >
+            Išsaugoti pasirinkimus
+          </button>
+        </div>
+      )}
 
       {showConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg max-w-md shadow-xl">
-            <h3 className="text-lg font-semibold mb-3">
-              Ar tikrai norite pasirinkti visus šiuos laikus?
-            </h3>
+          <div className="bg-white p-6 rounded-3xl max-w-md shadow-2xl">
+            <h3 className="text-lg font-semibold mb-3">Ar tikrai norite pasirinkti visus šiuos laikus?</h3>
             <p className="text-sm text-gray-600 mb-4">
               Pažymėtus laikus atsiradus užsakymui turėsite pamoką pravesti.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowConfirm(false)}
-                className="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300"
+                className="px-4 py-2 rounded-full bg-gray-200 hover:bg-gray-300 transition-all"
               >
                 Atšaukti
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
-                className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700"
+                className="px-4 py-2 rounded-full bg-green-500 text-white hover:bg-green-600 transition-all"
               >
                 {submitting ? "Išsaugoma..." : "Patvirtinti"}
               </button>
