@@ -456,7 +456,7 @@ export default function Home() {
       {/* Apie mus */}
       <div className="text-center max-w-3xl mb-16">
         <h2 className="text-5xl font-extrabold mb-6">Apie mus</h2>
-        <p className="text-xl text-gray-700 leading-relaxed mb-6">
+        <p className="text-xl text-gray-700 leading-relaxed mb-6 p-6 bg-blue-50 rounded-xl shadow-md border-l-4 border-blue-400">
           Tiksliukai.lt – tai studentų edukacinis projektas. <br />
           Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir
           patogesnis kiekvienam mokiniui Lietuvoje.
@@ -490,8 +490,11 @@ export default function Home() {
           <div
             key={index}
             className={`faq-item border rounded-lg overflow-hidden transition-all duration-300 ${
-              activeIndex === index ? "bg-white shadow-md" : "bg-blue-50"
-            }`}
+              activeIndex === index ? 
+                ? "bg-white border-blue-400 shadow-md"
+                : "bg-blue-50 border-blue-400 text-gray-800 p-4 shadow-sm"
+              }
+            `}
           >
             <button
               className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
@@ -504,7 +507,7 @@ export default function Home() {
               </span>
             </button>
             {activeIndex === index && (
-              <div className="faq-answer max-w-xl bg-blue-50 border-l-4 border-blue-400 text-gray-800 p-4 rounded-lg shadow-sm mt-2">
+              <div className="ffaq-answer p-4 text-gray-700 border-t border-gray-200">
                 <p>{faq.answer}</p>
               </div>
             )}
