@@ -703,7 +703,7 @@ export default function Home() {
         languages: "Lietuvių, Anglų",
         description:
           "Aš esu Dovydas, kiekybinės ekonomikos studentas VU. Turiu patirties ruošiant mokinius tiek matematikos, tiek IT egzaminams. Mano pamokos yra interaktyvios ir pritaikytos prie kiekvieno mokinio poreikių.",
-          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
+          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
       }
     ].map((teacher, i) => (
       <div

@@ -492,7 +492,7 @@ export default function Home() {
       <motion.div
         key={i}
         className={`p-6 rounded-xl shadow-md border-l-4 transition-transform duration-300 hover:scale-105 ${
-          i % 2 === 0 ? "bg-white border-blue-800" : "bg-white border-red-600"
+          i % 2 === 0 ? "bg-blue-50 border-blue-800" : "bg-red-50 border-red-600"
         }`}
         variants={{
           hidden: { opacity: 0, y: 20 },
@@ -696,19 +696,10 @@ export default function Home() {
           "Esu matematikos ir lietuvių kalbos korepetitorė. Padedu pasiruošti atsiskaitymams, kontroliniams darbams, atlikti namų darbus ar pagilinti žinias. Kiekvienam mokiniui taikau individualią mokymo strategiją, nes žinau, kad vieno „stebuklingo“ metodo nėra. Mano tikslas - ne tik geresni pažymiai, bet ir augantis pasitikėjimas savimi. Jei ieškote korepetitoriaus, kuris aiškiai paaiškina, palaiko ir motyvuoja, mielai padėsiu jūsų vaikui žengti pirmyn.",
         img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
       },
-      {
-        name: "Dovydas Žilinskas",
-        subject: "Matematika, IT",
-        experience: "2 metai",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Aš esu Dovydas, kiekybinės ekonomikos studentas VU. Turiu patirties ruošiant mokinius tiek matematikos, tiek IT egzaminams. Mano pamokos yra interaktyvios ir pritaikytos prie kiekvieno mokinio poreikių.",
-          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
-      }
     ].map((teacher, i) => (
       <div
         key={i}
-        className="w-72 bg-[#3B65CE] rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
+        className="w-72 bg-blue-600 rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
       >
         <img
           src={teacher.img}
@@ -719,13 +710,13 @@ export default function Home() {
 
         {/* Highlighted tags */}
         <div className="flex flex-wrap justify-center gap-2 mb-3">
-          <span className="bg-red-400 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          <span className="bg-blue-400 text-white px-3 py-1 rounded-full text-xs font-semibold">
             {teacher.subject}
           </span>
-          <span className="bg-yellow-400 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+          <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
             Patirtis: {teacher.experience}
           </span>
-          <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+          <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
             Kalbos, kuriomis galimos pamokos: {teacher.languages}
           </span>
         </div>

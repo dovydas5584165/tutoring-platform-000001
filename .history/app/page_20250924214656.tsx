@@ -697,13 +697,13 @@ export default function Home() {
         img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
       },
       {
-        name: "Dovydas Žilinskas",
-        subject: "Matematika, IT",
+        name: "Justė Giedraitytė",
+        subject: "Matematika, Anglų kalba",
         experience: "2 metai",
         languages: "Lietuvių, Anglų",
         description:
-          "Aš esu Dovydas, kiekybinės ekonomikos studentas VU. Turiu patirties ruošiant mokinius tiek matematikos, tiek IT egzaminams. Mano pamokos yra interaktyvios ir pritaikytos prie kiekvieno mokinio poreikių.",
-          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
+          "Esu Justė, politikos mokslų studentė iš Vilniaus. Ne visada mylėjau matematiką ir prisiekinėjau sau, jog nieko bendro su tuo neturėsiu ateityje. Tačiau ilgainiui, su daug sunkaus darbo, pamilau matematiką ir net vienus savo gyvenimo metus ją studijavau! Tas, manau, ir yra unikalu apie mane - žinau, kaip paaiškinti užduotis, taip, kad net visiškai žalias suprastų:)",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/IMG_5420.jpeg",
       }
     ].map((teacher, i) => (
       <div

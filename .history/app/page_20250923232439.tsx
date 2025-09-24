@@ -7,8 +7,6 @@ import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import Image from "next/image";
-import { FaTrophy } from "react-icons/fa";
-
 
 
 
@@ -279,49 +277,16 @@ export default function Home() {
   </div>
 
   {/* Mobile Hamburger Icon */}
-<div className="sm:hidden flex flex-col items-end relative">
-  <button
-    onClick={() => setMenuOpen(!menuOpen)}
-    className="text-gray-700 hover:text-blue-600 p-2 rounded-md"
-  >
-    {menuOpen ? (
-      // Close Icon
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    ) : (
-      // Hamburger Icon
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className="h-6 w-6"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
-      >
-        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-      </svg>
-    )}
-  </button>
-
-  {/* Mobile Menu Items */}
-  {menuOpen && (
-    <div className="mt-2 flex flex-col bg-white shadow-lg rounded-md w-48 py-4 absolute right-0 z-50">
-      {/* X Icon Top Right */}
-      <button
-        onClick={() => setMenuOpen(false)}
-        className="absolute top-2 right-2 text-gray-700 hover:text-red-500 p-1"
-      >
+  <div className="sm:hidden flex items-center">
+    <button
+      onClick={() => setMenuOpen(!menuOpen)}
+      className="text-gray-700 hover:text-green-600 p-2 rounded-md"
+    >
+      {menuOpen ? (
+        // Close Icon
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          className="h-5 w-5"
+          className="h-6 w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -329,18 +294,21 @@ export default function Home() {
         >
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
-      </button>
-
-      <a href="#apie-mus" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Apie mus</a>
-      <a href="#korepetitoriai" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Korepetitoriai</a>
-      <a href="/auth" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Prisiregistruoti</a>
-      <a href="/auth/log-in" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Prisijungti</a>
-      <a href="#pamokos" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Pamokos</a>
-    </div>
-  )}
-</div>
-
-
+      ) : (
+        // Hamburger Icon
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+      )}
+    </button>
+  </div>
 </div>
 
             )}
@@ -361,19 +329,18 @@ export default function Home() {
     transition={{ duration: 1 }}
     className="max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center relative overflow-hidden"
   >
-    <p className="text-2xl font-bold mb-6 text-gray-800">
+    <p className="text-2xl mb-6 text-gray-800">
        Kas didesnis: 20% nuo 50 ar 50% nuo 20?
     </p>
 
     {/* input answer */}
     <div className="flex flex-col gap-4 mb-6">
-      <input
-    type="text"
-    value={selected} // assuming `selected` is your state
-    onChange={(e) => setSelected(e.target.value)}
-    placeholder="Parašykite atsakymą..."
-    className="w-full p-2 border border-gray-300 bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-  />
+      <Button
+        onClick={() => setSelected("20% nuo 50")}
+        className="w-full bg-gray-300 hover:bg-blue-700 text-black"
+      >
+        parašykite atsakymą...
+      </Button>
     </div>
 
     {/* Reveal Animation */}
@@ -403,7 +370,7 @@ export default function Home() {
   {/* Single CTA */}
   <Button
     onClick={scrollToLessons}
-    className="px-8 py-4 text-lg font-semibold rounded-full bg-yellow-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
+    className="px-8 py-4 text-lg font-semibold rounded-full bg-[#FDD35D] text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
   >
     Atrask pamokas 
   </Button>
@@ -412,7 +379,6 @@ export default function Home() {
 
        {/* Section 1: Lessons */}
 <section
-  id="pamokos"
   ref={lessonsRef}
   className="w-full min-h-[60vh] flex flex-col justify-center items-center snap-start px-4 bg-white relative"
 >  
@@ -465,7 +431,7 @@ export default function Home() {
   initial="hidden"
   whileInView="visible"
   viewport={{ once: true }}
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20"
+  className="w-full min-h-screen flex flex-col justify-center items-center bg-blue-600 snap-start px-6 py-20"
 >
   <h2 className="text-5xl text-white font-extrabold mb-8 text-center">
     Kaip veikia sistema?
@@ -492,7 +458,7 @@ export default function Home() {
       <motion.div
         key={i}
         className={`p-6 rounded-xl shadow-md border-l-4 transition-transform duration-300 hover:scale-105 ${
-          i % 2 === 0 ? "bg-white border-blue-800" : "bg-white border-red-600"
+          i % 2 === 0 ? "bg-blue-50 border-blue-800" : "bg-red-50 border-red-600"
         }`}
         variants={{
           hidden: { opacity: 0, y: 20 },
@@ -516,7 +482,6 @@ export default function Home() {
       viewport={{ once: true }}
       transition={{ duration: 0.8 }}
       className="w-full flex flex-col items-center bg-white px-6 py-20"
-      id="apie-mus"
     >
       {/* Apie mus */}
       <div className="text-center max-w-3xl mb-16">
@@ -580,31 +545,20 @@ export default function Home() {
 
         {/* Section 5: Misija ir vizija */}
 <motion.section
-  initial={{ opacity: 0, y: 20 }}
+  initial={{ opacity: 0, y: 20 }}       // reduce y to make the slide subtle
   whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true, amount: 0.3 }}
-  transition={{ duration: 0.5, ease: "easeOut" }}
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20"
+  viewport={{ once: true, amount: 0.3 }} // trigger when 30% of section is visible
+  transition={{ duration: 0.5, ease: "easeOut" }} // shorter duration, smoother easing
+  className="w-full min-h-screen flex flex-col justify-center items-center bg-blue-600 snap-start px-6 py-20"
 >
   <h2 className="text-5xl font-extrabold mb-8 text-center text-white">
-    Mūsų misija ir vizija 
+    Mūsų misija ir vizija ⭐
   </h2>
   <p className="max-w-3xl text-xl text-white leading-relaxed text-center">
-    <span className="font-bold text-yellow-400">Mūsų misija</span> – suteikti kiekvienam vaikui galimybę mokytis iš geriausių mokytojų, nepriklausomai nuo jų gyvenamos vietos ar galimybių.
+    <span className="font-bold text-yellow-600">Mūsų misija</span> – suteikti kiekvienam vaikui galimybę mokytis iš geriausių mokytojų, nepriklausomai nuo jų gyvenamos vietos ar galimybių.
     <br />
-    <span className="font-bold text-yellow-400">Vizija</span> – būti Nr. 1 korepetitorių platforma Baltijos šalyse.
+    <span className="font-bold text-yellow-600">Vizija</span> – būti Nr. 1 korepetitorių platforma Baltijos šalyse.
   </p>
-
-  {/* BIG ICON BELOW */}
-  <motion.div
-    initial={{ scale: 0 }}
-    whileInView={{ scale: 1 }}
-    viewport={{ once: true }}
-    transition={{ duration: 0.7, ease: "easeOut" }}
-    className="mt-12 text-yellow-400"
-  >
-    <FaTrophy className="w-24 h-24 md:w-32 md:h-32" />
-  </motion.div>
 </motion.section>
 
 
@@ -635,7 +589,6 @@ export default function Home() {
   whileInView={{ opacity: 1, y: 0 }}
   viewport={{ once: true }}
   transition={{ duration: 0.8 }}
-  id="korepetitoriai"
   className="w-full min-h-screen flex flex-col justify-center items-center bg-white snap-start px-6 py-32"
 >
   <h2 className="text-5xl font-extrabold mb-12 text-center">Mūsų Mokytojai</h2>
@@ -696,19 +649,10 @@ export default function Home() {
           "Esu matematikos ir lietuvių kalbos korepetitorė. Padedu pasiruošti atsiskaitymams, kontroliniams darbams, atlikti namų darbus ar pagilinti žinias. Kiekvienam mokiniui taikau individualią mokymo strategiją, nes žinau, kad vieno „stebuklingo“ metodo nėra. Mano tikslas - ne tik geresni pažymiai, bet ir augantis pasitikėjimas savimi. Jei ieškote korepetitoriaus, kuris aiškiai paaiškina, palaiko ir motyvuoja, mielai padėsiu jūsų vaikui žengti pirmyn.",
         img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
       },
-      {
-        name: "Dovydas Žilinskas",
-        subject: "Matematika, IT",
-        experience: "2 metai",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Aš esu Dovydas, kiekybinės ekonomikos studentas VU. Turiu patirties ruošiant mokinius tiek matematikos, tiek IT egzaminams. Mano pamokos yra interaktyvios ir pritaikytos prie kiekvieno mokinio poreikių.",
-          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
-      }
     ].map((teacher, i) => (
       <div
         key={i}
-        className="w-72 bg-[#3B65CE] rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
+        className="w-72 bg-blue-600 rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
       >
         <img
           src={teacher.img}
@@ -719,18 +663,18 @@ export default function Home() {
 
         {/* Highlighted tags */}
         <div className="flex flex-wrap justify-center gap-2 mb-3">
-          <span className="bg-red-400 text-white px-3 py-1 rounded-full text-xs font-semibold">
+          <span className="bg-blue-400 text-white px-3 py-1 rounded-full text-xs font-semibold">
             {teacher.subject}
           </span>
-          <span className="bg-yellow-400 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+          <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
             Patirtis: {teacher.experience}
           </span>
-          <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+          <span className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
             Kalbos, kuriomis galimos pamokos: {teacher.languages}
           </span>
         </div>
 
-        <p className="text-white text-sm text-center">{teacher.description}</p>
+        <p className="text- text-sm text-center">{teacher.description}</p>
       </div>
     ))}
   </div>
@@ -744,7 +688,7 @@ export default function Home() {
   whileInView={{ opacity: 1, y: 0 }}
   viewport={{ once: true }}
   transition={{ duration: 0.8 }}
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-300 to-blue-600 snap-start px-4 py-16 sm:px-6 lg:px-20"
+  className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 to-white snap-start px-4 py-16 sm:px-6 lg:px-20"
 >
   <div className="w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6">
     <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">Kam man registruotis?</h2>

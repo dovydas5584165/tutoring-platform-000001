@@ -433,7 +433,7 @@ export default function Home() {
     {lessons.map((lesson) => (
       <Button
         key={lesson.slug}
-        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
+        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-red-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
         onClick={() => router.push(`/schedule/${lesson.slug}`)}
       >
         {lesson.name}
@@ -492,7 +492,7 @@ export default function Home() {
       <motion.div
         key={i}
         className={`p-6 rounded-xl shadow-md border-l-4 transition-transform duration-300 hover:scale-105 ${
-          i % 2 === 0 ? "bg-white border-blue-800" : "bg-white border-red-600"
+          i % 2 === 0 ? "bg-blue-50 border-blue-800" : "bg-red-50 border-red-600"
         }`}
         variants={{
           hidden: { opacity: 0, y: 20 },
@@ -696,15 +696,6 @@ export default function Home() {
           "Esu matematikos ir lietuvių kalbos korepetitorė. Padedu pasiruošti atsiskaitymams, kontroliniams darbams, atlikti namų darbus ar pagilinti žinias. Kiekvienam mokiniui taikau individualią mokymo strategiją, nes žinau, kad vieno „stebuklingo“ metodo nėra. Mano tikslas - ne tik geresni pažymiai, bet ir augantis pasitikėjimas savimi. Jei ieškote korepetitoriaus, kuris aiškiai paaiškina, palaiko ir motyvuoja, mielai padėsiu jūsų vaikui žengti pirmyn.",
         img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
       },
-      {
-        name: "Dovydas Žilinskas",
-        subject: "Matematika, IT",
-        experience: "2 metai",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Aš esu Dovydas, kiekybinės ekonomikos studentas VU. Turiu patirties ruošiant mokinius tiek matematikos, tiek IT egzaminams. Mano pamokos yra interaktyvios ir pritaikytos prie kiekvieno mokinio poreikių.",
-          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
-      }
     ].map((teacher, i) => (
       <div
         key={i}
