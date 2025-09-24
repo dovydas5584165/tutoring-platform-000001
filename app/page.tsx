@@ -57,7 +57,7 @@ export default function Home() {
   {
     question: "Kaip galima atsiskaityti už pamokas?",
     answer:
-      "Galite atsisakityti Apple Pay, Google Pay ar kortele",
+      "Galite atsiskaityti Apple Pay, Google Pay ar kortele",
   },
   {
     question: "Kas nutiks, jei mokytojas atšauks pamoką?",
