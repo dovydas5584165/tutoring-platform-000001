@@ -20,10 +20,6 @@ type Booking = {
   student_phone?: string | null;
   topic?: string;
   created_at: string;
-  confirmed_by_tutor?: boolean | null;  // add this
-  payment_status?: "pending" | "paid" | "failed" | "cancelled" | null;
-  
-
 };
 
 type UserFlags = {
@@ -405,7 +401,6 @@ export default function TutorDashboard() {
     <ul className="space-y-4 max-h-[400px] overflow-y-auto">
       {orders
         .filter(order => !hiddenBookings.includes(order.id))
-        .filter(order => order.payment_status === "paid" || order.payment_status === "cancelled")
         .map((order) => {
           const statusText = order.confirmed_by_tutor
             ? "Priimtas"
