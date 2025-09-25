@@ -316,12 +316,24 @@ export default function ScheduleLanding() {
           created_at: new Date().toISOString(),
           lesson_slug: slug,
           tutor_id: tutorId,
-          payment_status: "pending"
         })
         .select()
         .single();
 
       if (error || !bookingData) throw error || new Error("Nepavyko sukurti užsakymo");
+
+      // Send tutor notifications
+      const notificationsData = selectedSlots.map((slot) => ({
+        user_id: slot.user_id,
+        message: `Ar sutinki vesti pamoką ${slug} ${format(
+          parseISO(slot.start_time),
+          "yyyy-MM-dd HH:mm"
+        )}?${info.topic ? ` Tema: "${info.topic}"` : ""}`,
+        is_read: false,
+        booking_id: bookingData.id,
+      }));
+
+      await supabase.from("notifications").insert(notificationsData);
 
       setShowBookingModal(false);
       setSelectedSlots([]);
