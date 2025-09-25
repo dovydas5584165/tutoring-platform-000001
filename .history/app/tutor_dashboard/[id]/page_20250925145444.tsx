@@ -54,7 +54,6 @@ export default function TutorDashboard() {
   const [orders, setOrders] = useState<Booking[]>([]);
   const [hiddenBookings, setHiddenBookings] = useState<string[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
-  
 
   // Check user agreement on mount
   useEffect(() => {
@@ -409,7 +408,7 @@ export default function TutorDashboard() {
         .map((order) => {
           const statusText = order.confirmed_by_tutor
             ? "Priimtas"
-            : order.payment_status === "refunded"
+            : order.payment_status === "cancelled"
             ? "Atšauktas"
             : "Laukiama";
 
