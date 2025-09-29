@@ -353,27 +353,42 @@ export default function Home() {
 
         
 {/* === Hero/Landing Section: Percent Puzzle Game === */}
-<section className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-200 to-[#3B65CE] text-white snap-start px-6">
+<section className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] text-white snap-start px-6 overflow-hidden">
+  {/* Background Dots (ordered grid for neatness) */}
+  <div className="absolute inset-0 grid grid-cols-8 gap-6 opacity-50 pointer-events-none">
+    {Array.from({ length: 80 }).map((_, i) => (
+      <span key={i} className="w-2 h-2 rounded-full bg-black" />
+    ))}
+  </div>
+
   {/* Puzzle Card */}
   <motion.div
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 1 }}
-    className="max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center relative overflow-hidden"
+    className="relative z-10 max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center overflow-hidden"
   >
-    <p className="text-2xl font-bold mb-6 text-gray-800">
-       Kas didesnis: 20% nuo 50 ar 50% nuo 20?
-    </p>
+    <div className="relative inline-block">
+      <p className="text-2xl font-bold mb-6 text-gray-800">
+        Kas didesnis: 20% nuo 50 ar 50% nuo 20?
+      </p>
 
-    {/* input answer */}
-    <div className="flex flex-col gap-4 mb-6">
+      {/* Responsive Red Accent Line */}
+      <span className="block mx-auto h-1 bg-red-500 
+                       w-16 sm:w-20 md:w-24 lg:w-28 
+                       rounded-full transition-all duration-300">
+      </span>
+    </div>
+
+    {/* Input Answer */}
+    <div className="flex flex-col gap-4 mb-6 mt-6">
       <input
-    type="text"
-    value={selected} // assuming `selected` is your state
-    onChange={(e) => setSelected(e.target.value)}
-    placeholder="Parašykite atsakymą..."
-    className="w-full p-2 border border-gray-300 bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-  />
+        type="text"
+        value={selected}
+        onChange={(e) => setSelected(e.target.value)}
+        placeholder="Parašykite atsakymą..."
+        className="w-full p-2 border border-gray-300 bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </div>
 
     {/* Reveal Animation */}
@@ -384,8 +399,8 @@ export default function Home() {
         transition={{ duration: 0.6 }}
         className="text-lg text-gray-700 font-semibold mb-2"
       >
-         Abiejais atvejais atsakymas yra —{" "}
-        <span className="text-blue-600 font-bold">10</span> 
+        Abiejais atvejais atsakymas yra —{" "}
+        <span className="text-blue-600 font-bold">10</span>
       </motion.div>
     )}
 
@@ -399,15 +414,17 @@ export default function Home() {
         Tai yra pirmasis 10-ukas, kurį pamatėte su mumis, bet tikrai ne paskutinis!
       </motion.p>
     )}
-    </motion.div>
+  </motion.div>
+
   {/* Single CTA */}
   <Button
     onClick={scrollToLessons}
-    className="px-8 py-4 text-lg font-semibold rounded-full bg-yellow-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
+    className="relative z-10 px-8 py-4 text-lg font-semibold rounded-full bg-yellow-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
   >
-    Atrask pamokas 
+    Atrask pamokas
   </Button>
 </section>
+
 
 
        {/* Section 1: Lessons */}
@@ -415,7 +432,14 @@ export default function Home() {
   id="pamokos"
   ref={lessonsRef}
   className="w-full min-h-[60vh] flex flex-col justify-center items-center snap-start px-4 bg-white relative"
->  
+  style={{
+    backgroundImage: `
+      linear-gradient(to right, rgba(0,100,255,0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,100,255,0.1) 1px, transparent 1px)
+    `,
+    backgroundSize: "40px 40px", // grid spacing
+  }}>
+  
   <div className="h-24"></div> {/* spacer for header */}
 
   {/* Section title */}
@@ -433,7 +457,7 @@ export default function Home() {
     {lessons.map((lesson) => (
       <Button
         key={lesson.slug}
-        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
+        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-[#3B65CE] text-white hover:bg-[#2C4A8E] transition-shadow duration-300 shadow-md"
         onClick={() => router.push(`/schedule/${lesson.slug}`)}
       >
         {lesson.name}
@@ -492,7 +516,7 @@ export default function Home() {
       <motion.div
         key={i}
         className={`p-6 rounded-xl shadow-md border-l-4 transition-transform duration-300 hover:scale-105 ${
-          i % 2 === 0 ? "bg-white border-blue-800" : "bg-white border-red-600"
+          i % 2 === 0 ? "bg-white border-blue-800" : "bg-white border-yellow-300"
         }`}
         variants={{
           hidden: { opacity: 0, y: 20 },
@@ -584,12 +608,29 @@ export default function Home() {
   whileInView={{ opacity: 1, y: 0 }}
   viewport={{ once: true, amount: 0.3 }}
   transition={{ duration: 0.5, ease: "easeOut" }}
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20"
+  className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20 overflow-hidden"
 >
-  <h2 className="text-5xl font-extrabold mb-8 text-center text-white">
+  {/* Baltic States Map Background */}
+  <svg
+    className="absolute inset-0 w-full h-full opacity-10"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 800 1000"
+    preserveAspectRatio="xMidYMid meet"
+  >
+    <path
+      d="M350 50 L420 80 L460 150 L480 250 L470 350 L430 420 L400 500 L380 600 L350 680 L300 750 L250 730 L220 650 L200 550 L210 450 L250 350 L300 250 L320 150 Z"
+      fill="white"
+      fillOpacity="0.15"
+      stroke="white"
+      strokeWidth="2"
+    />
+  </svg>
+
+  {/* Content */}
+  <h2 className="relative z-10 text-5xl font-extrabold mb-8 text-center text-white">
     Mūsų misija ir vizija 
   </h2>
-  <p className="max-w-3xl text-xl text-white leading-relaxed text-center">
+  <p className="relative z-10 max-w-3xl text-xl text-white leading-relaxed text-center">
     <span className="font-bold text-yellow-400">Mūsų misija</span> – suteikti kiekvienam vaikui galimybę mokytis iš geriausių mokytojų, nepriklausomai nuo jų gyvenamos vietos ar galimybių.
     <br />
     <span className="font-bold text-yellow-400">Vizija</span> – būti Nr. 1 korepetitorių platforma Baltijos šalyse.
@@ -601,11 +642,13 @@ export default function Home() {
     whileInView={{ scale: 1 }}
     viewport={{ once: true }}
     transition={{ duration: 0.7, ease: "easeOut" }}
-    className="mt-12 text-yellow-400"
+    className="relative z-10 mt-12 text-yellow-400"
   >
     <FaTrophy className="w-24 h-24 md:w-32 md:h-32" />
   </motion.div>
 </motion.section>
+
+
 
 
         {/* Section 6: Statistika */}
@@ -744,15 +787,46 @@ export default function Home() {
   whileInView={{ opacity: 1, y: 0 }}
   viewport={{ once: true }}
   transition={{ duration: 0.8 }}
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-300 to-blue-600 snap-start px-4 py-16 sm:px-6 lg:px-20"
+  className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-4 py-16 sm:px-6 lg:px-20 overflow-hidden"
 >
-  <div className="w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6">
-    <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">Kam man registruotis?</h2>
+  {/* Yellow Ribbon */}
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="w-[250%] h-32 bg-yellow-400 rotate-[-8deg] opacity-70"></div>
+  </div>
+
+  {/* Minimalist Navigation Path */}
+  <svg
+    className="absolute inset-0 w-full h-full pointer-events-none opacity-40"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+  >
+    {/* Smooth red curved path */}
+    <path
+      d="M 0 400 Q 300 200, 600 400 T 1200 400"
+      stroke="#DC2626"          
+      strokeWidth="3"
+      fill="none"
+      strokeLinecap="round"
+      strokeDasharray="10 14"
+    />
+
+    {/* Waypoints */}
+    <circle cx="0" cy="400" r="6" fill="#DC2626" />
+    <circle cx="600" cy="400" r="6" fill="#DC2626" />
+    <circle cx="1200" cy="400" r="6" fill="#DC2626" />
+  </svg>
+
+  {/* Content Card */}
+  <div className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6">
+    <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
+      Kam man registruotis?
+    </h2>
     <p className="text-base sm:text-lg text-gray-700 text-center max-w-2xl">
       Užsiregistravę galėsite stebėti vaiko progresą, pamokų rezultatus ir mokymosi tendencijas.
     </p>
   </div>
 </motion.section>
+
 
 
       </main>
