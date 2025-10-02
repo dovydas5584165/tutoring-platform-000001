@@ -431,7 +431,7 @@ export default function Home() {
 <section
   id="pamokos"
   ref={lessonsRef}
-  className="w-full min-h-[100svh] flex flex-col items-center justify-start snap-start px-4 bg-white relative"
+  className="w-full h-[100svh] flex flex-col items-center justify-start snap-start px-4 bg-white relative overflow-hidden"  >
   style={{
     backgroundImage: `
       linear-gradient(to right, rgba(0,100,255,0.1) 1px, transparent 1px),
