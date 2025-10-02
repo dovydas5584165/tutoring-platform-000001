@@ -431,14 +431,15 @@ export default function Home() {
 <section
   id="pamokos"
   ref={lessonsRef}
-  className="w-full h-[100svh] flex flex-col items-center justify-start snap-start px-4 bg-white relative overflow-hidden"  >
+  className="w-full h-[85svh] flex flex-col items-center justify-start snap-start px-4 bg-white relative overflow-hidden" 
   style={{
     backgroundImage: `
       linear-gradient(to right, rgba(0,100,255,0.1) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(0,100,255,0.1) 1px, transparent 1px)
     `,
-    backgroundSize: "40px 40px", // grid spacing
-  }}>
+    backgroundSize: "40px 40px",
+  }}
+>
   
   <div className="h-24"></div> {/* spacer for header */}
 
@@ -489,7 +490,7 @@ export default function Home() {
   initial="hidden"
   whileInView="visible"
   viewport={{ once: true }}
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20"
+  className="w-full min-h-[85svh] flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20"
 >
   <h2 className="text-5xl text-white font-extrabold mb-8 text-center">
     Kaip veikia sistema?
