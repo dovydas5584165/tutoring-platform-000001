@@ -25,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="lt">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* ✅ Google Analytics */}
+        {/* Google Analytics */}
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-CP50RV65SV"
@@ -43,7 +43,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        {/* ✅ Meta Pixel (moved inside body) */}
+        {/* Google Tag Manager */}
+        <Script
+          id="gtm-script"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function(w,d,s,l,i){
+                w[l]=w[l]||[];
+                w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
+                var f=d.getElementsByTagName(s)[0],
+                j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
+                j.async=true; j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
+                f.parentNode.insertBefore(j,f);
+              })(window,document,'script','dataLayer','GTM-PCFWWKBF');
+            `,
+          }}
+        />
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PCFWWKBF"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+            title="GTM"
+          />
+        </noscript>
+
+        {/* Facebook Pixel */}
         <Script
           id="facebook-pixel"
           strategy="afterInteractive"
@@ -68,7 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             width="1"
             style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=1945002179684844&ev=PageView&noscript=1"
-            alt=""
+            alt="facebook pixel"
           />
         </noscript>
 
