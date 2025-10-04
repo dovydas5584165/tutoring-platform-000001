@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script"; // ✅ Use Next.js Script component
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -19,32 +19,13 @@ export const metadata: Metadata = {
   icons: {
     icon: "/favicon.ico",
   },
-  openGraph: {
-    title: "Tiksliukai.lt",
-    description: "Aiškiau. Tiksliau. Suprantamiau",
-    url: "https://tiksliukai.lt",
-    images: [
-      {
-        url: "/favicon.ico",
-        width: 512,
-        height: 512,
-      },
-    ],
-    siteName: "Tiksliukai.lt",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Tiksliukai.lt",
-    description: "Aiškiau. Tiksliau. Suprantamiau",
-    images: ["/favicon.ico"],
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="lt">
-      <head>
-        {/* Google Analytics 4 */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        {/* ✅ Google Analytics */}
         <Script
           async
           src="https://www.googletagmanager.com/gtag/js?id=G-CP50RV65SV"
@@ -62,7 +43,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
 
-        {/* ✅ Meta Pixel Code */}
+        {/* ✅ Meta Pixel (moved inside body) */}
         <Script
           id="facebook-pixel"
           strategy="afterInteractive"
@@ -87,13 +68,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             width="1"
             style={{ display: "none" }}
             src="https://www.facebook.com/tr?id=1945002179684844&ev=PageView&noscript=1"
-            alt="facebook pixel"
+            alt=""
           />
         </noscript>
-        {/* ✅ End Meta Pixel Code */}
-      </head>
 
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
