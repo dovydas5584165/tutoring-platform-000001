@@ -82,7 +82,6 @@ export default function InvoiceGenerator() {
       const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
 
       try {
-        // Count confirmed & not cancelled bookings in the current month
         const { count, error: bookingsError } = await supabase
           .from("bookings")
           .select("id", { count: "exact" })
@@ -94,7 +93,6 @@ export default function InvoiceGenerator() {
 
         if (bookingsError) throw bookingsError;
 
-        // Fetch tutor hourly wage
         const { data: userData, error: userError } = await supabase
           .from("users")
           .select("hourly_wage")
@@ -195,7 +193,10 @@ export default function InvoiceGenerator() {
 
   /* ─── JSX ─────────────────────────────────────────────────────────────────── */
   return (
-    <div className="min-h-screen bg-gray-50 p-8 font-sans flex justify-center items-start">
+    <div
+      className="min-h-screen p-8 font-sans flex justify-center items-start"
+      style={{ backgroundColor: "#f9fafb" }}
+    >
       <div>
         <h1 className="text-3xl font-bold mb-6 text-center">Automatinė sąskaitos faktūra</h1>
 
@@ -204,7 +205,8 @@ export default function InvoiceGenerator() {
             e.preventDefault();
             generatePDF();
           }}
-          className="max-w-md space-y-4 bg-white p-6 rounded shadow mx-auto"
+          className="max-w-md space-y-4 p-6 rounded shadow mx-auto"
+          style={{ backgroundColor: "#ffffff" }}
         >
           <label className="block">
             Individualios veiklos Nr.
@@ -257,7 +259,12 @@ export default function InvoiceGenerator() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white font-bold py-2 rounded hover:bg-blue-700 transition"
+            className="w-full font-bold py-2 rounded transition"
+            style={{
+              backgroundColor: "#2563eb",
+              color: "#ffffff",
+              border: "none",
+            }}
           >
             Generuoti PDF
           </button>
@@ -270,7 +277,7 @@ export default function InvoiceGenerator() {
             width: "595px",
             minHeight: "842px",
             padding: "40px",
-            backgroundColor: "white",
+            backgroundColor: "#ffffff",
             fontFamily: "Helvetica, Arial, sans-serif",
             fontSize: "12pt",
             position: "absolute",
@@ -342,15 +349,21 @@ export default function InvoiceGenerator() {
             <tbody>
               <tr>
                 <td style={{ border: "1px solid #ccc", padding: 8 }}>Mokymo paslaugos (tutoring services)</td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right"}}>1</td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
+                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>1</td>
+                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                  {parseFloat(suma).toFixed(2)}
+                </td>
+                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                  {parseFloat(suma).toFixed(2)}
+                </td>
               </tr>
               <tr style={{ fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
                 <td colSpan={3} style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
                   Iš viso:
                 </td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
+                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                  {parseFloat(suma).toFixed(2)}
+                </td>
               </tr>
             </tbody>
           </table>
