@@ -39,6 +39,7 @@ export default function InvoiceGenerator() {
 
   /* --------- Get tutorId from URL --------- */
   useEffect(() => {
+    if (!pathname) return;
     const parts = pathname.split("/");
     const idFromUrl = parts[2]; // /tutor_dashboard/[tutorId]/sf_form
     if (idFromUrl) setTutorId(idFromUrl);
@@ -129,7 +130,89 @@ export default function InvoiceGenerator() {
     return `INV-${yr}-${mo}-${serial}`;
   };
 
-  /* --------- PDF generation + save IV_NR --------- */
+  /* --------- Helper: create isolated iframe and render clone there --------- */
+  const renderNodeInIsolatedIframe = async (node: HTMLElement) => {
+    return new Promise<HTMLCanvasElement>(async (resolve, reject) => {
+      try {
+        // create iframe
+        const iframe = document.createElement("iframe");
+        // hide it but keep in DOM so html2canvas can render
+        iframe.style.position = "fixed";
+        iframe.style.left = "-9999px";
+        iframe.style.top = "0";
+        iframe.style.width = "800px"; // A4 ~ 595pt, use a width that gives good quality
+        iframe.style.height = "1120px";
+        iframe.setAttribute("aria-hidden", "true");
+        document.body.appendChild(iframe);
+
+        const idoc = iframe.contentDocument;
+        if (!idoc) throw new Error("Nepavyko atidaryti iframe dokumento");
+
+        // Minimal HTML + reset to avoid global CSS (e.g., Tailwind with oklch)
+        idoc.open();
+        idoc.write(`
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width,initial-scale=1" />
+              <style>
+                /* Minimal reset: avoid external fonts/styles inheritance */
+                html,body { margin:0; padding:0; background: #ffffff; }
+                * { box-sizing: border-box; }
+              </style>
+            </head>
+            <body></body>
+          </html>
+        `);
+        idoc.close();
+
+        // clone the node (deep) and append into iframe body
+        const clone = node.cloneNode(true) as HTMLElement;
+
+        // Ensure widths are reasonable inside iframe: set explicit width on the root cloned element
+        clone.style.width = "595px"; // A4 width in px at 72dpi; html2canvas will scale
+        clone.style.minHeight = "842px";
+        clone.style.position = "relative";
+        // optionally remove any class names to avoid accidental external CSS hooks
+        const all = clone.querySelectorAll("*");
+        all.forEach((el) => {
+          (el as HTMLElement).className = "";
+        });
+
+        idoc.body.appendChild(clone);
+
+        // Wait a tick for layout
+        await new Promise((r) => setTimeout(r, 50));
+
+        // use html2canvas on the iframe's cloned element
+        const canvas = await html2canvas(clone, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: "#ffffff",
+          // make sure html2canvas uses iframe's document as owner
+          windowWidth: iframe.clientWidth,
+          windowHeight: iframe.clientHeight,
+        });
+
+        // cleanup iframe
+        setTimeout(() => {
+          try {
+            document.body.removeChild(iframe);
+          } catch (e) {
+            // ignore
+          }
+        }, 0);
+
+        resolve(canvas);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
+  /* --------- PDF generation + save IV_NR (uses iframe isolation to avoid oklch parsing errors) --------- */
   const generatePDF = async () => {
     if (!invoiceRef.current || !tutorId) {
       alert("Invoice reference or tutor ID is missing");
@@ -145,7 +228,7 @@ export default function InvoiceGenerator() {
 
       if (fetchError) throw fetchError;
 
-      if (!tutorData.iv_nr && individualNr) {
+      if (!tutorData?.iv_nr && individualNr) {
         const { error: updateError } = await supabase
           .from("users")
           .update({ iv_nr: individualNr })
@@ -154,8 +237,9 @@ export default function InvoiceGenerator() {
         if (updateError) throw updateError;
       }
 
-      // Generate PDF
-      const canvas = await html2canvas(invoiceRef.current, { scale: 2 });
+      // Render a sanitized clone of invoiceRef into an isolated iframe and get canvas
+      const canvas = await renderNodeInIsolatedIframe(invoiceRef.current);
+
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({ unit: "pt", format: "a4" });
       const pdfW = pdf.internal.pageSize.getWidth();
