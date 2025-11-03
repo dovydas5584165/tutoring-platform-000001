@@ -276,6 +276,9 @@ export default function Home() {
     >
       Sign Up
     </button>
+    <a href="#bank-info" className="text-black px-4 py-2 text-sm">
+  Pastoviems klientams
+</a>
   </div>
 
   {/* Mobile Hamburger Icon */}
@@ -824,6 +827,46 @@ export default function Home() {
     </h2>
     <p className="text-base sm:text-lg text-gray-700 text-center max-w-2xl">
       Užsiregistravę galėsite stebėti vaiko progresą, pamokų rezultatus ir mokymosi tendencijas.
+    </p>
+  </div>
+</motion.section>
+{/* Section: Bank Details */}
+<motion.section
+  id="bank-info"
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#E2E8F0] snap-start px-4 py-16 sm:px-6 lg:px-20 overflow-hidden"
+>
+  {/* Decorative background */}
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="w-[250%] h-32 bg-[#3B65CE] rotate-[-6deg] opacity-10"></div>
+  </div>
+
+  {/* Content Card */}
+  <div className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6 text-center">
+    <h2 className="text-3xl sm:text-5xl font-extrabold mb-4 text-[#3B65CE]">
+      Jei turite pastovius laikus, galite apmokėti paprasčiau.
+    </h2>
+    <p className="text-base sm:text-lg text-gray-700 max-w-2xl">
+      Mokėjimus galite atlikti banko pavedimu, naudodami žemiau pateiktą informaciją.
+    </p>
+
+    {/* Bank Info Placeholder */}
+    <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl px-6 py-4 text-left w-full max-w-md mt-4">
+      <p className="font-semibold text-gray-800">Vardas, Pavardė:</p>
+      <p className="text-gray-700 mb-3">Dovydas Žilinskas</p>
+
+      <p className="font-semibold text-gray-800">IBAN:</p>
+      <p className="text-gray-700 mb-3">LT077300010164121505</p>
+
+      <p className="font-semibold text-gray-800">Bankas:</p>
+      <p className="text-gray-700">SWEDBANK</p>
+    </div>
+
+    <p className="text-sm text-gray-500 mt-4">
+      *Prašome patikrinti informaciją prieš atlikdami pavedimą.
     </p>
   </div>
 </motion.section>
