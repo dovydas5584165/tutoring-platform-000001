@@ -850,7 +850,7 @@ export default function Home() {
       Jei turite pastovius laikus, galite apmokėti paprasčiau.
     </h2>
     <p className="text-base sm:text-lg text-gray-700 max-w-2xl">
-      Mokėjimus galite atlikti banko pavedimu, naudodami žemiau pateiktą informaciją.
+      Pamokos kaina yra 25eur. Galite pervesti pinigus už susitartą pamokų skaičių netikrinant naujų laikų.
     </p>
 
     {/* Bank Info Placeholder */}
