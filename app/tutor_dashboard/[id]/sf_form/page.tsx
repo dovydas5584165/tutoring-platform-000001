@@ -29,9 +29,8 @@ export default function InvoiceGenerator() {
   const [individualNr, setIndividualNr] = useState("");
   const [vardas, setVardas] = useState("");
   const [pavarde, setPavarde] = useState("");
-  const [hourlyWage, setHourlyWage] = useState(0);
   const [data, setData] = useState(() => new Date().toISOString().slice(0, 10));
-  const [suma, setSuma] = useState("0");
+  const [suma, setSuma] = useState("0"); // user-input now
   const [klientas, setKlientas] = useState("Dovydas Žilinskas");
   const [tutorId, setTutorId] = useState<string | null>(null);
 
@@ -52,7 +51,7 @@ export default function InvoiceGenerator() {
     const fetchTutor = async () => {
       const { data, error } = await supabase
         .from("users")
-        .select("id, vardas, pavarde, hourly_wage, iv_nr")
+        .select("id, vardas, pavarde, iv_nr")
         .eq("id", tutorId)
         .single();
 
@@ -64,55 +63,12 @@ export default function InvoiceGenerator() {
       if (data) {
         setVardas(data.vardas);
         setPavarde(data.pavarde);
-        setHourlyWage(parseFloat(data.hourly_wage) || 0);
 
         if (data.iv_nr) setIndividualNr(data.iv_nr.toString());
       }
     };
 
     fetchTutor();
-  }, [tutorId]);
-
-  /* --------- Fetch confirmed bookings for current month --------- */
-  useEffect(() => {
-    if (!tutorId) return;
-
-    const fetchMonthlyWage = async () => {
-      const now = new Date();
-      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59).toISOString();
-
-      try {
-        const { count, error: bookingsError } = await supabase
-          .from("bookings")
-          .select("id", { count: "exact" })
-          .eq("tutor_id", tutorId)
-          .eq("confirmed_by_tutor", true)
-          .is("cancelled_at", null)
-          .gte("created_at", startOfMonth)
-          .lte("created_at", endOfMonth);
-
-        if (bookingsError) throw bookingsError;
-
-        const { data: userData, error: userError } = await supabase
-          .from("users")
-          .select("hourly_wage")
-          .eq("id", tutorId)
-          .single();
-
-        if (userError) throw userError;
-
-        const hourlyWage = userData?.hourly_wage ?? 0;
-        const confirmedOrders = count ?? 0;
-        const totalWage = confirmedOrders * hourlyWage;
-
-        setSuma(totalWage.toFixed(2));
-      } catch (err: any) {
-        console.error("Error fetching monthly wage:", err.message || err);
-      }
-    };
-
-    fetchMonthlyWage();
   }, [tutorId]);
 
   /* --------- Helper functions --------- */
@@ -130,89 +86,7 @@ export default function InvoiceGenerator() {
     return `INV-${yr}-${mo}-${serial}`;
   };
 
-  /* --------- Helper: create isolated iframe and render clone there --------- */
-  const renderNodeInIsolatedIframe = async (node: HTMLElement) => {
-    return new Promise<HTMLCanvasElement>(async (resolve, reject) => {
-      try {
-        // create iframe
-        const iframe = document.createElement("iframe");
-        // hide it but keep in DOM so html2canvas can render
-        iframe.style.position = "fixed";
-        iframe.style.left = "-9999px";
-        iframe.style.top = "0";
-        iframe.style.width = "800px"; // A4 ~ 595pt, use a width that gives good quality
-        iframe.style.height = "1120px";
-        iframe.setAttribute("aria-hidden", "true");
-        document.body.appendChild(iframe);
-
-        const idoc = iframe.contentDocument;
-        if (!idoc) throw new Error("Nepavyko atidaryti iframe dokumento");
-
-        // Minimal HTML + reset to avoid global CSS (e.g., Tailwind with oklch)
-        idoc.open();
-        idoc.write(`
-          <!doctype html>
-          <html>
-            <head>
-              <meta charset="utf-8" />
-              <meta name="viewport" content="width=device-width,initial-scale=1" />
-              <style>
-                /* Minimal reset: avoid external fonts/styles inheritance */
-                html,body { margin:0; padding:0; background: #ffffff; }
-                * { box-sizing: border-box; }
-              </style>
-            </head>
-            <body></body>
-          </html>
-        `);
-        idoc.close();
-
-        // clone the node (deep) and append into iframe body
-        const clone = node.cloneNode(true) as HTMLElement;
-
-        // Ensure widths are reasonable inside iframe: set explicit width on the root cloned element
-        clone.style.width = "595px"; // A4 width in px at 72dpi; html2canvas will scale
-        clone.style.minHeight = "842px";
-        clone.style.position = "relative";
-        // optionally remove any class names to avoid accidental external CSS hooks
-        const all = clone.querySelectorAll("*");
-        all.forEach((el) => {
-          (el as HTMLElement).className = "";
-        });
-
-        idoc.body.appendChild(clone);
-
-        // Wait a tick for layout
-        await new Promise((r) => setTimeout(r, 50));
-
-        // use html2canvas on the iframe's cloned element
-        const canvas = await html2canvas(clone, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: true,
-          backgroundColor: "#ffffff",
-          // make sure html2canvas uses iframe's document as owner
-          windowWidth: iframe.clientWidth,
-          windowHeight: iframe.clientHeight,
-        });
-
-        // cleanup iframe
-        setTimeout(() => {
-          try {
-            document.body.removeChild(iframe);
-          } catch (e) {
-            // ignore
-          }
-        }, 0);
-
-        resolve(canvas);
-      } catch (err) {
-        reject(err);
-      }
-    });
-  };
-
-  /* --------- PDF generation + save IV_NR (uses iframe isolation to avoid oklch parsing errors) --------- */
+  /* --------- PDF generation --------- */
   const generatePDF = async () => {
     if (!invoiceRef.current || !tutorId) {
       alert("Invoice reference or tutor ID is missing");
@@ -237,9 +111,8 @@ export default function InvoiceGenerator() {
         if (updateError) throw updateError;
       }
 
-      // Render a sanitized clone of invoiceRef into an isolated iframe and get canvas
+      // Render the invoice in an isolated iframe to avoid CSS issues
       const canvas = await renderNodeInIsolatedIframe(invoiceRef.current);
-
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({ unit: "pt", format: "a4" });
       const pdfW = pdf.internal.pageSize.getWidth();
@@ -248,7 +121,6 @@ export default function InvoiceGenerator() {
       pdf.addImage(imgData, "PNG", 0, 0, pdfW, pdfH);
 
       const blob = pdf.output("blob");
-
       const invoiceDate = new Date(data);
       const folder = `${invoiceDate.getFullYear()}-${(invoiceDate.getMonth() + 1)
         .toString()
@@ -275,12 +147,68 @@ export default function InvoiceGenerator() {
     }
   };
 
+  /* --------- Helper: render in isolated iframe --------- */
+  const renderNodeInIsolatedIframe = async (node: HTMLElement) => {
+    return new Promise<HTMLCanvasElement>(async (resolve, reject) => {
+      try {
+        const iframe = document.createElement("iframe");
+        iframe.style.position = "fixed";
+        iframe.style.left = "-9999px";
+        iframe.style.top = "0";
+        iframe.style.width = "800px";
+        iframe.style.height = "1120px";
+        iframe.setAttribute("aria-hidden", "true");
+        document.body.appendChild(iframe);
+
+        const idoc = iframe.contentDocument;
+        if (!idoc) throw new Error("Nepavyko atidaryti iframe dokumento");
+
+        idoc.open();
+        idoc.write(`
+          <!doctype html>
+          <html>
+            <head>
+              <meta charset="utf-8" />
+              <meta name="viewport" content="width=device-width,initial-scale=1" />
+              <style>
+                html,body { margin:0; padding:0; background: #ffffff; }
+                * { box-sizing: border-box; }
+              </style>
+            </head>
+            <body></body>
+          </html>
+        `);
+        idoc.close();
+
+        const clone = node.cloneNode(true) as HTMLElement;
+        clone.style.width = "595px";
+        clone.style.minHeight = "842px";
+        clone.style.position = "relative";
+        const all = clone.querySelectorAll("*");
+        all.forEach((el) => ((el as HTMLElement).className = ""));
+        idoc.body.appendChild(clone);
+
+        await new Promise((r) => setTimeout(r, 50));
+        const canvas = await html2canvas(clone, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: true,
+          backgroundColor: "#ffffff",
+          windowWidth: iframe.clientWidth,
+          windowHeight: iframe.clientHeight,
+        });
+
+        setTimeout(() => document.body.removeChild(iframe), 0);
+        resolve(canvas);
+      } catch (err) {
+        reject(err);
+      }
+    });
+  };
+
   /* ─── JSX ─────────────────────────────────────────────────────────────────── */
   return (
-    <div
-      className="min-h-screen p-8 font-sans flex justify-center items-start"
-      style={{ backgroundColor: "#f9fafb" }}
-    >
+    <div className="min-h-screen p-8 font-sans flex justify-center items-start" style={{ backgroundColor: "#f9fafb" }}>
       <div>
         <h1 className="text-3xl font-bold mb-6 text-center">Automatinė sąskaitos faktūra</h1>
 
@@ -294,31 +222,24 @@ export default function InvoiceGenerator() {
         >
           <label className="block">
             Individualios veiklos Nr.
-            <input
-              className="w-full border rounded p-2 mt-1"
-              required
-              value={individualNr}
-              onChange={(e) => setIndividualNr(e.target.value)}
-            />
+            <input className="w-full border rounded p-2 mt-1" required value={individualNr} onChange={(e) => setIndividualNr(e.target.value)} />
           </label>
+
           <label className="block">
             Vardas
             <input className="w-full border rounded p-2 mt-1" required value={vardas} readOnly />
           </label>
+
           <label className="block">
             Pavardė
             <input className="w-full border rounded p-2 mt-1" required value={pavarde} readOnly />
           </label>
+
           <label className="block">
             Data
-            <input
-              type="date"
-              className="w-full border rounded p-2 mt-1"
-              required
-              value={data}
-              onChange={(e) => setData(e.target.value)}
-            />
+            <input type="date" className="w-full border rounded p-2 mt-1" required value={data} onChange={(e) => setData(e.target.value)} />
           </label>
+
           <label className="block">
             Suma (€)
             <input
@@ -328,27 +249,19 @@ export default function InvoiceGenerator() {
               className="w-full border rounded p-2 mt-1"
               required
               value={suma}
-              readOnly
+              onChange={(e) => setSuma(e.target.value)}
             />
           </label>
+
           <label className="block">
             Kliento vardas ir pavardė
-            <input
-              className="w-full border rounded p-2 mt-1"
-              required
-              value={klientas}
-              onChange={(e) => setKlientas(e.target.value)}
-            />
+            <input className="w-full border rounded p-2 mt-1" required value={klientas} onChange={(e) => setKlientas(e.target.value)} />
           </label>
 
           <button
             type="submit"
             className="w-full font-bold py-2 rounded transition"
-            style={{
-              backgroundColor: "#2563eb",
-              color: "#ffffff",
-              border: "none",
-            }}
+            style={{ backgroundColor: "#2563eb", color: "#ffffff", border: "none" }}
           >
             Generuoti PDF
           </button>
@@ -375,9 +288,7 @@ export default function InvoiceGenerator() {
           {/* Header */}
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 40 }}>
             <div>
-              <h1 style={{ fontSize: "24pt", margin: 0, color: "#003366", fontWeight: "bold" }}>
-                tiksliukai.lt
-              </h1>
+              <h1 style={{ fontSize: "24pt", margin: 0, color: "#003366", fontWeight: "bold" }}>tiksliukai.lt</h1>
               <p style={{ margin: "6px 0", fontSize: "10pt", lineHeight: 1.3 }}>
                 Saulėtekio al. 4, Vilnius
                 <br />
@@ -388,12 +299,8 @@ export default function InvoiceGenerator() {
             </div>
             <div style={{ textAlign: "right" }}>
               <h2 style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>Sąskaita faktūra</h2>
-              <p style={{ margin: 0 }}>
-                <strong>Nr.:</strong> {formatInvoiceNumber(invoiceNumber)}
-              </p>
-              <p style={{ margin: 0 }}>
-                <strong>Data:</strong> {formattedDate}
-              </p>
+              <p style={{ margin: 0 }}><strong>Nr.:</strong> {formatInvoiceNumber(invoiceNumber)}</p>
+              <p style={{ margin: 0 }}><strong>Data:</strong> {formattedDate}</p>
             </div>
           </div>
 
@@ -405,23 +312,12 @@ export default function InvoiceGenerator() {
             </div>
             <div style={{ width: "48%" }}>
               <h3 style={{ borderBottom: "1px solid #ccc", paddingBottom: 4, marginBottom: 8 }}>Pardavėjas</h3>
-              <p style={{ margin: 0 }}>
-                Vardas: {vardas} {pavarde}
-                <br />
-                Individualios veiklos Nr.: {individualNr}
-              </p>
+              <p style={{ margin: 0 }}>Vardas: {vardas} {pavarde}<br />Individualios veiklos Nr.: {individualNr}</p>
             </div>
           </div>
 
           {/* Table */}
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              marginBottom: 40,
-              fontSize: "11pt",
-            }}
-          >
+          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 40, fontSize: "11pt" }}>
             <thead>
               <tr style={{ backgroundColor: "#f2f2f2", borderBottom: "2px solid #003366" }}>
                 <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "left" }}>Aprašymas</th>
@@ -434,20 +330,12 @@ export default function InvoiceGenerator() {
               <tr>
                 <td style={{ border: "1px solid #ccc", padding: 8 }}>Mokymo paslaugos (tutoring services)</td>
                 <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>1</td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
-                  {parseFloat(suma).toFixed(2)}
-                </td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
-                  {parseFloat(suma).toFixed(2)}
-                </td>
+                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
+                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
               </tr>
               <tr style={{ fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
-                <td colSpan={3} style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
-                  Iš viso:
-                </td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
-                  {parseFloat(suma).toFixed(2)}
-                </td>
+                <td colSpan={3} style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>Iš viso:</td>
+                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
               </tr>
             </tbody>
           </table>
