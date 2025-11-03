@@ -333,7 +333,7 @@ export default function Home() {
           <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
-
+      <a href="#bank-info" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Pastoviems klientams</a>
       <a href="#apie-mus" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Apie mus</a>
       <a href="#korepetitoriai" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Korepetitoriai</a>
       <a href="/auth" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Prisiregistruoti</a>
