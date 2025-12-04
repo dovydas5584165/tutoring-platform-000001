@@ -373,7 +373,7 @@ export default function Home() {
   >
     <div className="relative inline-block">
       <p className="text-2xl font-bold mb-6 text-gray-800">
-        Kas didesnis: 20% nuo 50 ar 50% nuo 20?
+        Individualios pamokos iš profesionalų per 1min.
       </p>
 
       {/* Responsive Red Accent Line */}
@@ -383,46 +383,10 @@ export default function Home() {
       </span>
     </div>
 
-    {/* Input Answer */}
-    <div className="flex flex-col gap-4 mb-6 mt-6">
-      <input
-        type="text"
-        value={selected}
-        onChange={(e) => setSelected(e.target.value)}
-        placeholder="Parašykite atsakymą..."
-        className="w-full p-2 border border-gray-300 bg-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
-
-    {/* Reveal Animation */}
-    {selected && (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-lg text-gray-700 font-semibold mb-2"
-      >
-        Abiejais atvejais atsakymas yra —{" "}
-        <span className="text-blue-600 font-bold">10</span>
-      </motion.div>
-    )}
-
-    {selected && (
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.8 }}
-        className="mt-4 text-gray-600 text-sm"
-      >
-        Tai yra pirmasis 10-ukas, kurį pamatėte su mumis, bet tikrai ne paskutinis!
-      </motion.p>
-    )}
-  </motion.div>
-
   {/* Single CTA */}
   <Button
     onClick={scrollToLessons}
-    className="relative z-10 px-8 py-4 text-lg font-semibold rounded-full bg-yellow-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
+    className="relative z-10 px-8 py-4 text-lg font-semibold rounded-full bg-red-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
   >
     Atrask pamokas
   </Button>
