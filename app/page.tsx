@@ -390,6 +390,7 @@ export default function Home() {
   >
     Atrask pamokas
   </Button>
+  </motion.div>
 </section>
 
 
