@@ -6,6 +6,12 @@ import { motion, animate } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
+import Image from "next/image";
+import { FaTrophy } from "react-icons/fa";
+
+
+
+
 
 export default function Home() {
   const router = useRouter();
@@ -22,13 +28,14 @@ export default function Home() {
   const lessonsRef = useRef<HTMLDivElement>(null);
   const scrollToLessons = () => lessonsRef.current?.scrollIntoView({ behavior: "smooth" });
   const [selected, setSelected] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
   const toggleFAQ = (index: number) => setActiveIndex(activeIndex === index ? null : index);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
 
   const faqData = [
   {
-    question: "Kokia pamokos kaina ir trukmė?",
+    question: "Kokia yra pamokos kaina ir trukmė?",
     answer:
       "Vienos individualios pamokos trukmė – 45 minutės, o kaina – 25 €. Tai viena geriausių kainų už individualų dėmesį.",
   },
@@ -50,7 +57,7 @@ export default function Home() {
   {
     question: "Kaip galima atsiskaityti už pamokas?",
     answer:
-      "Galite atsisakityti Apple Pay, Google Pay ar kortele",
+      "Galite atsiskaityti Apple Pay, Google Pay ar kortele",
   },
   {
     question: "Kas nutiks, jei mokytojas atšauks pamoką?",
@@ -214,7 +221,15 @@ export default function Home() {
         }`}
       >
         <div className="flex justify-between items-center px-4 sm:px-8 py-3">
-          <div className="text-2xl font-extrabold tracking-tight">Tiksliukai.lt</div>
+          <div className="flex items-center justify-center">
+  <Image
+    src="/logo-removebg-preview.png"
+    alt="Tiksliukai Logo"
+    width={60}
+    height={60}
+    className="rounded-lg"
+  />
+</div>
           <nav>
             {loading ? (
               <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
@@ -245,22 +260,92 @@ export default function Home() {
                 </Button>
               </div>
             ) : (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => router.push("/auth/log-in")}
-                  className="text-black px-4 py-2 text-sm"
-                >
-                  Log In
-                </button>
+              <div className="flex items-center gap-2">
+  {/* Log In / Sign Up buttons (desktop + mobile) */}
+  <div className="hidden sm:flex gap-2">
+    <button
+      onClick={() => router.push("/auth/log-in")}
+      className="text-black px-4 py-2 text-sm"
+    >
+      Log In
+    </button>
 
-                <button
-                  onClick={() => router.push("/auth")}
-                  className="text-black px-4 py-2 text-sm"
-                >
-                  Sign Up
-                </button>
+    <button
+      onClick={() => router.push("/auth")}
+      className="text-black px-4 py-2 text-sm"
+    >
+      Sign Up
+    </button>
+    <a href="#bank-info" className="text-black px-4 py-2 text-sm">
+  Pastoviems klientams
+</a>
+  </div>
 
-              </div>
+  {/* Mobile Hamburger Icon */}
+<div className="sm:hidden flex flex-col items-end relative">
+  <button
+    onClick={() => setMenuOpen(!menuOpen)}
+    className="text-gray-700 hover:text-blue-600 p-2 rounded-md"
+  >
+    {menuOpen ? (
+      // Close Icon
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    ) : (
+      // Hamburger Icon
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        className="h-6 w-6"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        strokeWidth={2}
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+      </svg>
+    )}
+  </button>
+
+  {/* Mobile Menu Items */}
+  {menuOpen && (
+    <div className="mt-2 flex flex-col bg-white shadow-lg rounded-md w-48 py-4 absolute right-0 z-50">
+      {/* X Icon Top Right */}
+      <button
+        onClick={() => setMenuOpen(false)}
+        className="absolute top-2 right-2 text-gray-700 hover:text-red-500 p-1"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+      <a href="#bank-info" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Pastoviems klientams</a>
+      <a href="#apie-mus" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Apie mus</a>
+      <a href="#korepetitoriai" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Korepetitoriai</a>
+      <a href="/auth" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Prisiregistruoti</a>
+      <a href="/auth/log-in" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Prisijungti</a>
+      <a href="#pamokos" className="px-4 py-2 hover:bg-blue-100 text-gray-800">Pamokos</a>
+    </div>
+  )}
+</div>
+
+
+</div>
+
             )}
           </nav>
         </div>
@@ -271,88 +356,59 @@ export default function Home() {
 
         
 {/* === Hero/Landing Section: Percent Puzzle Game === */}
-<section className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-400 to-blue-800 text-white snap-start px-6">
-  {/* Main Headline */}
-  <motion.h1
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.8 }}
-    className="text-6xl font-extrabold mb-6 text-center"
-  >
-    Kaip manote? 
-  </motion.h1>
+<section className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] text-white snap-start px-6 overflow-hidden">
+  {/* Background Dots (ordered grid for neatness) */}
+  <div className="absolute inset-0 grid grid-cols-8 gap-6 opacity-50 pointer-events-none">
+    {Array.from({ length: 80 }).map((_, i) => (
+      <span key={i} className="w-2 h-2 rounded-full bg-black" />
+    ))}
+  </div>
 
   {/* Puzzle Card */}
   <motion.div
     initial={{ opacity: 0, scale: 0.95 }}
     animate={{ opacity: 1, scale: 1 }}
     transition={{ duration: 1 }}
-    className="max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center relative overflow-hidden"
+    className="relative z-10 max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center overflow-hidden"
   >
-    <p className="text-2xl font-bold mb-6 text-gray-800">
-      ❓ Kas didesnis: 20% nuo 50 ar 50% nuo 20?
-    </p>
+    <div className="relative inline-block">
+      <p className="text-2xl font-bold mb-6 text-gray-800">
+        Individualios pamokos iš profesionalų per 1min.
+      </p>
 
-    {/* Quiz Choices */}
-    <div className="flex flex-col gap-4 mb-6">
-      <Button
-        onClick={() => setSelected("20% nuo 50")}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-      >
-        20% nuo 50
-      </Button>
-      <Button
-        onClick={() => setSelected("50% iš 20")}
-        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
-      >
-        50% nuo 20
-      </Button>
+      {/* Responsive Red Accent Line */}
+      <span className="block mx-auto h-1 bg-red-500 
+                       w-16 sm:w-20 md:w-24 lg:w-28 
+                       rounded-full transition-all duration-300">
+      </span>
     </div>
-
-    {/* Reveal Animation */}
-    {selected && (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="text-lg text-gray-700 font-semibold mb-2"
-      >
-        👉 Abiejais atvejais atsakymas yra —{" "}
-        <span className="text-blue-600 font-bold">10</span> 🎉
-      </motion.div>
-    )}
-
-    {selected && (
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.4, duration: 0.8 }}
-        className="mt-4 text-gray-600 text-sm"
-      >
-        Tai yra pirmasis 10-ukas, kurį pamatėte su mumis, bet tikrai ne paskutinis!
-      </motion.p>
-    )}
-
-    {/* Decorative Shapes */}
-    <div className="absolute top-0 left-0 w-16 h-16 bg-yellow-400 rounded-full opacity-30 animate-pulse"></div>
-    <div className="absolute bottom-0 right-0 w-20 h-20 bg-pink-400 rounded-full opacity-30 animate-pulse"></div>
-  </motion.div>
 
   {/* Single CTA */}
   <Button
     onClick={scrollToLessons}
-    className="px-8 py-4 text-lg font-semibold rounded-full bg-yellow-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
+    className="relative z-10 px-8 py-4 text-lg font-semibold rounded-full bg-red-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
   >
-    Atrask pamokas 🚀
+    Atrask pamokas
   </Button>
+  </motion.div>
 </section>
+
 
 
        {/* Section 1: Lessons */}
 <section
+  id="pamokos"
   ref={lessonsRef}
-  className="w-full min-h-screen flex flex-col justify-center items-center snap-start px-4 bg-white relative"
->  
+  className="w-full h-[85svh] flex flex-col items-center justify-start snap-start px-4 bg-white relative overflow-hidden" 
+  style={{
+    backgroundImage: `
+      linear-gradient(to right, rgba(0,100,255,0.1) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,100,255,0.1) 1px, transparent 1px)
+    `,
+    backgroundSize: "40px 40px",
+  }}
+>
+  
   <div className="h-24"></div> {/* spacer for header */}
 
   {/* Section title */}
@@ -370,7 +426,7 @@ export default function Home() {
     {lessons.map((lesson) => (
       <Button
         key={lesson.slug}
-        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-blue-600 text-white hover:bg-blue-700 transition-shadow duration-300 shadow-md"
+        className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-[#3B65CE] text-white hover:bg-[#2C4A8E] transition-shadow duration-300 shadow-md"
         onClick={() => router.push(`/schedule/${lesson.slug}`)}
       >
         {lesson.name}
@@ -399,46 +455,47 @@ export default function Home() {
 
 
         <motion.section
-  initial={{ opacity: 0, y: 60 }}
-  whileInView={{ opacity: 1, y: 0 }}
+  initial="hidden"
+  whileInView="visible"
   viewport={{ once: true }}
-  transition={{ duration: 0.8 }}
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-white snap-start px-6 py-20"
+  className="w-full min-h-[85svh] flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20"
 >
-  <h2 className="text-5xl font-extrabold mb-8 text-center">
-    Kaip veikia sistema? 🚀
+  <h2 className="text-5xl text-white font-extrabold mb-8 text-center">
+    Kaip veikia sistema?
   </h2>
 
-  <p className="max-w-2xl text-xl text-gray-700 leading-relaxed text-center mb-10">
-    Tobulėk čia ir dabar:
-  </p>
-
-  {/* Step List */}
-  <div className="max-w-xl space-y-6 mb-8">
+  {/* Step List as Tip Boxes with stagger animation */}
+  <motion.div
+    className="max-w-xl flex flex-col gap-6 mb-8"
+    variants={{
+      hidden: {},
+      visible: {
+        transition: {
+          staggerChildren: 0.3, // each tip appears 0.3s after previous
+        },
+      },
+    }}
+  >
     {[
-      { num: 1, text: "Pasirink mokytoją iš mūsų patikrintos komandos." },
-      { num: 2, text: "Rezervuok pamoką patogiu laiku." },
-      { num: 3, text: "Apmokėk saugiai per mūsų sistemą." },
-      { num: 4, text: "Gauk nuorodą el. paštu ir junkis prie pamokos!" },
-    ].map((step, i) => (
-      <div key={i} className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-10 h-10 rounded-full bg-blue-400 text-black flex items-center justify-center font-bold text-lg shadow-md">
-          {step.num}
-        </div>
-        <p className="text-lg text-gray-800 leading-relaxed">
-          <strong>{step.text.split(" ")[0]}</strong>{" "}
-          {step.text.split(" ").slice(1).join(" ")}
-        </p>
-      </div>
+      "Pasirink mokytoją iš mūsų patikrintos komandos.",
+      "Rezervuok pamoką patogiu laiku.",
+      "Apmokėk saugiai per mūsų sistemą.",
+      "Gauk nuorodą el. paštu ir junkis prie pamokos!",
+    ].map((tip, i) => (
+      <motion.div
+        key={i}
+        className={`p-6 rounded-xl shadow-md border-l-4 transition-transform duration-300 hover:scale-105 ${
+          i % 2 === 0 ? "bg-white border-blue-800" : "bg-white border-yellow-300"
+        }`}
+        variants={{
+          hidden: { opacity: 0, y: 20 },
+          visible: { opacity: 1, y: 0 },
+        }}
+      >
+        <p className="text-gray-800 text-lg">{tip}</p>
+      </motion.div>
     ))}
-  </div>
-
-  {/* Tip Box */}
-  <div className="max-w-xl bg-blue-50 border-l-4 border-blue-400 text-gray-800 p-4 rounded-lg shadow-sm">
-    <p className="text-base">
-      <strong>Ar žinojote?:</strong> Galite rezervuoti visas mėnesio pamokas iškart.
-    </p>
-  </div>
+  </motion.div>
 </motion.section>
 
 
@@ -451,88 +508,116 @@ export default function Home() {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.8 }}
-      className="w-full flex flex-col items-center bg-blue-50 px-6 py-20"
+      className="w-full flex flex-col items-center bg-white px-6 py-20"
+      id="apie-mus"
     >
       {/* Apie mus */}
       <div className="text-center max-w-3xl mb-16">
         <h2 className="text-5xl font-extrabold mb-6">Apie mus</h2>
-        <p className="text-xl text-gray-700 leading-relaxed mb-6">
+        <p className="text-xl text-gray-800 leading-relaxed mb-6 p-6 bg-white rounded-xl shadow-md border-l-4 border-blue-400">
           Tiksliukai.lt – tai studentų edukacinis projektas. <br />
           Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir
           patogesnis kiekvienam mokiniui Lietuvoje.
         </p>
 
         {/* Social links */}
-        <div className="flex justify-center gap-8">
-          <a
-            href="https://www.instagram.com/tiksliukai.lt/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-pink-500 hover:text-pink-600 transition-colors"
-          >
-            <FaInstagram className="text-3xl" />
-            <span className="font-semibold text-lg">Instagram</span>
-          </a>
-          <a
-            href="https://www.facebook.com/tiksliukai"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 transition-colors"
-          >
-            <FaFacebook className="text-3xl" />
-            <span className="font-semibold text-lg">Facebook</span>
-          </a>
-        </div>
+<div className="flex justify-center gap-8 text-3xl">
+  <a
+    href="https://www.instagram.com/tiksliukai.lt/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-pink-500 hover:text-pink-600 transition-colors"
+  >
+    <FaInstagram />
+  </a>
+  <a
+    href="https://www.facebook.com/tiksliukai"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="text-blue-600 hover:text-blue-700 transition-colors"
+  >
+    <FaFacebook />
+  </a>
+</div>
       </div>
 
       {/* FAQ Accordion */}
-      <div className="w-full max-w-3xl space-y-4">
-        <h2 className="text-5xl font-extrabold mb-6 text-center">DUK</h2>
-        {faqData.map((faq, index) => (
-          <div
-            key={index}
-            className={`faq-item border rounded-lg overflow-hidden transition-all duration-300 ${
-              activeIndex === index ? "bg-white shadow-md" : "bg-blue-50"
-            }`}
-          >
-            <button
-              className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
-              aria-expanded={activeIndex === index}
-              onClick={() => toggleFAQ(index)}
-            >
-              <span>{faq.question}</span>
-              <span className="text-gray-500 text-xl">
-                {activeIndex === index ? "−" : "+"}
-              </span>
-            </button>
-            {activeIndex === index && (
-              <div className="faq-answer p-4 border-t border-gray-200 text-gray-700">
-                <p>{faq.answer}</p>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
+<div className="w-full max-w-3xl space-y-4">
+  <h2 className="text-5xl font-extrabold mb-6 text-center">DUK</h2>
+  {faqData.map((faq, index) => (
+    <div
+      key={index}
+      className={`faq-item bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300`}
+    >
+      <button
+        className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
+        aria-expanded={activeIndex === index}
+        onClick={() => toggleFAQ(index)}
+      >
+        <span>{faq.question}</span>
+        <span className="text-gray-500 text-xl">
+          {activeIndex === index ? "−" : "+"}
+        </span>
+      </button>
+      {activeIndex === index && (
+        <div className="faq-answer p-4 border-t border-gray-200 text-gray-700">
+          <p>{faq.answer}</p>
+        </div>
+      )}
+    </div>
+  ))}
+</div>
+
     </motion.section>
 
 
         {/* Section 5: Misija ir vizija */}
 <motion.section
-  initial={{ opacity: 0, y: 20 }}       // reduce y to make the slide subtle
+  initial={{ opacity: 0, y: 20 }}
   whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true, amount: 0.3 }} // trigger when 30% of section is visible
-  transition={{ duration: 0.5, ease: "easeOut" }} // shorter duration, smoother easing
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-blue-600 snap-start px-6 py-20"
+  viewport={{ once: true, amount: 0.3 }}
+  transition={{ duration: 0.5, ease: "easeOut" }}
+  className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20 overflow-hidden"
 >
-  <h2 className="text-5xl font-extrabold mb-8 text-center text-white">
-    Mūsų misija ir vizija ⭐
+  {/* Baltic States Map Background */}
+  <svg
+    className="absolute inset-0 w-full h-full opacity-10"
+    xmlns="http://www.w3.org/2000/svg"
+    viewBox="0 0 800 1000"
+    preserveAspectRatio="xMidYMid meet"
+  >
+    <path
+      d="M350 50 L420 80 L460 150 L480 250 L470 350 L430 420 L400 500 L380 600 L350 680 L300 750 L250 730 L220 650 L200 550 L210 450 L250 350 L300 250 L320 150 Z"
+      fill="white"
+      fillOpacity="0.15"
+      stroke="white"
+      strokeWidth="2"
+    />
+  </svg>
+
+  {/* Content */}
+  <h2 className="relative z-10 text-5xl font-extrabold mb-8 text-center text-white">
+    Mūsų misija ir vizija 
   </h2>
-  <p className="max-w-3xl text-xl text-white leading-relaxed text-center">
-    <span className="font-bold text-yellow-600">Mūsų misija</span> – suteikti kiekvienam vaikui galimybę mokytis iš geriausių mokytojų, nepriklausomai nuo jų gyvenamos vietos ar galimybių.
+  <p className="relative z-10 max-w-3xl text-xl text-white leading-relaxed text-center">
+    <span className="font-bold text-yellow-400">Mūsų misija</span> – suteikti kiekvienam vaikui galimybę mokytis iš geriausių mokytojų, nepriklausomai nuo jų gyvenamos vietos ar galimybių.
     <br />
-    <span className="font-bold text-yellow-600">Vizija</span> – būti Nr. 1 korepetitorių platforma Baltijos šalyse.
+    <span className="font-bold text-yellow-400">Vizija</span> – būti Nr. 1 korepetitorių platforma Baltijos šalyse.
   </p>
+
+  {/* BIG ICON BELOW */}
+  <motion.div
+    initial={{ scale: 0 }}
+    whileInView={{ scale: 1 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.7, ease: "easeOut" }}
+    className="relative z-10 mt-12 text-yellow-400"
+  >
+    <FaTrophy className="w-24 h-24 md:w-32 md:h-32" />
+  </motion.div>
 </motion.section>
+
+
 
 
         {/* Section 6: Statistika */}
@@ -562,6 +647,7 @@ export default function Home() {
   whileInView={{ opacity: 1, y: 0 }}
   viewport={{ once: true }}
   transition={{ duration: 0.8 }}
+  id="korepetitoriai"
   className="w-full min-h-screen flex flex-col justify-center items-center bg-white snap-start px-6 py-32"
 >
   <h2 className="text-5xl font-extrabold mb-12 text-center">Mūsų Mokytojai</h2>
@@ -590,7 +676,7 @@ export default function Home() {
         name: "Darija Stanislavovaitė",
         subject: "IT",
         experience: "1 metai",
-        languages: "Lietuvių, Anglų",
+        languages: "Lietuvių, Rusų",
         description:
           "Draugiška mokytoja, kuri moko per praktinius pavyzdžius. Darija yra VGTU studentė ir informatikos korepetitorė.",
         img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/da.jpg",
@@ -622,32 +708,41 @@ export default function Home() {
           "Esu matematikos ir lietuvių kalbos korepetitorė. Padedu pasiruošti atsiskaitymams, kontroliniams darbams, atlikti namų darbus ar pagilinti žinias. Kiekvienam mokiniui taikau individualią mokymo strategiją, nes žinau, kad vieno „stebuklingo“ metodo nėra. Mano tikslas - ne tik geresni pažymiai, bet ir augantis pasitikėjimas savimi. Jei ieškote korepetitoriaus, kuris aiškiai paaiškina, palaiko ir motyvuoja, mielai padėsiu jūsų vaikui žengti pirmyn.",
         img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
       },
+      {
+        name: "Dovydas Žilinskas",
+        subject: "Matematika, IT",
+        experience: "2 metai",
+        languages: "Lietuvių, Anglų",
+        description:
+          "Aš esu Dovydas, kiekybinės ekonomikos studentas VU. Turiu patirties ruošiant mokinius tiek matematikos, tiek IT egzaminams. Mano pamokos yra interaktyvios ir pritaikytos prie kiekvieno mokinio poreikių.",
+          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
+      }
     ].map((teacher, i) => (
       <div
         key={i}
-        className="w-72 bg-blue-50 rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
+        className="w-72 bg-[#3B65CE] rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
       >
         <img
           src={teacher.img}
           alt={teacher.name}
           className="h-40 w-40 object-cover rounded-full mb-4"
         />
-        <h3 className="text-xl font-bold mb-3 text-center">{teacher.name}</h3>
+        <h3 className="text-xl text-white font-bold mb-3 text-center">{teacher.name}</h3>
 
         {/* Highlighted tags */}
         <div className="flex flex-wrap justify-center gap-2 mb-3">
-          <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-semibold">
+          <span className="bg-red-400 text-white px-3 py-1 rounded-full text-xs font-semibold">
             {teacher.subject}
           </span>
-          <span className="bg-yellow-50 text-yellow-600 px-3 py-1 rounded-full text-xs font-medium">
+          <span className="bg-yellow-400 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
             Patirtis: {teacher.experience}
           </span>
-          <span className="bg-yellow-50 text-yellow-600 px-3 py-1 rounded-full text-xs font-medium">
+          <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
             Kalbos, kuriomis galimos pamokos: {teacher.languages}
           </span>
         </div>
 
-        <p className="text-gray-700 text-sm text-center">{teacher.description}</p>
+        <p className="text-white text-sm text-center">{teacher.description}</p>
       </div>
     ))}
   </div>
@@ -655,19 +750,94 @@ export default function Home() {
 
 
 
-        {/* Section 3: Kam man registruotis */}
-        <motion.section
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="w-full min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-100 to-white snap-start px-6 py-20"
-        >
-          <h2 className="text-5xl font-extrabold mb-8 text-center">Kam man registruotis?</h2>
-          <p className="max-w-2xl text-xl text-gray-700 leading-relaxed text-center">
-            Užsiregistravę galėsite stebėti vaiko progresą ir matyti, ką jis mokosi. 📈
-          </p>
-        </motion.section>
+      {/* Section 3: Kam man registruotis */}
+<motion.section
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-4 py-16 sm:px-6 lg:px-20 overflow-hidden"
+>
+  {/* Yellow Ribbon */}
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="w-[250%] h-32 bg-yellow-400 rotate-[-8deg] opacity-70"></div>
+  </div>
+
+  {/* Minimalist Navigation Path */}
+  <svg
+    className="absolute inset-0 w-full h-full pointer-events-none opacity-40"
+    xmlns="http://www.w3.org/2000/svg"
+    preserveAspectRatio="none"
+  >
+    {/* Smooth red curved path */}
+    <path
+      d="M 0 400 Q 300 200, 600 400 T 1200 400"
+      stroke="#DC2626"          
+      strokeWidth="3"
+      fill="none"
+      strokeLinecap="round"
+      strokeDasharray="10 14"
+    />
+
+    {/* Waypoints */}
+    <circle cx="0" cy="400" r="6" fill="#DC2626" />
+    <circle cx="600" cy="400" r="6" fill="#DC2626" />
+    <circle cx="1200" cy="400" r="6" fill="#DC2626" />
+  </svg>
+
+  {/* Content Card */}
+  <div className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6">
+    <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">
+      Kam man registruotis?
+    </h2>
+    <p className="text-base sm:text-lg text-gray-700 text-center max-w-2xl">
+      Užsiregistravę galėsite stebėti vaiko progresą, pamokų rezultatus ir mokymosi tendencijas.
+    </p>
+  </div>
+</motion.section>
+{/* Section: Bank Details */}
+<motion.section
+  id="bank-info"
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#E2E8F0] snap-start px-4 py-16 sm:px-6 lg:px-20 overflow-hidden"
+>
+  {/* Decorative background */}
+  <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+    <div className="w-[250%] h-32 bg-[#3B65CE] rotate-[-6deg] opacity-10"></div>
+  </div>
+
+  {/* Content Card */}
+  <div className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6 text-center">
+    <h2 className="text-3xl sm:text-5xl font-extrabold mb-4 text-[#3B65CE]">
+      Jei turite pastovius laikus, galite apmokėti paprasčiau.
+    </h2>
+    <p className="text-base sm:text-lg text-gray-700 max-w-2xl">
+      Pamokos kaina yra 25eur. Galite pervesti pinigus už susitartą pamokų skaičių netikrinant naujų laikų.
+    </p>
+
+    {/* Bank Info Placeholder */}
+    <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl px-6 py-4 text-left w-full max-w-md mt-4">
+      <p className="font-semibold text-gray-800">Vardas, Pavardė:</p>
+      <p className="text-gray-700 mb-3">Dovydas Žilinskas</p>
+
+      <p className="font-semibold text-gray-800">IBAN:</p>
+      <p className="text-gray-700 mb-3">LT077300010164121505</p>
+
+      <p className="font-semibold text-gray-800">Bankas:</p>
+      <p className="text-gray-700">SWEDBANK</p>
+    </div>
+
+    <p className="text-sm text-gray-500 mt-4">
+      *Prašome patikrinti informaciją prieš atlikdami pavedimą.
+    </p>
+  </div>
+</motion.section>
+
+
+
       </main>
 
       {/* Footer */}
