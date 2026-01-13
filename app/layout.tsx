@@ -70,7 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           />
         </noscript>
 
-        {/* Facebook Pixel */}
+        {/* Facebook Pixel - NEW ID ONLY (1256062859918317) */}
         <Script
           id="facebook-pixel"
           strategy="afterInteractive"
@@ -84,7 +84,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               t.src=v;s=b.getElementsByTagName(e)[0];
               s.parentNode.insertBefore(t,s)}(window, document,'script',
               'https://connect.facebook.net/en_US/fbevents.js');
-              fbq('init', '1945002179684844');
+              
+              fbq('init', '1256062859918317');
               fbq('track', 'PageView');
             `,
           }}
@@ -94,7 +95,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             height="1"
             width="1"
             style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1945002179684844&ev=PageView&noscript=1"
+            src="https://www.facebook.com/tr?id=1256062859918317&ev=PageView&noscript=1"
             alt="facebook pixel"
           />
         </noscript>
