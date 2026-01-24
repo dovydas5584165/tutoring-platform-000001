@@ -356,42 +356,56 @@ export default function Home() {
 
         
 {/* === Hero/Landing Section: Percent Puzzle Game === */}
-<section className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] text-white snap-start px-6 overflow-hidden">
-  {/* Background Dots (ordered grid for neatness) */}
-  <div className="absolute inset-0 grid grid-cols-8 gap-6 opacity-50 pointer-events-none">
-    {Array.from({ length: 80 }).map((_, i) => (
-      <span key={i} className="w-2 h-2 rounded-full bg-black" />
-    ))}
+<section className="relative w-full min-h-screen bg-[#3B65CE] text-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+
+        {/* LEFT SIDE */}
+        <div className="flex flex-col gap-8">
+
+            <p className="text-sm text-white/90">
+              <strong>100+</strong>{" "}
+              <span className="opacity-80">Pagerintų vidurkių!</span>
+            </p>
+          </div>
+
+          {/* Headline */}
+          <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight">
+            Mes{" "}
+            <span className="bg-white text-[#3B65CE] px-3 py-1 rounded-lg">
+              padėsime!
+            </span>
+          </h1>
+
+          {/* Subheadline */}
+          <h2 className="text-xl lg:text-2xl font-medium text-white/90 max-w-xl">
+            Profesionalūs korepetitoriai ir geresni pažymiai.
+          </h2>
+
+          {/* CTA */}
+          <a
+            href="#"
+            className="inline-flex items-center gap-4 bg-[#FF8200] text-black font-semibold px-6 py-4 rounded-full w-fit hover:scale-105 transition-transform"
+          >
+            Atrask pamokas
+            <span className="bg-white rounded-full w-11 h-11 flex items-center justify-center text-xl">
+              ↗
+            </span>
+          </a>
+
+        {/* RIGHT SIDE */}
+<div className="relative flex justify-center items-center">
+  <div className="w-full max-w-md aspect-[4/5] rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center">
+    <span className="text-7xl select-none">📘</span>
   </div>
+</div>
 
-  {/* Puzzle Card */}
-  <motion.div
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    transition={{ duration: 1 }}
-    className="relative z-10 max-w-md w-full bg-white text-gray-900 rounded-3xl shadow-2xl p-8 mb-10 text-center overflow-hidden"
-  >
-    <div className="relative inline-block">
-      <p className="text-2xl font-bold mb-6 text-gray-800">
-        Individualios pamokos iš profesionalų per 1min.
-      </p>
 
-      {/* Responsive Red Accent Line */}
-      <span className="block mx-auto h-1 bg-red-500 
-                       w-16 sm:w-20 md:w-24 lg:w-28 
-                       rounded-full transition-all duration-300">
-      </span>
-    </div>
+          {/* Floating accent */}
+          <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-[#FF8200]/80 blur-xl" />
+        </div>
 
-  {/* Single CTA */}
-  <Button
-    onClick={scrollToLessons}
-    className="relative z-10 px-8 py-4 text-lg font-semibold rounded-full bg-red-400 text-black hover:bg-yellow-500 transition-transform transform hover:scale-105 shadow-lg"
-  >
-    Atrask pamokas
-  </Button>
-  </motion.div>
-</section>
+      </div>
+    </section>
 
 
 
