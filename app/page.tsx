@@ -468,6 +468,115 @@ export default function Home() {
   </div>
 </section>
 
+ {/* Section 7: Mūsų Mokytojai */}
+<motion.section
+  ref={teacherRef}
+  initial={{ opacity: 0, y: 60 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.8 }}
+  id="korepetitoriai"
+  className="w-full min-h-screen flex flex-col justify-center items-center bg-white snap-start px-6 py-32"
+>
+  <h2 className="text-5xl font-extrabold mb-12 text-center">Mūsų Mokytojai</h2>
+
+  <div className="flex gap-8 justify-center flex-wrap max-w-6xl mx-auto">
+    {[
+      {
+        name: "Justė Giedraitytė",
+        subject: "Matematika, Anglų kalba",
+        experience: "2 metai",
+        languages: "Lietuvių, Anglų",
+        description:
+          "Esu Justė, politikos mokslų studentė iš Vilniaus. Ne visada mylėjau matematiką ir prisiekinėjau sau, jog nieko bendro su tuo neturėsiu ateityje. Tačiau ilgainiui, su daug sunkaus darbo, pamilau matematiką ir net vienus savo gyvenimo metus ją studijavau! Tas, manau, ir yra unikalu apie mane - žinau, kaip paaiškinti užduotis, taip, kad net visiškai žalias suprastų:)",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/IMG_5420.jpeg",
+      },
+      {
+        name: "Aleksandras Šileika",
+        subject: "Matematika",
+        experience: "1 metai",
+        languages: "Lietuvių, Anglų",
+        description:
+          "Esu matematikos korepetitorius, studijuojantis matematiką Bonos universitete (Vokietijoje). Iš matematikos VBE gavau 100 balų. Puikiai suprantu atnaujintą bendrąją ugdymo programą ir žinau, kokie iššūkiai laukia mokinių ruošiantis kontroliniams, NMPP, PUPP ar VBE.",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/E0Tsj4D9OTOfOSOhS6zfFxwscH4sVtb8INL9xPp4.jpg",
+      },
+      {
+        name: "Darija Stanislavovaitė",
+        subject: "IT",
+        experience: "1 metai",
+        languages: "Lietuvių, Rusų",
+        description:
+          "Draugiška mokytoja, kuri moko per praktinius pavyzdžius. Darija yra VGTU studentė ir informatikos korepetitorė.",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/da.jpg",
+      },
+      {
+        name: "Nomeda Sabienė",
+        subject: "Chemija, Biologija, Fizika",
+        experience: "15 metų",
+        languages: "Lietuvių, Anglų",
+        description:
+          "Esu aplinkos chemijos ir ekologijos mokslų daktarė, gamtos mokslus suprantu kaip vientisą nedalomą/holistinę visumą. Galiu paaiškinti įvairius chemijos, fizikos, biologijos klausimus iš visų šių mokslų pozicijų. Ilgametė pedagoginė patirtis leidžia suteikti pagrindus sunkiau besimokantiems, ruošti moksleivius olimpiadoms ir VBE. Mano moto: kartu lengviau!",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/20200624_203645-1.jpg",
+      },
+      {
+        name: "Kajus Tutor",
+        subject: "Matematika, Fizika",
+        experience: "2 metai",
+        languages: "Lietuvių, Anglų",
+        description:
+          "Esu Kajus, mokau matematiką ir fiziką. Mėgstu paaiškinti sudėtingas temas paprastai ir suprantamai, kad kiekvienas mokinys galėtų jas įsisavinti.",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/anon.avif",
+      },
+      {
+        name: "Kristina Balnytė",
+        subject: "Matematika, Anglų kalba",
+        experience: "2 metai",
+        languages: "Lietuvių, Anglų",
+        description:
+          "Esu matematikos ir lietuvių kalbos korepetitorė. Padedu pasiruošti atsiskaitymams, kontroliniams darbams, atlikti namų darbus ar pagilinti žinias. Kiekvienam mokiniui taikau individualią mokymo strategiją, nes žinau, kad vieno „stebuklingo“ metodo nėra. Mano tikslas - ne tik geresni pažymiai, bet ir augantis pasitikėjimas savimi. Jei ieškote korepetitoriaus, kuris aiškiai paaiškina, palaiko ir motyvuoja, mielai padėsiu jūsų vaikui žengti pirmyn.",
+        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
+      },
+      {
+        name: "Dovydas Žilinskas",
+        subject: "Matematika, IT",
+        experience: "2 metai",
+        languages: "Lietuvių, Anglų",
+        description:
+          "Aš esu Dovydas, kiekybinės ekonomikos studentas VU. Turiu patirties ruošiant mokinius tiek matematikos, tiek IT egzaminams. Mano pamokos yra interaktyvios ir pritaikytos prie kiekvieno mokinio poreikių.",
+          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
+      }
+    ].map((teacher, i) => (
+      <div
+        key={i}
+        className="w-72 bg-[#3B65CE] rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
+      >
+        <img
+          src={teacher.img}
+          alt={teacher.name}
+          className="h-40 w-40 object-cover rounded-full mb-4"
+        />
+        <h3 className="text-xl text-white font-bold mb-3 text-center">{teacher.name}</h3>
+
+        {/* Highlighted tags */}
+        <div className="flex flex-wrap justify-center gap-2 mb-3">
+          <span className="bg-red-400 text-white px-3 py-1 rounded-full text-xs font-semibold">
+            {teacher.subject}
+          </span>
+          <span className="bg-yellow-400 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+            Patirtis: {teacher.experience}
+          </span>
+          <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
+            Kalbos, kuriomis galimos pamokos: {teacher.languages}
+          </span>
+        </div>
+
+        <p className="text-white text-sm text-center">{teacher.description}</p>
+      </div>
+    ))}
+  </div>
+</motion.section>
+
+
 
         <motion.section
   initial="hidden"
@@ -530,7 +639,7 @@ export default function Home() {
       <div className="text-center max-w-3xl mb-16">
         <h2 className="text-5xl font-extrabold mb-6">Apie mus</h2>
         <p className="text-xl text-gray-800 leading-relaxed mb-6 p-6 bg-white rounded-xl shadow-md border-l-4 border-blue-400">
-          Tiksliukai.lt – tai studentų edukacinis projektas. <br />
+          Tiksliukai.lt – tai modernus edukacinis projektas. <br />
           Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir
           patogesnis kiekvienam mokiniui Lietuvoje.
         </p>
@@ -655,114 +764,7 @@ export default function Home() {
           </div>
         </motion.section>
 
-       {/* Section 7: Mūsų Mokytojai */}
-<motion.section
-  ref={teacherRef}
-  initial={{ opacity: 0, y: 60 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true }}
-  transition={{ duration: 0.8 }}
-  id="korepetitoriai"
-  className="w-full min-h-screen flex flex-col justify-center items-center bg-white snap-start px-6 py-32"
->
-  <h2 className="text-5xl font-extrabold mb-12 text-center">Mūsų Mokytojai</h2>
-
-  <div className="flex gap-8 justify-center flex-wrap max-w-6xl mx-auto">
-    {[
-      {
-        name: "Justė Giedraitytė",
-        subject: "Matematika, Anglų kalba",
-        experience: "2 metai",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Esu Justė, politikos mokslų studentė iš Vilniaus. Ne visada mylėjau matematiką ir prisiekinėjau sau, jog nieko bendro su tuo neturėsiu ateityje. Tačiau ilgainiui, su daug sunkaus darbo, pamilau matematiką ir net vienus savo gyvenimo metus ją studijavau! Tas, manau, ir yra unikalu apie mane - žinau, kaip paaiškinti užduotis, taip, kad net visiškai žalias suprastų:)",
-        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/IMG_5420.jpeg",
-      },
-      {
-        name: "Aleksandras Šileika",
-        subject: "Matematika",
-        experience: "1 metai",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Esu matematikos korepetitorius, studijuojantis matematiką Bonos universitete (Vokietijoje). Iš matematikos VBE gavau 100 balų. Puikiai suprantu atnaujintą bendrąją ugdymo programą ir žinau, kokie iššūkiai laukia mokinių ruošiantis kontroliniams, NMPP, PUPP ar VBE.",
-        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/E0Tsj4D9OTOfOSOhS6zfFxwscH4sVtb8INL9xPp4.jpg",
-      },
-      {
-        name: "Darija Stanislavovaitė",
-        subject: "IT",
-        experience: "1 metai",
-        languages: "Lietuvių, Rusų",
-        description:
-          "Draugiška mokytoja, kuri moko per praktinius pavyzdžius. Darija yra VGTU studentė ir informatikos korepetitorė.",
-        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/da.jpg",
-      },
-      {
-        name: "Nomeda Sabienė",
-        subject: "Chemija, Biologija, Fizika",
-        experience: "15 metų",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Esu aplinkos chemijos ir ekologijos mokslų daktarė, gamtos mokslus suprantu kaip vientisą nedalomą/holistinę visumą. Galiu paaiškinti įvairius chemijos, fizikos, biologijos klausimus iš visų šių mokslų pozicijų. Ilgametė pedagoginė patirtis leidžia suteikti pagrindus sunkiau besimokantiems, ruošti moksleivius olimpiadoms ir VBE. Mano moto: kartu lengviau!",
-        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/20200624_203645-1.jpg",
-      },
-      {
-        name: "Kajus Tutor",
-        subject: "Matematika, Fizika",
-        experience: "2 metai",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Esu Kajus, mokau matematiką ir fiziką. Mėgstu paaiškinti sudėtingas temas paprastai ir suprantamai, kad kiekvienas mokinys galėtų jas įsisavinti.",
-        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/anon.avif",
-      },
-      {
-        name: "Kristina Balnytė",
-        subject: "Matematika, Anglų kalba",
-        experience: "2 metai",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Esu matematikos ir lietuvių kalbos korepetitorė. Padedu pasiruošti atsiskaitymams, kontroliniams darbams, atlikti namų darbus ar pagilinti žinias. Kiekvienam mokiniui taikau individualią mokymo strategiją, nes žinau, kad vieno „stebuklingo“ metodo nėra. Mano tikslas - ne tik geresni pažymiai, bet ir augantis pasitikėjimas savimi. Jei ieškote korepetitoriaus, kuris aiškiai paaiškina, palaiko ir motyvuoja, mielai padėsiu jūsų vaikui žengti pirmyn.",
-        img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
-      },
-      {
-        name: "Dovydas Žilinskas",
-        subject: "Matematika, IT",
-        experience: "2 metai",
-        languages: "Lietuvių, Anglų",
-        description:
-          "Aš esu Dovydas, kiekybinės ekonomikos studentas VU. Turiu patirties ruošiant mokinius tiek matematikos, tiek IT egzaminams. Mano pamokos yra interaktyvios ir pritaikytos prie kiekvieno mokinio poreikių.",
-          img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
-      }
-    ].map((teacher, i) => (
-      <div
-        key={i}
-        className="w-72 bg-[#3B65CE] rounded-2xl shadow-xl p-6 hover:scale-105 transition-transform duration-300 flex flex-col items-center"
-      >
-        <img
-          src={teacher.img}
-          alt={teacher.name}
-          className="h-40 w-40 object-cover rounded-full mb-4"
-        />
-        <h3 className="text-xl text-white font-bold mb-3 text-center">{teacher.name}</h3>
-
-        {/* Highlighted tags */}
-        <div className="flex flex-wrap justify-center gap-2 mb-3">
-          <span className="bg-red-400 text-white px-3 py-1 rounded-full text-xs font-semibold">
-            {teacher.subject}
-          </span>
-          <span className="bg-yellow-400 text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-            Patirtis: {teacher.experience}
-          </span>
-          <span className="bg-white text-blue-700 px-3 py-1 rounded-full text-xs font-medium">
-            Kalbos, kuriomis galimos pamokos: {teacher.languages}
-          </span>
-        </div>
-
-        <p className="text-white text-sm text-center">{teacher.description}</p>
-      </div>
-    ))}
-  </div>
-</motion.section>
-
+      
 
 
       {/* Section 3: Kam man registruotis */}
