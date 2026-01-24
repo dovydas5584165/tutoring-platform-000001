@@ -364,7 +364,7 @@ if (notifError) {
 
   <div className="mb-8 max-w-md relative">
     <label htmlFor="teacher-select" className="block mb-2 text-sm font-semibold text-gray-700">
-      Pasirinkite mokytoją:
+    
     </label>
     <select
       id="teacher-select"
@@ -375,7 +375,7 @@ if (notifError) {
       }
       disabled={loading} // optionally disable while loading
     >
-      <option value="">-- Rodyti visus --</option>
+      <option value="">Pasirinkite mokytoją:</option>
       {teachers.length > 0 ? (
         teachers.map((t) => (
           <option key={t.id} value={t.id}>
