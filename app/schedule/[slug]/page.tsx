@@ -360,38 +360,7 @@ if (notifError) {
   return (
     <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans px-6 py-10 max-w-5xl mx-auto">
       <header className="mb-8">
-  <h1 className="text-3xl font-bold mb-4 capitalize">Pamokos: {slug}</h1>
-
-  <div className="mb-8 max-w-md relative">
-    <label htmlFor="teacher-select" className="block mb-2 text-sm font-semibold text-gray-700">
-    
-    </label>
-    <select
-      id="teacher-select"
-      className="appearance-none w-full border border-gray-300 bg-white py-3 px-4 pr-10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 cursor-pointer transition"
-      value={selectedTeacher?.id || ""}
-      onChange={(e) =>
-        setSelectedTeacher(teachers.find((t) => t.id === e.target.value) || null)
-      }
-      disabled={loading} // optionally disable while loading
-    >
-      <option value="">Pasirinkite mokytoją:</option>
-      {teachers.length > 0 ? (
-        teachers.map((t) => (
-          <option key={t.id} value={t.id}>
-            {t.vardas} {t.pavarde} – €{lessonPrice ?? 25}/45min
-          </option>
-        ))
-      ) : loading ? (
-        <option disabled>Kraunama mokytojų...</option>
-      ) : (
-        <option disabled>Šiai pamokai šiuo metu nėra mokytojų</option>
-      )}
-    </select>
-  </div>
-</header>
-
-      {/* Section 7: Mūsų Mokytojai */}
+        {/* Section 7: Mūsų Mokytojai */}
 <motion.section
   initial={{ opacity: 0, y: 60 }}
   whileInView={{ opacity: 1, y: 0 }}
@@ -464,6 +433,37 @@ if (notifError) {
     ))}
   </div>
 </motion.section>
+  <h1 className="text-3xl font-bold mb-4 capitalize">Pamokos: {slug}</h1>
+
+  <div className="mb-8 max-w-md relative">
+    <label htmlFor="teacher-select" className="block mb-2 text-sm font-semibold text-gray-700">
+    
+    </label>
+    <select
+      id="teacher-select"
+      className="appearance-none w-full border border-gray-300 bg-white py-3 px-4 pr-10 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-800 cursor-pointer transition"
+      value={selectedTeacher?.id || ""}
+      onChange={(e) =>
+        setSelectedTeacher(teachers.find((t) => t.id === e.target.value) || null)
+      }
+      disabled={loading} // optionally disable while loading
+    >
+      <option value="">Pasirinkite mokytoją:</option>
+      {teachers.length > 0 ? (
+        teachers.map((t) => (
+          <option key={t.id} value={t.id}>
+            {t.vardas} {t.pavarde} – €{lessonPrice ?? 25}/45min
+          </option>
+        ))
+      ) : loading ? (
+        <option disabled>Kraunama mokytojų...</option>
+      ) : (
+        <option disabled>Šiai pamokai šiuo metu nėra mokytojų</option>
+      )}
+    </select>
+  </div>
+</header>
+
 
       <div className="p-4 mb-8 bg-white rounded-3xl shadow-md">
         <DayPicker
