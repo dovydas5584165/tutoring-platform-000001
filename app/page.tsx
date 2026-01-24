@@ -356,56 +356,59 @@ export default function Home() {
 
         
 {/* === Hero / Landing Section === */}
-  <section className="relative w-full min-h-screen bg-[#3B65CE] text-white overflow-hidden">
-    <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+  <section className="relative w-full min-h-screen bg-[#3B65CE] text-white overflow-hidden snap-start">
+        <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
 
-      {/* LEFT SIDE */}
-      <div className="flex flex-col gap-8">
+          {/* LEFT SIDE */}
+          <div className="flex flex-col gap-8">
 
-        {/* Trust */}
-        <p className="text-sm text-white/90">
-          <strong>100+</strong>{" "}
-          <span className="opacity-80">Pagerintų vidurkių!</span>
-        </p>
+            {/* Trust */}
+            <p className="text-sm text-white/90">
+              <strong>100+</strong>{" "}
+              <span className="opacity-80">Pagerintų vidurkių!</span>
+            </p>
 
-        {/* Headline */}
-        <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight">
-          Mes{" "}
-          <span className="bg-white text-[#3B65CE] px-3 py-1 rounded-lg">
-            padėsime!
-          </span>
-        </h1>
+            {/* Headline */}
+            <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight">
+              Mes{" "}
+              <span className="bg-white text-[#3B65CE] px-3 py-1 rounded-lg">
+                padėsime!
+              </span>
+            </h1>
 
-        {/* Subheadline */}
-        <h2 className="text-xl lg:text-2xl font-medium text-white/90 max-w-xl">
-          Profesionalūs korepetitoriai ir geresni pažymiai.
-        </h2>
+            {/* Subheadline */}
+            <h2 className="text-xl lg:text-2xl font-medium text-white/90 max-w-xl">
+              Profesionalūs korepetitoriai ir geresni pažymiai.
+            </h2>
 
-        {/* CTA */}
-        <a
-          href="#"
-          className="inline-flex items-center gap-4 bg-[#FF8200] text-black font-semibold px-6 py-4 rounded-full w-fit hover:scale-105 transition-transform"
-        >
-          Atrask pamokas
-          <span className="bg-white rounded-full w-11 h-11 flex items-center justify-center text-xl">
-            ↗
-          </span>
-        </a>
+            {/* CTA */}
+            <Button
+              onClick={scrollToLessons}
+              className="relative z-10 px-8 py-4 text-lg font-semibold rounded-full
+                         bg-red-400 text-black hover:bg-yellow-500
+                         transition-transform transform hover:scale-105 shadow-lg w-fit"
+            >
+              Atrask pamokas
+            </Button>
+          </div>
 
-      </div>
+          {/* RIGHT SIDE */}
+          <div className="relative flex justify-center items-center">
 
-      {/* RIGHT SIDE */}
-      <div className="relative flex justify-center items-center">
-        <div className="w-full max-w-md aspect-[4/5] rounded-3xl bg-white/10 border border-white/20 flex items-center justify-center">
-          <span className="text-7xl select-none">📘</span>
+            <div className="w-full max-w-md aspect-[4/5] rounded-3xl overflow-hidden bg-white/10 border border-white/20">
+              <img
+                src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/Gemini_Generated_Image_kl5nq3kl5nq3kl5n.png"
+                alt="Student learning"
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            {/* Floating accent */}
+            <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-[#FF8200]/80 blur-xl" />
+          </div>
+
         </div>
-
-        {/* Floating accent */}
-        <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-[#FF8200]/80 blur-xl" />
-      </div>
-
-    </div>
-  </section>
+      </section>
 
        {/* Section 1: Lessons */}
 <section
