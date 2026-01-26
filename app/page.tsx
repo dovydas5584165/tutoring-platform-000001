@@ -379,7 +379,6 @@ export default function Home() {
               {/* Subheadline */}
               <h2 className="text-xl lg:text-2xl font-medium text-white/80 max-w-xl leading-relaxed">
                 Profesionalūs korepetitoriai ir geresni pažymiai. <br />
-                Arba atrask savo ateities kelią su mūsų testu.
               </h2>
 
               {/* CTA BUTTONS GROUP */}
@@ -394,7 +393,7 @@ export default function Home() {
 
                 {/* 2. Naujas mygtukas (Karjeros testas) */}
                 <Link
-                  href="/test"
+                  href="/career_test"
                   className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 overflow-hidden"
                 >
                   {/* Mažas "badge" kampe */}
