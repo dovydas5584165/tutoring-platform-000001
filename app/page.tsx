@@ -354,62 +354,106 @@ export default function Home() {
       <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
 
 
-        
+
 {/* === Hero / Landing Section === */}
-  <section className="relative w-full min-h-screen bg-[#3B65CE] text-white overflow-hidden snap-start">
-        <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+<section className="relative w-full min-h-screen bg-[#3B65CE] text-white overflow-hidden snap-start flex items-center">
+  
+  {/* Fono dekoracija (nebūtina, bet prideda gylio) */}
+  <div className="absolute top-0 right-0 w-2/3 h-full bg-white/5 skew-x-12 pointer-events-none" />
 
-          {/* LEFT SIDE */}
-          <div className="flex flex-col gap-8">
+  <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
 
-            {/* Trust */}
-            <p className="text-sm text-white/90">
-              <strong>100+</strong>{" "}
-              <span className="opacity-80">Pagerintų vidurkių!</span>
-            </p>
+    {/* LEFT SIDE */}
+    <div className="flex flex-col gap-8">
 
-            {/* Headline */}
-            <h1 className="text-5xl lg:text-6xl font-extrabold leading-tight">
-              Mes{" "}
-              <span className="bg-white text-[#3B65CE] px-3 py-1 rounded-lg">
-                padėsime!
-              </span>
-            </h1>
+      {/* Trust */}
+      <div className="inline-flex items-center gap-2 bg-blue-800/30 border border-blue-400/30 px-4 py-2 rounded-full w-fit backdrop-blur-sm">
+        <span className="font-bold text-yellow-400">100+</span>
+        <span className="text-sm text-white/90">Pagerintų vidurkių!</span>
+      </div>
 
-            {/* Subheadline */}
-            <h2 className="text-xl lg:text-2xl font-medium text-white/90 max-w-xl">
-              Profesionalūs korepetitoriai ir geresni pažymiai.
-            </h2>
+      {/* Headline */}
+      <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight">
+        Mes{" "}
+        <span className="relative inline-block">
+          <span className="relative z-10 bg-white text-[#3B65CE] px-4 py-1 rounded-xl shadow-xl transform -rotate-2 inline-block">
+            padėsime!
+          </span>
+        </span>
+      </h1>
 
-            {/* CTA */}
-            <Button
-              onClick={scrollToLessons}
-              className="relative z-10 px-8 py-4 text-lg font-semibold rounded-full
-                         bg-red-400 text-black hover:bg-yellow-500
-                         transition-transform transform hover:scale-105 shadow-lg w-fit"
-            >
-              Atrask pamokas
-            </Button>
-          </div>
+      {/* Subheadline */}
+      <h2 className="text-xl lg:text-2xl font-medium text-white/80 max-w-xl leading-relaxed">
+        Profesionalūs korepetitoriai ir geresni pažymiai. <br/>
+        Arba atrask savo ateities kelią su mūsų testu.
+      </h2>
 
-          {/* RIGHT SIDE */}
-          <div className="relative flex justify-center items-center">
+      {/* CTA BUTTONS GROUP */}
+      <div className="flex flex-col sm:flex-row gap-4 mt-2">
+        
+        {/* 1. Pagrindinis mygtukas (Pamokos) */}
+        <Button
+          onClick={scrollToLessons}
+          className="px-8 py-4 text-lg font-bold rounded-2xl bg-red-400 text-slate-900 hover:bg-yellow-400 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
+        >
+          Atrask pamokas <ArrowRight size={20} />
+        </Button>
 
-            <div className="w-full max-w-md aspect-[4/5] rounded-3xl overflow-hidden bg-white/10 border border-white/20">
-              <img
-                src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/Gemini_Generated_Image_kl5nq3kl5nq3kl5n.png"
-                alt="Student learning"
-                className="w-full h-full object-cover"
-              />
+        {/* 2. Naujas mygtukas (Karjeros testas) */}
+        <Link 
+          href="/test" 
+          className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 overflow-hidden"
+        >
+            {/* Mažas "badge" kampe */}
+            <span className="absolute top-0 right-0 bg-yellow-400 text-[10px] font-black text-slate-900 px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">
+                Naujiena
+            </span>
+            <Compass size={20} className="group-hover:rotate-45 transition-transform duration-500" />
+            <span>Karjeros testas</span>
+        </Link>
+      </div>
+      
+      <p className="text-xs text-blue-200 ml-1">
+        * Karjeros testas padės pasirinkti tinkamus egzaminus.
+      </p>
+
+    </div>
+
+    {/* RIGHT SIDE */}
+    <div className="relative flex justify-center items-center lg:justify-end">
+
+      <div className="relative w-full max-w-md aspect-[4/5] rounded-[2.5rem] overflow-hidden border-4 border-white/20 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-700">
+        <img
+          src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/Gemini_Generated_Image_kl5nq3kl5nq3kl5n.png"
+          alt="Student learning"
+          className="w-full h-full object-cover scale-105 hover:scale-110 transition-transform duration-700"
+        />
+        
+        {/* Overlay gradient for text readability if needed */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#3B65CE]/80 to-transparent opacity-60"></div>
+        
+        {/* Floating Card inside image */}
+        <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/50">
+            <div className="flex items-center gap-3">
+                <div className="bg-green-100 p-2 rounded-full">
+                    <ArrowRight className="text-green-600 w-5 h-5 -rotate-45" />
+                </div>
+                <div>
+                    <p className="text-slate-900 font-bold text-sm">Vidurkis pakilo</p>
+                    <p className="text-slate-500 text-xs">nuo 6.2 iki 9.4 🚀</p>
+                </div>
             </div>
-
-            {/* Floating accent */}
-            <div className="absolute -bottom-6 -left-6 w-24 h-24 rounded-full bg-[#FF8200]/80 blur-xl" />
-          </div>
-
         </div>
-      </section>
+      </div>
 
+      {/* Floating accents */}
+      <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-[#FF8200] blur-[80px] opacity-60" />
+      <div className="absolute top-10 -right-10 w-40 h-40 rounded-full bg-blue-400 blur-[80px] opacity-40" />
+      
+    </div>
+
+  </div>
+</section>
        {/* Section 1: Lessons */}
 <section
   id="pamokos"
