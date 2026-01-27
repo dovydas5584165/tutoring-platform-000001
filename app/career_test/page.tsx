@@ -17,14 +17,14 @@ import {
   Lock,
   X
 } from 'lucide-react';
-// Make sure this path points to where your CheckoutForm component is
-import CheckoutForm from '../components/CheckoutForm'; 
+
+// --- FIX IS HERE: Go up 2 levels (../../) to find the components folder ---
+import CheckoutForm from '../../components/CheckoutForm'; 
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // --- PAYMENT MODAL COMPONENT ---
-// This handles fetching the payment intent and showing the form
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
@@ -196,7 +196,7 @@ export default function KarjerosPristatymas() {
       <section id="kaip-veikia" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Kodėl verta investuoti 30 €?</h2>
-          <p className="text-slate-500">Tai ne šiaip testas, o išsami 50 klausimų analizė, kuri sutaupys tau mėnesius blaškymosi.</p>
+          <p className="text-slate-500">Tai ne šiaip testas, o išsami 100 klausimų analizė, kuri sutaupys tau mėnesius blaškymosi.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -273,11 +273,11 @@ export default function KarjerosPristatymas() {
                         </div>
                         <div>
                             <h4 className="font-bold text-lg">Tiksliukai.lt</h4>
-                            <p className="text-blue-300 text-sm">Korepetitorių platforma</p>
+                            <p className="text-blue-300 text-sm">Egzaminų paruošimo centras</p>
                         </div>
                     </div>
                     <p className="text-slate-300 italic mb-6">
-                        „Mūsų tikslas- ne tik padėti išlaikyti egzaminus, bet ir įstoti į svajonių studijas, kurias atradote atlikę testą.“
+                        „Mūsų tikslas – ne tik padėti išlaikyti egzaminus, bet ir įstoti į svajonių studijas, kurias atradote atlikę testą.“
                     </p>
                     <div className="flex items-center gap-1 text-yellow-400">
                         <Star fill="currentColor" size={16} />
