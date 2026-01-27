@@ -8,14 +8,16 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 
+// UPDATE 1: Interface now allows either bookingId OR returnUrl
 interface CheckoutFormProps {
-  bookingId: string;
+  bookingId?: string; // Made optional ( ? )
+  returnUrl?: string; // New optional prop
 }
 
-export default function CheckoutForm({ bookingId }: CheckoutFormProps) {
+export default function CheckoutForm({ bookingId, returnUrl }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const router = useRouter();
+  const router = useRouter(); // Kept for consistency, though Stripe handles the redirect
 
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>('');
@@ -31,18 +33,21 @@ export default function CheckoutForm({ bookingId }: CheckoutFormProps) {
     setIsLoading(true);
     setMessage('');
 
+    // UPDATE 2: Smart Logic to decide where to send the user
+    // If Landing Page passed a 'returnUrl', use it. 
+    // Otherwise, fall back to the old booking success page.
+    const finalReturnUrl = returnUrl 
+      ? returnUrl 
+      : `${window.location.origin}/payment-success?booking_id=${bookingId}`;
+
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/payment-success?booking_id=${bookingId}`,
+        // UPDATE 3: Use the variable we calculated above
+        return_url: finalReturnUrl,
       },
     });
 
-    // This point will only be reached if there is an immediate error when
-    // confirming the payment. Otherwise, your customer will be redirected to
-    // your `return_url`. For some payment methods like iDEAL, your customer will
-    // be redirected to an intermediate site first to authorize the payment, then
-    // redirected to the `return_url`.
     if (error) {
       if (error.type === "card_error" || error.type === "validation_error") {
         setMessage(error.message || 'An unexpected error occurred.');
@@ -82,7 +87,8 @@ export default function CheckoutForm({ bookingId }: CheckoutFormProps) {
               Processing...
             </div>
           ) : (
-            "Pay Now"
+            // UPDATE 4: Button text changes based on what we are buying
+            bookingId ? "Pay Now" : "Pay 30.00 €"
           )}
         </span>
       </button>
@@ -93,4 +99,4 @@ export default function CheckoutForm({ bookingId }: CheckoutFormProps) {
       </div>
     </form>
   );
-} 
+}
