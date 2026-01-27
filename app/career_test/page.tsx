@@ -15,23 +15,27 @@ import {
   Star, 
   ShieldCheck,
   Lock,
-  X
+  X,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
-// --- FIX IS HERE: Go up 2 levels (../../) to find the components folder ss---
+// --- IMPORT CHECKOUT FORM (Up 2 levels) ---
 import CheckoutForm from '../../components/CheckoutForm'; 
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-// --- PAYMENT MODAL COMPONENT ---
+// --- MOBILE OPTIMIZED PAYMENT MODAL COMPONENT ---
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
+  // New state to toggle details on mobile
+  const [showDetails, setShowDetails] = useState(false); 
 
   useEffect(() => {
     if (isOpen && !clientSecret) {
-      // 1. Ask API for a payment intent for the career test
+      // 1. Ask API for a payment intent
       fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -53,79 +57,119 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
   const appearance = {
     theme: 'stripe' as const,
-    variables: { colorPrimary: '#2563eb', borderRadius: '12px' },
+    variables: { colorPrimary: '#2563eb', borderRadius: '12px', fontSizeBase: '16px' },
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center sm:p-4">
       {/* Dark Background Backdrop */}
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
         onClick={onClose}
       />
       
-      {/* Modal Window */}
-      <div className="relative bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+      {/* Modal Window - Full screen on mobile, Rounded on desktop */}
+      <div className="relative bg-white w-full h-[95vh] md:h-auto md:max-h-[90vh] md:max-w-4xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden transition-all transform">
         
-        {/* Left Side: Summary */}
-        <div className="bg-slate-50 p-8 md:w-2/5 border-r border-slate-100 flex flex-col justify-between">
-          <div>
-            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-              <Lock className="w-5 h-5 text-blue-600" /> Užsakymas
-            </h3>
-            
-            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-              <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Produktas</span>
-              <p className="font-bold text-slate-900 text-lg">Karjeros analizė 2026</p>
-              <ul className="mt-3 space-y-2 text-sm text-slate-500">
-                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> 10 profesijų, kurios geriausiai tinka tau ir jų perspektyvos.</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> Profesionali ataskaita</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> Individualizuota universitetų selekcija, reikiamų egzaminų sąrašas</li>
-              </ul>
-            </div>
-          </div>
+        {/* CLOSE BUTTON (Mobile: Top Right) */}
+        <button 
+          onClick={onClose}
+          className="md:hidden absolute top-4 right-4 z-20 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200"
+        >
+          <X size={20} />
+        </button>
 
-          <div className="mt-6 pt-6 border-t border-slate-200">
-            <div className="flex justify-between items-end">
-              <span className="text-slate-500 font-medium">Iš viso:</span>
-              <span className="text-3xl font-black text-slate-900">30.00 €</span>
+        {/* --- LEFT SIDE (SUMMARY) --- */}
+        <div className="bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 md:w-2/5 flex-shrink-0">
+          
+          <div className="p-6 md:p-8 flex flex-col justify-between h-full">
+            <div>
+              <h3 className="text-xl font-bold text-slate-900 mb-2 md:mb-6 flex items-center gap-2">
+                <Lock className="w-5 h-5 text-blue-600" /> Užsakymas
+              </h3>
+              
+              {/* Mobile Only: Price Header */}
+              <div className="flex justify-between items-end mb-4 md:hidden">
+                 <span className="text-slate-500 font-medium text-sm">Mokėti:</span>
+                 <span className="text-3xl font-black text-slate-900">30.00 €</span>
+              </div>
+
+              {/* Mobile Toggle for Details */}
+              <button 
+                onClick={() => setShowDetails(!showDetails)}
+                className="flex items-center gap-1 text-blue-600 text-sm font-bold md:hidden mb-4"
+              >
+                {showDetails ? 'Slėpti informaciją' : 'Ką aš perku?'}
+                {showDetails ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+              </button>
+
+              {/* Product Details Box - Hidden on Mobile unless toggled */}
+              <div className={`${showDetails ? 'block' : 'hidden'} md:block bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-all`}>
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Produktas</span>
+                <p className="font-bold text-slate-900 text-lg leading-tight mt-1">Karjeros analizė 2026</p>
+                <ul className="mt-4 space-y-3 text-sm text-slate-500">
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
+                    <span>10 profesijų, kurios geriausiai tinka tau.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
+                    <span>Profesionali ataskaita.</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
+                    <span>Studijų ir egzaminų planas.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Desktop Only: Price Footer */}
+            <div className="hidden md:block mt-6 pt-6 border-t border-slate-200">
+              <div className="flex justify-between items-end">
+                <span className="text-slate-500 font-medium">Iš viso:</span>
+                <span className="text-3xl font-black text-slate-900">30.00 €</span>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right Side: Stripe Form */}
-        <div className="p-8 md:w-3/5 overflow-y-auto relative bg-white">
+        {/* --- RIGHT SIDE (STRIPE FORM) --- */}
+        <div className="flex-1 bg-white flex flex-col h-full overflow-hidden">
+          {/* Desktop Close Button */}
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+            className="hidden md:block absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors z-10"
           >
             <X size={20} />
           </button>
 
-          <h2 className="text-2xl font-bold mb-2">Apmokėjimas</h2>
-          <p className="text-slate-500 text-sm mb-6">Saugus atsiskaitymas kortele per Stripe.</p>
+          {/* Scrollable Form Area */}
+          <div className="overflow-y-auto p-6 md:p-8 h-full pb-20 md:pb-8">
+            <h2 className="text-2xl font-bold mb-2">Apmokėjimas</h2>
+            <p className="text-slate-500 text-sm mb-6">Saugus atsiskaitymas kortele per Stripe.</p>
 
-          {!clientSecret && !error && (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-            </div>
-          )}
+            {!clientSecret && !error && (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            )}
 
-          {error && (
-            <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 mb-4">
-              {error}
+            {error && (
+              <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 mb-4 text-sm">
+                {error}
+              </div>
+            )}
+            
+            {clientSecret && (
+              <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
+                <CheckoutForm returnUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/test-start`} />
+              </Elements>
+            )}
+            
+            <div className="mt-8 flex items-center justify-center gap-2 text-[10px] text-slate-400 uppercase tracking-widest">
+              <ShieldCheck size={14} /> 100% Saugus SSL Apmokėjimas
             </div>
-          )}
-          
-          {clientSecret && (
-            <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
-              {/* IMPORTANT: Sets the return URL to your success page */}
-              <CheckoutForm returnUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/test-start`} />
-            </Elements>
-          )}
-          
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400">
-            <ShieldCheck size={12} /> Powered by Stripe SSL Secure Payment
           </div>
         </div>
       </div>
@@ -160,7 +204,7 @@ export default function KarjerosPristatymas() {
               <Zap size={16} className="text-blue-600" /> Naujiena: Tiksliausias 2026-ųjų karjeros testas
             </div>
             <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 mb-6 leading-tight">
-              Tavo ateitis- ne <span className="text-blue-600">atsitiktinumas.</span>
+              Tavo ateitis — ne <span className="text-blue-600">atsitiktinumas.</span>
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl">
               Gauk profesionalią asmenybės analizę, tinkančių profesijų sąrašą ir studijų planą. 
@@ -300,7 +344,7 @@ export default function KarjerosPristatymas() {
           <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
             Tai investicija, kuri atsipirks jau pirmą studijų dieną. Užpildyk testą dabar ir gauk rezultatus akimirksniu.
           </p>
-          {/* 3. UPDATED FOOTER BUTTON AS WELL */}
+          {/* 3. UPDATED FOOTER BUTTON */}
           <button 
             onClick={handleBuyClick}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-2xl font-extrabold text-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
