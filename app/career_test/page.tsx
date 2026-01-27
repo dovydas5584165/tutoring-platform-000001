@@ -160,7 +160,7 @@ export default function KarjerosPristatymas() {
               <Zap size={16} className="text-blue-600" /> Naujiena: Tiksliausias 2026-ųjų karjeros testas
             </div>
             <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 mb-6 leading-tight">
-              Tavo ateitis — ne <span className="text-blue-600">atsitiktinumas.</span>
+              Tavo ateitis- ne <span className="text-blue-600">atsitiktinumas.</span>
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl">
               Gauk profesionalią asmenybės analizę, tinkančių profesijų sąrašą ir studijų planą. 
