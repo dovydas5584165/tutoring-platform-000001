@@ -1,9 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
+import React, { Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function TestStartPage() {
+// 1. The Component that handles the Logic
+function TestStartLogic() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const paymentIntentId = searchParams.get('payment_intent'); 
@@ -11,7 +12,7 @@ export default function TestStartPage() {
   useEffect(() => {
     if (!paymentIntentId) return;
 
-    // Call the "Ticket Printer" API we just made
+    // Call the "Ticket Printer" API
     fetch('/api/auth-test', {
       method: 'POST',
       body: JSON.stringify({ paymentIntentId }),
@@ -31,5 +32,19 @@ export default function TestStartPage() {
         <p className="text-slate-500">Prašome palaukti, generuojamas testas.</p>
       </div>
     </div>
+  );
+}
+
+// 2. The Main Page (Wrapper)
+// This Suspense boundary fixes the build error
+export default function TestStartPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <p>Kraunama...</p>
+      </div>
+    }>
+      <TestStartLogic />
+    </Suspense>
   );
 }
