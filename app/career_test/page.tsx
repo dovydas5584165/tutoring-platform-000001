@@ -78,9 +78,9 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
               <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Produktas</span>
               <p className="font-bold text-slate-900 text-lg">Karjeros analizė 2026</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-500">
-                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> 100 klausimų testas</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> 35 puslapių ataskaita</li>
-                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> Studijų planas</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> 10 profesijų, kurios geriausiai tinka tau ir jų perspektyvos.</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> Profesionali ataskaita</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> Individualizuota universitetų selekcija, reikiamų egzaminų sąrašas</li>
               </ul>
             </div>
           </div>
