@@ -1,5 +1,9 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import { 
   Target, 
   GraduationCap, 
@@ -7,15 +11,146 @@ import {
   Users, 
   ArrowRight, 
   CheckCircle2, 
-  Compass,
-  Zap,
-  Star,
-  ShieldCheck
+  Zap, 
+  Star, 
+  ShieldCheck,
+  Lock,
+  X
 } from 'lucide-react';
+// Make sure this path points to where your CheckoutForm component is
+import CheckoutForm from '../components/CheckoutForm'; 
 
+// Initialize Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
+// --- PAYMENT MODAL COMPONENT ---
+// This handles fetching the payment intent and showing the form
+function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [clientSecret, setClientSecret] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (isOpen && !clientSecret) {
+      // 1. Ask API for a payment intent for the career test
+      fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_type: 'career_test' }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) throw new Error(data.error);
+          setClientSecret(data.clientSecret);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError('Nepavyko inicijuoti mokėjimo. Bandykite vėliau.');
+        });
+    }
+  }, [isOpen, clientSecret]);
+
+  if (!isOpen) return null;
+
+  const appearance = {
+    theme: 'stripe' as const,
+    variables: { colorPrimary: '#2563eb', borderRadius: '12px' },
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Dark Background Backdrop */}
+      <div 
+        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" 
+        onClick={onClose}
+      />
+      
+      {/* Modal Window */}
+      <div className="relative bg-white rounded-3xl w-full max-w-4xl shadow-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh]">
+        
+        {/* Left Side: Summary */}
+        <div className="bg-slate-50 p-8 md:w-2/5 border-r border-slate-100 flex flex-col justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+              <Lock className="w-5 h-5 text-blue-600" /> Užsakymas
+            </h3>
+            
+            <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+              <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Produktas</span>
+              <p className="font-bold text-slate-900 text-lg">Karjeros analizė 2026</p>
+              <ul className="mt-3 space-y-2 text-sm text-slate-500">
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> 100 klausimų testas</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> 35 puslapių ataskaita</li>
+                <li className="flex items-center gap-2"><CheckCircle2 size={16} className="text-green-500"/> Studijų planas</li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-slate-200">
+            <div className="flex justify-between items-end">
+              <span className="text-slate-500 font-medium">Iš viso:</span>
+              <span className="text-3xl font-black text-slate-900">30.00 €</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Side: Stripe Form */}
+        <div className="p-8 md:w-3/5 overflow-y-auto relative bg-white">
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+          >
+            <X size={20} />
+          </button>
+
+          <h2 className="text-2xl font-bold mb-2">Apmokėjimas</h2>
+          <p className="text-slate-500 text-sm mb-6">Saugus atsiskaitymas kortele per Stripe.</p>
+
+          {!clientSecret && !error && (
+            <div className="flex justify-center items-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            </div>
+          )}
+
+          {error && (
+            <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 mb-4">
+              {error}
+            </div>
+          )}
+          
+          {clientSecret && (
+            <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
+              {/* IMPORTANT: Sets the return URL to your success page */}
+              <CheckoutForm returnUrl={`${typeof window !== 'undefined' ? window.location.origin : ''}/test-start`} />
+            </Elements>
+          )}
+          
+          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-400">
+            <ShieldCheck size={12} /> Powered by Stripe SSL Secure Payment
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// --- MAIN LANDING PAGE COMPONENT ---
 export default function KarjerosPristatymas() {
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+
+  // Function to open the modal instead of following a link
+  const handleBuyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsCheckoutOpen(true);
+  };
+
   return (
     <div className="bg-white text-slate-900 font-sans">
+      
+      {/* 1. RENDER THE MODAL (Initially Hidden) */}
+      <PaymentModal 
+        isOpen={isCheckoutOpen} 
+        onClose={() => setIsCheckoutOpen(false)} 
+      />
       
       {/* --- HERO SECTION --- */}
       <section className="relative overflow-hidden bg-slate-50 py-20 lg:py-32">
@@ -33,13 +168,15 @@ export default function KarjerosPristatymas() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
-              <a 
-                href="https://www.tiksliukai.lt/test" 
+              {/* 2. UPDATED BUTTON: NOW OPENS MODAL */}
+              <button 
+                onClick={handleBuyClick}
                 className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-xl shadow-blue-200 group"
               >
                 <span>Įsigyti ir atlikti testą (30 €)</span> 
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-              </a>
+              </button>
+              
               <Link href="#kaip-veikia" className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-600 text-slate-700 px-8 py-5 rounded-2xl font-bold text-lg transition-all">
                 Ką aš gausiu?
               </Link>
@@ -59,7 +196,7 @@ export default function KarjerosPristatymas() {
       <section id="kaip-veikia" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Kodėl verta investuoti 30 €?</h2>
-          <p className="text-slate-500">Tai ne šiaip testas, o išsami 100 klausimų analizė, kuri sutaupys tau mėnesius blaškymosi.</p>
+          <p className="text-slate-500">Tai ne šiaip testas, o išsami 50 klausimų analizė, kuri sutaupys tau mėnesius blaškymosi.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -136,11 +273,11 @@ export default function KarjerosPristatymas() {
                         </div>
                         <div>
                             <h4 className="font-bold text-lg">Tiksliukai.lt</h4>
-                            <p className="text-blue-300 text-sm">Egzaminų paruošimo centras</p>
+                            <p className="text-blue-300 text-sm">Korepetitorių platforma</p>
                         </div>
                     </div>
                     <p className="text-slate-300 italic mb-6">
-                        „Mūsų tikslas – ne tik padėti išlaikyti egzaminus, bet ir įstoti į svajonių studijas, kurias atradote atlikę testą.“
+                        „Mūsų tikslas- ne tik padėti išlaikyti egzaminus, bet ir įstoti į svajonių studijas, kurias atradote atlikę testą.“
                     </p>
                     <div className="flex items-center gap-1 text-yellow-400">
                         <Star fill="currentColor" size={16} />
@@ -163,12 +300,13 @@ export default function KarjerosPristatymas() {
           <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
             Tai investicija, kuri atsipirks jau pirmą studijų dieną. Užpildyk testą dabar ir gauk rezultatus akimirksniu.
           </p>
-          <a 
-            href="https://www.tiksliukai.lt/test" 
+          {/* 3. UPDATED FOOTER BUTTON AS WELL */}
+          <button 
+            onClick={handleBuyClick}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-2xl font-extrabold text-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
           >
             Pradėti testą <ArrowRight />
-          </a>
+          </button>
         </div>
       </section>
 
