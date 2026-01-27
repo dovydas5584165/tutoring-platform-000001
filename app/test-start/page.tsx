@@ -7,7 +7,6 @@ import { CheckCircle2, AlertCircle, Sparkles, Lock, Copy } from 'lucide-react';
 function TestStartLogic() {
   const searchParams = useSearchParams();
   const paymentIntentId = searchParams.get('payment_intent'); 
-  // We added a new status: 'CookiesDisabled'
   const [status, setStatus] = useState<'Verifying' | 'Success' | 'Error' | 'CookiesDisabled'>('Verifying'); 
 
   useEffect(() => {
@@ -16,10 +15,10 @@ function TestStartLogic() {
       return;
     }
 
-    // 1. INSTANT CHECK: Are cookies enabled?
+    // 1. Safety Check: Are cookies enabled?
     if (typeof navigator !== 'undefined' && !navigator.cookieEnabled) {
       setStatus('CookiesDisabled');
-      return; // Stop here, don't even try the API
+      return;
     }
 
     const authorize = async () => {
@@ -32,9 +31,23 @@ function TestStartLogic() {
 
         if (res.ok) {
           setStatus('Success');
-          setTimeout(() => {
-            window.location.href = '/test'; 
-          }, 1500);
+          
+          // --- THE FIX: INTELLIGENT REDIRECT ---
+          // Instead of a timer, we check if the browser actually HAS the cookie yet.
+          const checkAndRedirect = () => {
+            // Check if our specific cookie exists in the browser
+            if (document.cookie.includes('test_session_token')) {
+              // Cookie is ready! Now we can go.
+              window.location.href = '/test';
+            } else {
+              // Not ready yet? Wait 100ms and try again.
+              setTimeout(checkAndRedirect, 100);
+            }
+          };
+          
+          // Start checking
+          checkAndRedirect();
+
         } else {
           setStatus('Error');
         }
@@ -46,9 +59,8 @@ function TestStartLogic() {
     authorize();
   }, [paymentIntentId]);
 
-  // --- RENDER STATES ---
+  // --- UI RENDER STATES ---
 
-  // 1. COOKIES ARE BLOCKED (The new safety screen)
   if (status === 'CookiesDisabled') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center bg-slate-50">
@@ -56,42 +68,33 @@ function TestStartLogic() {
           <Lock className="w-16 h-16 text-orange-500 mx-auto mb-4" />
           <h1 className="text-2xl font-bold mb-2 text-slate-900">Slapukai išjungti</h1>
           <p className="text-slate-600 mb-6">
-            Jūsų naršyklė blokuoja slapukus (cookies). Be jų negalime patvirtinti jūsų tapatybės.
+            Jūsų naršyklė blokuoja slapukus. Be jų negalime patvirtinti tapatybės.
           </p>
-          <div className="bg-orange-50 p-4 rounded-xl text-sm text-orange-800 mb-6">
-            <strong>Ką daryti?</strong><br/>
-            Įjunkite slapukus naršyklės nustatymuose arba pabandykite atidaryti šią nuorodą kitoje naršyklėje.
-          </div>
-          <p className="text-xs text-slate-400">Jūsų užsakymo ID: {paymentIntentId}</p>
+          <p className="text-xs text-slate-400">ID: {paymentIntentId}</p>
         </div>
       </div>
     );
   }
 
-  // 2. GENERIC ERROR
   if (status === 'Error') {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center bg-slate-50">
         <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
         <h1 className="text-2xl font-bold mb-2">Nepavyko patvirtinti mokėjimo</h1>
-        <p className="text-slate-500 mb-6">Jei pinigai buvo nuskaityti, susisiekite su mumis.</p>
-        
-        {/* Support ID Box */}
+        <p className="text-slate-500 mb-6">Jei pinigai nuskaityti, susisiekite su mumis.</p>
         <div className="bg-slate-100 p-3 rounded-lg flex items-center justify-between gap-3 mb-6 max-w-xs mx-auto">
           <code className="text-xs text-slate-600 font-mono truncate">{paymentIntentId || 'No ID'}</code>
           <button onClick={() => navigator.clipboard.writeText(paymentIntentId || '')}>
              <Copy size={14} className="text-blue-600"/>
           </button>
         </div>
-
         <button onClick={() => window.location.href = '/career_test'} className="text-blue-600 font-bold underline">
-          Grįžti į pagrindinį
+          Grįžti
         </button>
       </div>
     );
   }
 
-  // 3. SUCCESS / LOADING
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 p-4 text-center">
       <div className="bg-white p-10 rounded-3xl shadow-xl max-w-md w-full border border-slate-100">
@@ -112,8 +115,6 @@ function TestStartLogic() {
               <Sparkles size={20} />
               Atidaromas testas...
             </div>
-            {/* Hidden ID just in case they get stuck on redirect */}
-            <p className="mt-8 text-[10px] text-slate-300 font-mono select-all">ID: {paymentIntentId}</p>
           </>
         )}
       </div>
