@@ -59,7 +59,7 @@ export default function Home() {
     {
       question: "Kas nutiks, jei vėluosiu?",
       answer:
-        "Mokytojas palauks Jūsų iki 10 minučių. Jei vėlavimas ilgesnis, pamokos trukmė gali būti sutrumpinta arba perkelta į kitą laiką.",
+        "Mokytojas palauks Jūsų iki 10 minučių. Jei vėlavimas ilgesnis, pamoka atšaukiama ir pinigai nėra grąžinami.",
     },
   ];
 
