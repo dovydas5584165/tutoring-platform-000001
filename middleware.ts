@@ -2,20 +2,14 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
-  const path = request.nextUrl.pathname;
-
-  // DEBUG LOG: Watch your server logs to see this running
-  console.log("🔒 Checking path:", path);
-
-  // FIXED LOGIC: Check if it IS '/test' OR starts with '/test/'
-  // This covers both "tiksliukai.lt/test" and "tiksliukai.lt/test/questions"
-  if (path === '/test' || path.startsWith('/test/')) {
+  // Protect the /test route
+  if (request.nextUrl.pathname.startsWith('/test')) {
     
-    const session = request.cookies.get('test_session_token');
+    // --- CHECK FOR YOUR COOKIE NAME ---
+    const hasTicket = request.cookies.has('test_session_token');
 
-    if (!session) {
-      console.log("⛔ Access Denied. Redirecting...");
-      // Redirect back to the sales page
+    if (!hasTicket) {
+      // If no ticket, kick them back to the sales page
       return NextResponse.redirect(new URL('/career_test', request.url));
     }
   }
@@ -24,9 +18,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  // Update matcher to be safer
-  matcher: [
-    '/test',       // Matches /test exactly
-    '/test/:path*' // Matches /test/questions, /test/results, etc.
-  ],
+  matcher: ['/test/:path*'],
 };
