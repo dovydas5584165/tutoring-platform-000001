@@ -18,7 +18,7 @@ import {
   X
 } from 'lucide-react';
 
-// --- FIX IS HERE: Go up 2 levels (../../) to find the components folder ---
+// --- FIX IS HERE: Go up 2 levels (../../) to find the components folder ss---
 import CheckoutForm from '../../components/CheckoutForm'; 
 
 // Initialize Stripe
