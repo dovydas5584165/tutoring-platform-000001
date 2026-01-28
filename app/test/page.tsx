@@ -8,14 +8,14 @@ import {
   RefreshCcw, 
   Compass, 
   ArrowRight, 
-  ArrowLeft, // Added for Back button
+  ArrowLeft, 
   BookOpen, 
   Building2, 
-  Briefcase,
-  GraduationCap,
-  Star,
-  X,
-  Info
+  Briefcase, 
+  GraduationCap, 
+  Star, 
+  X, 
+  Info 
 } from "lucide-react";
 
 // --- DATA & TYPES SECTION ---
@@ -30,7 +30,7 @@ interface Profession {
 
 interface University {
   name: string;
-  score: string; // Konkursinis balas
+  score: string; 
 }
 
 interface FamousPerson {
@@ -46,7 +46,7 @@ interface ResultData {
   communication: string;
   exams: string;
   uniLt: University[];
-  uniEu: string;
+  uniEu: string; // Comma separated string
   famousPeople: FamousPerson[];
   professions: Profession[];
 }
@@ -64,7 +64,7 @@ const RESULTS: Record<CareerType, ResultData> = {
       { name: "VU Matematikos ir informatikos fak.", score: "KB: >8.8" },
       { name: "VILNIUS TECH", score: "KB: >7.5" }
     ],
-    uniEu: "TU Delft (Olandija), ETH Zurich (Šveicarija), Miuncheno technikos universitetas.",
+    uniEu: "TU Delft (Olandija), ETH Zurich (Šveicarija), Miuncheno technikos universitetas",
     famousPeople: [
       { name: "Elon Musk", role: "Tesla & SpaceX įkūrėjas" },
       { name: "Bill Gates", role: "Microsoft įkūrėjas" },
@@ -85,7 +85,7 @@ const RESULTS: Record<CareerType, ResultData> = {
   },
   B: {
     title: "Žmonių Ugdytojas (Socialinis-Emocinis)",
-    summary: "Tavo stiprybė- empatija ir komunikacija. Tu jauti kitų emocijas, gebi juos motyvuoti, suprasti ir nukreipti teisinga linkme. Tau svarbu darbas, turintis prasmę.",
+    summary: "Tavo stiprybė – empatija ir komunikacija. Tu jauti kitų emocijas, gebi juos motyvuoti, suprasti ir nukreipti teisinga linkme. Tau svarbu darbas, turintis prasmę.",
     positives: ["Empatija", "Klausymo įgūdžiai", "Diplomatija", "Kantrybė"],
     negatives: ["Sunkumas brėžti ribas", "Emocinis jautrumas kitiems", "Kritikos baimė"],
     communication: "Esi draugų būrio patarėjas. Moki išklausyti, suprasti be žodžių ir visada rasti tinkamą paguodos ar palaikymo frazę.",
@@ -95,7 +95,7 @@ const RESULTS: Record<CareerType, ResultData> = {
       { name: "LSMU (Sveikatos psichologija)", score: "KB: >8.5" },
       { name: "VDU Socialinių mokslų fak.", score: "KB: >7.0" }
     ],
-    uniEu: "Amsterdamo universitetas (Olandija), KU Leuven (Belgija), Kopenhagos universitetas.",
+    uniEu: "Amsterdamo universitetas (Olandija), KU Leuven (Belgija), Kopenhagos universitetas",
     famousPeople: [
       { name: "Oprah Winfrey", role: "TV laidų vedėja, filantropė" },
       { name: "Michelle Obama", role: "Advokatė, rašytoja" },
@@ -126,7 +126,7 @@ const RESULTS: Record<CareerType, ResultData> = {
       { name: "LMTA (Muzikos ir teatro)", score: "KB: Stojamasis" },
       { name: "VU Kūrybinės industrijos", score: "KB: >6.5" }
     ],
-    uniEu: "UAL Londonas (JK), Dizaino akademija Eindhoven (Olandija), Aalto universitetas (Suomija).",
+    uniEu: "UAL Londonas (JK), Dizaino akademija Eindhoven (Olandija), Aalto universitetas (Suomija)",
     famousPeople: [
       { name: "Steve Jobs", role: "Apple įkūrėjas" },
       { name: "Coco Chanel", role: "Dizainerė" },
@@ -157,7 +157,7 @@ const RESULTS: Record<CareerType, ResultData> = {
       { name: "VU Verslo mokykla", score: "KB: >7.5" },
       { name: "KTU Ekonomikos ir verslo fak.", score: "KB: >6.5" }
     ],
-    uniEu: "SSE Stokholmas (Švedija), IE verslo mokykla (Ispanija), HEC Paryžius (Prancūzija).",
+    uniEu: "SSE Stokholmas (Švedija), IE verslo mokykla (Ispanija), HEC Paryžius (Prancūzija)",
     famousPeople: [
       { name: "Jeff Bezos", role: "Amazon įkūrėjas" },
       { name: "Richard Branson", role: "Virgin Group įkūrėjas" },
@@ -188,7 +188,7 @@ const RESULTS: Record<CareerType, ResultData> = {
       { name: "VU Medicinos fak.", score: "KB: >9.2" },
       { name: "VU Gyvybės mokslų centras", score: "KB: >8.5" }
     ],
-    uniEu: "Heidelbergo universitetas (Vokietija), Karolinska Institutet (Švedija), Sorbona (Prancūzija).",
+    uniEu: "Heidelbergo universitetas (Vokietija), Karolinska Institutet (Švedija), Sorbona (Prancūzija)",
     famousPeople: [
       { name: "Marie Curie", role: "Mokslininkė" },
       { name: "Angela Merkel", role: "Politikė, fizikė" },
@@ -239,7 +239,6 @@ const RAW_QUESTIONS = [
 
 // --- COMPONENTS ---
 
-// Profession Details Modal
 function ProfessionModal({ profession, onClose }: { profession: Profession | null, onClose: () => void }) {
   if (!profession) return null;
 
@@ -293,7 +292,6 @@ function ProfessionModal({ profession, onClose }: { profession: Profession | nul
   );
 }
 
-// Results View Component
 function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () => void }) {
   const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null);
 
@@ -304,14 +302,12 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
       animate={{ opacity: 1 }}
       className="flex-1 overflow-y-auto max-h-[85vh] md:max-h-[800px] scrollbar-thin scrollbar-thumb-slate-300"
     >
-      {/* Modal for Profession Details */}
       <AnimatePresence>
         {selectedProfession && (
           <ProfessionModal profession={selectedProfession} onClose={() => setSelectedProfession(null)} />
         )}
       </AnimatePresence>
 
-      {/* Header Banner */}
       <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-white p-8 md:p-12 text-center border-b border-slate-100">
         <span className="inline-block py-1.5 px-4 rounded-full bg-blue-100 text-blue-700 text-xs font-bold tracking-widest uppercase mb-6 shadow-sm">
           Tavo Karjeros Tipas
@@ -326,7 +322,6 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
 
       <div className="p-6 md:p-10 space-y-12 bg-white">
         
-        {/* Strengths / Weaknesses Grid */}
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-emerald-50/60 p-8 rounded-3xl border border-emerald-100 shadow-sm">
             <h3 className="text-emerald-800 font-bold mb-6 flex items-center gap-3 text-xl">
@@ -354,7 +349,6 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
           </div>
         </div>
 
-        {/* Famous People (Hall of Fame) */}
         <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden">
            <div className="relative z-10">
               <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
@@ -372,15 +366,12 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
                 ))}
               </div>
            </div>
-           {/* Decorative bg elements */}
            <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
            <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
         </div>
 
-        {/* Info Grid */}
         <div className="grid md:grid-cols-3 gap-8">
           
-          {/* Communication Card */}
           <div className="md:col-span-3 bg-gradient-to-r from-slate-50 to-white p-8 rounded-3xl border border-slate-200 relative shadow-sm">
              <div className="absolute top-6 right-6 p-4 opacity-[0.03]">
                <Briefcase size={140} />
@@ -391,7 +382,6 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
              <p className="text-slate-700 text-lg leading-relaxed relative z-10 max-w-4xl">{result.communication}</p>
           </div>
 
-          {/* Exams Column */}
           <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-full">
             <div className="flex items-center gap-4 mb-6">
                 <div className="p-3 bg-blue-100 rounded-xl text-blue-600">
@@ -408,7 +398,7 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
               </a>
             </div>
           </div>
-{/* Universities Column */}
+
           <div className="md:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
             <div className="flex items-center gap-4 mb-8">
                 <div className="p-3 bg-indigo-100 rounded-xl text-indigo-600">
@@ -431,20 +421,23 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
                   ))}
                 </ul>
               </div>
-              <div className="flex flex-col">
+              
+              <div>
                 <h5 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-lg">
                     <span className="w-3 h-3 rounded-full bg-blue-500"></span> Europoje
                 </h5>
-                <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 flex-1">
-                   <p className="text-slate-700 font-medium leading-relaxed break-words">
-                      {result.uniEu}
-                   </p>
-                </div>
+                <ul className="space-y-3">
+                  {result.uniEu.split(',').map((uni, i) => (
+                    <li key={i} className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center">
+                       <span className="text-slate-700 font-medium">{uni.trim()}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
           </div>
+        </div>
 
-        {/* Professions Section */}
         <div>
           <h3 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3 pb-4 border-b border-slate-100">
             <Building2 className="w-8 h-8 text-blue-500" /> Tau tinkančios profesijos
@@ -515,7 +508,6 @@ export default function CareerQuiz() {
       setScores(prev => ({ ...prev, [type]: prev[type] + 1 }));
     }
     
-    // Save to history
     setHistory(prev => [...prev, { type, isYes }]);
 
     if (currentIdx + 1 < questions.length) {
@@ -547,7 +539,6 @@ export default function CareerQuiz() {
     <main className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 flex items-center justify-center">
       <div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden min-h-[700px] flex flex-col relative">
         
-        {/* Header Section */}
         <div className="bg-slate-900 p-8 text-white flex justify-between items-center z-10">
           <div className="flex items-center gap-3">
             <Compass className="w-8 h-8 text-blue-400" />
@@ -560,11 +551,9 @@ export default function CareerQuiz() {
           )}
         </div>
 
-        {/* Content Area */}
         <div className="flex-1 flex flex-col relative">
           <AnimatePresence mode="wait">
             
-            {/* INTRO VIEW */}
             {gameState === 'intro' && (
               <motion.div 
                 key="intro"
@@ -593,13 +582,11 @@ export default function CareerQuiz() {
               </motion.div>
             )}
 
-            {/* QUIZ VIEW */}
             {gameState === 'playing' && (
               <motion.div 
                 key="quiz"
                 className="flex flex-col flex-1 max-w-3xl mx-auto w-full p-6 md:p-12 justify-center"
               >
-                {/* Back Button and Progress Bar */}
                 <div className="mb-12">
                     <div className="flex justify-between items-center mb-4">
                         <button 
@@ -651,7 +638,6 @@ export default function CareerQuiz() {
               </motion.div>
             )}
 
-            {/* RESULTS VIEW */}
             {gameState === 'result' && (
               <ResultsView result={RESULTS[getWinner()]} onRestart={startGame} />
             )}
