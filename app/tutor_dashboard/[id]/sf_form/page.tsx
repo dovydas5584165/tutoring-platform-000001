@@ -41,12 +41,14 @@ export default function InvoiceGenerator() {
   const [tutorId, setTutorId] = useState<string | null>(null);
 
   /* --------- Pricing & Students --------- */
+  // Price per lesson is fetched but hidden from UI input
   const [pricePerLesson, setPricePerLesson] = useState<string>("0");
+  
   const [students, setStudents] = useState<StudentLine[]>([
     { id: "1", name: "", lessonCount: "" },
   ]);
   
-  // New State for the Total Sum
+  // Editable Total Sum
   const [totalSum, setTotalSum] = useState<string>("0.00");
 
   const invoiceRef = useRef<HTMLDivElement | null>(null);
@@ -89,8 +91,7 @@ export default function InvoiceGenerator() {
   }, [tutorId]);
 
   /* --------- Auto-Calculate Total Effect --------- */
-  // Whenever students or price changes, update the totalSum automatically.
-  // The user can still edit the input afterwards.
+  // Updates total automatically based on DB price, but user can overwrite it later
   useEffect(() => {
     const price = parseFloat(pricePerLesson) || 0;
     const calculated = students.reduce((acc, curr) => {
@@ -297,19 +298,7 @@ export default function InvoiceGenerator() {
 
           <hr className="my-4 border-gray-200" />
 
-          {/* Price Per Lesson */}
-          <label className="block">
-            <span className="text-sm font-bold text-blue-700">Kaina už 1 pamoką (€)</span>
-            <input
-              type="number"
-              step="0.01"
-              min="0"
-              className="w-full border rounded p-2 mt-1"
-              required
-              value={pricePerLesson}
-              onChange={(e) => setPricePerLesson(e.target.value)}
-            />
-          </label>
+          {/* Note: Price Input is removed per request, but logic remains in background */}
 
           {/* Dynamic Student List */}
           <div>
@@ -357,7 +346,7 @@ export default function InvoiceGenerator() {
             </button>
           </div>
 
-          {/* EDITABLE TOTAL SUM */}
+          {/* EDITABLE TOTAL SUM with Note */}
           <div className="pt-2 text-right">
             <label className="inline-block text-lg font-bold mr-2">Iš viso (€):</label>
             <input 
@@ -367,6 +356,9 @@ export default function InvoiceGenerator() {
               value={totalSum}
               onChange={(e) => setTotalSum(e.target.value)}
             />
+            <p className="text-xs text-gray-500 mt-2 leading-tight max-w-xs ml-auto">
+              Jei pamokos trukmė buvo nestandartinė ir su administracija buvo susitarta dėl kitokios pamokos kainos, sumą galite pakeisti.
+            </p>
           </div>
 
           <button
