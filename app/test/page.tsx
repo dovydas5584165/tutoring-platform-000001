@@ -123,7 +123,7 @@ const RESULTS: Record<CareerType, ResultData> = {
     uniLt: [
       { name: "Vilniaus Dailės Akademija (VDA)", score: "KB: Portfelis + Egz." },
       { name: "LMTA (Muzikos ir teatro)", score: "KB: Stojamasis" },
-      { name: "ISM Kūrybinės industrijos", score: "KB: >6.5" }
+      { name: "VU Kūrybinės industrijos", score: "KB: >6.5" }
     ],
     uniEu: "UAL Londonas (JK), Dizaino akademija Eindhoven (Olandija), Aalto universitetas (Suomija).",
     famousPeople: [
