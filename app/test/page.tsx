@@ -85,7 +85,7 @@ const RESULTS: Record<CareerType, ResultData> = {
   },
   B: {
     title: "Žmonių Ugdytojas (Socialinis-Emocinis)",
-    summary: "Tavo stiprybė – empatija ir komunikacija. Tu jauti kitų emocijas, gebi juos motyvuoti, suprasti ir nukreipti teisinga linkme. Tau svarbu darbas, turintis prasmę.",
+    summary: "Tavo stiprybė- empatija ir komunikacija. Tu jauti kitų emocijas, gebi juos motyvuoti, suprasti ir nukreipti teisinga linkme. Tau svarbu darbas, turintis prasmę.",
     positives: ["Empatija", "Klausymo įgūdžiai", "Diplomatija", "Kantrybė"],
     negatives: ["Sunkumas brėžti ribas", "Emocinis jautrumas kitiems", "Kritikos baimė"],
     communication: "Esi draugų būrio patarėjas. Moki išklausyti, suprasti be žodžių ir visada rasti tinkamą paguodos ar palaikymo frazę.",
@@ -106,7 +106,7 @@ const RESULTS: Record<CareerType, ResultData> = {
       { title: "Personalo vadovas (HR)", salary: "1800-3800€", description: "Rūpinasi įmonės darbuotojų gerove, atrankomis, motyvacija ir vidine kultūra." },
       { title: "Karjeros konsultantas", salary: "1200-2500€", description: "Padeda žmonėms atrasti savo profesinį kelią, ruošti CV ir pasiruošti darbo pokalbiams." },
       { title: "Socialinis darbuotojas", salary: "1100-2000€", description: "Teikia pagalbą pažeidžiamoms visuomenės grupėms, vaikams ar senjorams, sprendžia socialines problemas." },
-      { title: "Mediatorius (Taikytojas)", salary: "1500-3200€", description: "Nepšališkas asmuo, padedantis spręsti konfliktus tarp dviejų šalių (pvz., skyrybų ar verslo ginčų metu)." },
+      { title: "Mediatorius (Taikytojas)", salary: "1500-3200€", description: "Nešališkas asmuo, padedantis spręsti konfliktus tarp dviejų šalių (pvz., skyrybų ar verslo ginčų metu)." },
       { title: "Ryšių su visuomene (PR) specialistas", salary: "1400-3500€", description: "Formuoja organizacijos ar asmens įvaizdį viešojoje erdvėje, bendrauja su žiniasklaida." },
       { title: "Mokymų treneris (Lektorius)", salary: "1500-4000€", description: "Veda seminarus ir mokymus įmonėms ar grupėms, ugdydamas specifinius įgūdžius." },
       { title: "Ergoterapeutas", salary: "1300-2400€", description: "Padeda žmonėms po traumų ar ligų susigrąžinti kasdienius įgūdžius ir savarankiškumą." },
@@ -164,7 +164,7 @@ const RESULTS: Record<CareerType, ResultData> = {
       { name: "Sheryl Sandberg", role: "Facebook COO" }
     ],
     professions: [
-      { title: "Verslininkas (Antrepreneris)", salary: "Neribota", description: "Kuriai savo verslą nuo idėjos iki realizavimo, prisiima riziką ir valdo procesus." },
+      { title: "Verslininkas (Antrepreneris)", salary: "Neribota", description: "Kuria savo verslą nuo idėjos iki realizavimo, prisiima riziką ir valdo procesus." },
       { title: "Investicijų valdytojas", salary: "3000-8000€", description: "Valdo dideles pinigų sumas, investuoja į akcijas, fondus ar nekilnojamąjį turtą." },
       { title: "Projektų vadovas (PM)", salary: "2000-4500€", description: "Planuoja, vykdo ir užbaigia projektus, koordinuoja komandos darbą ir biudžetą." },
       { title: "Pardavimų direktorius", salary: "2500-6000€", description: "Vadovauja pardavimų komandai, kuria strategijas, kaip padidinti įmonės pajamas." },
@@ -198,7 +198,7 @@ const RESULTS: Record<CareerType, ResultData> = {
       { title: "Gydytojas / Chirurgas", salary: "2500-7000€", description: "Diagnozuoja ligas, atlieka operacijas ir skiria gydymą. Reikalauja ilgų studijų ir atsakomybės." },
       { title: "Biotechnologas", salary: "1600-3500€", description: "Naudoja gyvus organizmus kurdamas vaistus, maisto produktus ar naujas medžiagas." },
       { title: "Auditorius", salary: "1500-3200€", description: "Tikrina įmonių finansines ataskaitas, užtikrina, kad jos atitiktų įstatymus ir būtų tikslios." },
-      { title: "Farmacininkas", salary: "1500-2800€", description: "Kurpia arba išduoda vaistus, konsultuoja pacientus dėl vaistų vartojimo ir sąveikos." },
+      { title: "Farmacininkas", salary: "1500-2800€", description: "Kuria arba išduoda vaistus, konsultuoja pacientus dėl vaistų vartojimo ir sąveikos." },
       { title: "Teismo medicinos ekspertas", salary: "1600-3000€", description: "Tiria nusikaltimų vietas ir įkalčius naudodamas mokslo metodus tiesai nustatyti." },
       { title: "Inžinierius-konstruktorius", salary: "1800-4000€", description: "Projektuoja pastatų konstrukcijas, užtikrindamas, kad jie būtų saugūs ir stabilūs." },
       { title: "Draudimo rizikos vertintojas", salary: "1700-3500€", description: "Analizuoja duomenis ir skaičiuoja tikimybes, kad nustatytų draudimo kainas ir rizikas." },
@@ -408,8 +408,7 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
               </a>
             </div>
           </div>
-
-          {/* Universities Column */}
+{/* Universities Column */}
           <div className="md:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
             <div className="flex items-center gap-4 mb-8">
                 <div className="p-3 bg-indigo-100 rounded-xl text-indigo-600">
@@ -426,25 +425,24 @@ function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () 
                 <ul className="space-y-3">
                   {result.uniLt.map((uni, i) => (
                     <li key={i} className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
-                       <span className="text-slate-700 font-medium">{uni.name}</span>
+                       <span className="text-slate-700 font-medium truncate mr-2">{uni.name}</span>
                        <span className="text-xs font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded ml-2 whitespace-nowrap">{uni.score}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div>
+              <div className="flex flex-col">
                 <h5 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-lg">
                     <span className="w-3 h-3 rounded-full bg-blue-500"></span> Europoje
                 </h5>
-                <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 h-full">
-                   <p className="text-slate-700 font-medium leading-relaxed">
+                <div className="bg-blue-50/50 p-6 rounded-2xl border border-blue-100 flex-1">
+                   <p className="text-slate-700 font-medium leading-relaxed break-words">
                       {result.uniEu}
                    </p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
         {/* Professions Section */}
         <div>
