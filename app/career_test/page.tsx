@@ -204,7 +204,7 @@ export default function KarjerosPristatymas() {
               <Zap size={16} className="text-blue-600" /> Naujiena: Tiksliausias 2026-ųjų karjeros testas
             </div>
             <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 mb-6 leading-tight">
-              Tavo ateitis — ne <span className="text-blue-600">atsitiktinumas.</span>
+              Tavo ateitis- ne <span className="text-blue-600">atsitiktinumas.</span>
             </h1>
             <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl">
               Gauk profesionalią asmenybės analizę, tinkančių profesijų sąrašą ir studijų planą. 
@@ -240,7 +240,7 @@ export default function KarjerosPristatymas() {
       <section id="kaip-veikia" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Kodėl verta investuoti 30 €?</h2>
-          <p className="text-slate-500">Tai ne šiaip testas, o išsami 100 klausimų analizė, kuri sutaupys tau mėnesius blaškymosi.</p>
+          <p className="text-slate-500">Tai ne šiaip testas, o išsami 50 klausimų analizė, kuri sutaupys tau mėnesius blaškymosi.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -317,11 +317,11 @@ export default function KarjerosPristatymas() {
                         </div>
                         <div>
                             <h4 className="font-bold text-lg">Tiksliukai.lt</h4>
-                            <p className="text-blue-300 text-sm">Egzaminų paruošimo centras</p>
+                            <p className="text-blue-300 text-sm">Korepetitorių platforma</p>
                         </div>
                     </div>
                     <p className="text-slate-300 italic mb-6">
-                        „Mūsų tikslas – ne tik padėti išlaikyti egzaminus, bet ir įstoti į svajonių studijas, kurias atradote atlikę testą.“
+                        „Mūsų tikslas- ne tik padėti išlaikyti egzaminus, bet ir įstoti į svajonių studijas, kurias atradote atlikę testą.“
                     </p>
                     <div className="flex items-center gap-1 text-yellow-400">
                         <Star fill="currentColor" size={16} />
