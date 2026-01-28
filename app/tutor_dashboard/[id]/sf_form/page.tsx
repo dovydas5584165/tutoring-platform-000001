@@ -11,6 +11,13 @@ const supabaseUrl = "https://yabbhnnhnrainsakhuio.supabase.co";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "REPLACE_ME";
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+/* ─── Types ─────────────────────────────────────────────────────────────────── */
+interface StudentLine {
+  id: string;
+  name: string;
+  lessonCount: string;
+}
+
 /* ─── Component ─────────────────────────────────────────────────────────────── */
 export default function InvoiceGenerator() {
   const pathname = usePathname();
@@ -30,9 +37,17 @@ export default function InvoiceGenerator() {
   const [vardas, setVardas] = useState("");
   const [pavarde, setPavarde] = useState("");
   const [data, setData] = useState(() => new Date().toISOString().slice(0, 10));
-  const [suma, setSuma] = useState("0"); // user-input now
   const [klientas, setKlientas] = useState("Dovydas Žilinskas");
   const [tutorId, setTutorId] = useState<string | null>(null);
+
+  /* --------- Pricing & Students --------- */
+  const [pricePerLesson, setPricePerLesson] = useState<string>("0");
+  const [students, setStudents] = useState<StudentLine[]>([
+    { id: "1", name: "", lessonCount: "" },
+  ]);
+  
+  // New State for the Total Sum
+  const [totalSum, setTotalSum] = useState<string>("0.00");
 
   const invoiceRef = useRef<HTMLDivElement | null>(null);
 
@@ -40,18 +55,18 @@ export default function InvoiceGenerator() {
   useEffect(() => {
     if (!pathname) return;
     const parts = pathname.split("/");
-    const idFromUrl = parts[2]; // /tutor_dashboard/[tutorId]/sf_form
+    const idFromUrl = parts[2];
     if (idFromUrl) setTutorId(idFromUrl);
   }, [pathname]);
 
-  /* --------- Fetch tutor info by tutorId --------- */
+  /* --------- Fetch Tutor Info & Hourly Wage --------- */
   useEffect(() => {
     if (!tutorId) return;
 
     const fetchTutor = async () => {
       const { data, error } = await supabase
         .from("users")
-        .select("id, vardas, pavarde, iv_nr")
+        .select("id, vardas, pavarde, iv_nr, hourly_wage")
         .eq("id", tutorId)
         .single();
 
@@ -63,15 +78,51 @@ export default function InvoiceGenerator() {
       if (data) {
         setVardas(data.vardas);
         setPavarde(data.pavarde);
-
         if (data.iv_nr) setIndividualNr(data.iv_nr.toString());
+        if (data.hourly_wage) {
+          setPricePerLesson(data.hourly_wage.toString());
+        }
       }
     };
 
     fetchTutor();
   }, [tutorId]);
 
-  /* --------- Helper functions --------- */
+  /* --------- Auto-Calculate Total Effect --------- */
+  // Whenever students or price changes, update the totalSum automatically.
+  // The user can still edit the input afterwards.
+  useEffect(() => {
+    const price = parseFloat(pricePerLesson) || 0;
+    const calculated = students.reduce((acc, curr) => {
+      const count = parseFloat(curr.lessonCount) || 0;
+      return acc + count * price;
+    }, 0);
+    setTotalSum(calculated.toFixed(2));
+  }, [students, pricePerLesson]);
+
+  /* --------- Student List Handlers --------- */
+  const addStudent = () => {
+    setStudents((prev) => [
+      ...prev,
+      { id: crypto.randomUUID(), name: "", lessonCount: "" },
+    ]);
+  };
+
+  const removeStudent = (id: string) => {
+    if (students.length > 1) {
+      setStudents((prev) => prev.filter((s) => s.id !== id));
+    } else {
+      setStudents([{ id: crypto.randomUUID(), name: "", lessonCount: "" }]);
+    }
+  };
+
+  const updateStudent = (id: string, field: "name" | "lessonCount", value: string) => {
+    setStudents((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, [field]: value } : s))
+    );
+  };
+
+  /* --------- Formatters --------- */
   const formattedDate = new Date(data).toLocaleDateString("lt-LT", {
     day: "2-digit",
     month: "2-digit",
@@ -86,7 +137,7 @@ export default function InvoiceGenerator() {
     return `INV-${yr}-${mo}-${serial}`;
   };
 
-  /* --------- PDF generation --------- */
+  /* --------- PDF Generation --------- */
   const generatePDF = async () => {
     if (!invoiceRef.current || !tutorId) {
       alert("Invoice reference or tutor ID is missing");
@@ -107,11 +158,9 @@ export default function InvoiceGenerator() {
           .from("users")
           .update({ iv_nr: individualNr })
           .eq("id", tutorId);
-
         if (updateError) throw updateError;
       }
 
-      // Render the invoice in an isolated iframe to avoid CSS issues
       const canvas = await renderNodeInIsolatedIframe(invoiceRef.current);
       const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({ unit: "pt", format: "a4" });
@@ -147,7 +196,6 @@ export default function InvoiceGenerator() {
     }
   };
 
-  /* --------- Helper: render in isolated iframe --------- */
   const renderNodeInIsolatedIframe = async (node: HTMLElement) => {
     return new Promise<HTMLCanvasElement>(async (resolve, reject) => {
       try {
@@ -220,54 +268,117 @@ export default function InvoiceGenerator() {
           className="max-w-md space-y-4 p-6 rounded shadow mx-auto"
           style={{ backgroundColor: "#ffffff" }}
         >
+          {/* Static Fields */}
+          <div className="grid grid-cols-2 gap-4">
+            <label className="block">
+              <span className="text-sm font-medium">Vardas</span>
+              <input className="w-full border rounded p-2 mt-1 bg-gray-50" required value={vardas} readOnly />
+            </label>
+            <label className="block">
+              <span className="text-sm font-medium">Pavardė</span>
+              <input className="w-full border rounded p-2 mt-1 bg-gray-50" required value={pavarde} readOnly />
+            </label>
+          </div>
+
           <label className="block">
-            Individualios veiklos Nr.
+            <span className="text-sm font-medium">Individualios veiklos Nr.</span>
             <input className="w-full border rounded p-2 mt-1" required value={individualNr} onChange={(e) => setIndividualNr(e.target.value)} />
           </label>
 
           <label className="block">
-            Vardas
-            <input className="w-full border rounded p-2 mt-1" required value={vardas} readOnly />
-          </label>
-
-          <label className="block">
-            Pavardė
-            <input className="w-full border rounded p-2 mt-1" required value={pavarde} readOnly />
-          </label>
-
-          <label className="block">
-            Data
+            <span className="text-sm font-medium">Data</span>
             <input type="date" className="w-full border rounded p-2 mt-1" required value={data} onChange={(e) => setData(e.target.value)} />
           </label>
 
           <label className="block">
-            Suma (€)
+            <span className="text-sm font-medium">Klientas (Mokėtojas)</span>
+            <input className="w-full border rounded p-2 mt-1" required value={klientas} onChange={(e) => setKlientas(e.target.value)} />
+          </label>
+
+          <hr className="my-4 border-gray-200" />
+
+          {/* Price Per Lesson */}
+          <label className="block">
+            <span className="text-sm font-bold text-blue-700">Kaina už 1 pamoką (€)</span>
             <input
               type="number"
               step="0.01"
               min="0"
               className="w-full border rounded p-2 mt-1"
               required
-              value={suma}
-              onChange={(e) => setSuma(e.target.value)}
+              value={pricePerLesson}
+              onChange={(e) => setPricePerLesson(e.target.value)}
             />
           </label>
 
-          <label className="block">
-            Kliento vardas ir pavardė
-            <input className="w-full border rounded p-2 mt-1" required value={klientas} onChange={(e) => setKlientas(e.target.value)} />
-          </label>
+          {/* Dynamic Student List */}
+          <div>
+            <label className="block text-sm font-medium mb-2">Mokiniai ir pamokų kiekis:</label>
+            {students.map((student) => (
+              <div key={student.id} className="flex gap-2 mb-2 items-end">
+                <div className="flex-1">
+                  <input
+                    placeholder="Mokinio vardas"
+                    className="w-full border rounded p-2"
+                    required
+                    value={student.name}
+                    onChange={(e) => updateStudent(student.id, "name", e.target.value)}
+                  />
+                </div>
+                <div className="w-20">
+                  <input
+                    type="number"
+                    min="1"
+                    placeholder="Kiekis"
+                    className="w-full border rounded p-2 text-center"
+                    required
+                    value={student.lessonCount}
+                    onChange={(e) => updateStudent(student.id, "lessonCount", e.target.value)}
+                  />
+                </div>
+                {students.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeStudent(student.id)}
+                    className="bg-red-100 text-red-600 p-2 rounded hover:bg-red-200 font-bold"
+                    title="Pašalinti"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={addStudent}
+              className="text-sm text-blue-600 font-medium hover:underline mt-1"
+            >
+              + Pridėti mokinį
+            </button>
+          </div>
+
+          {/* EDITABLE TOTAL SUM */}
+          <div className="pt-2 text-right">
+            <label className="inline-block text-lg font-bold mr-2">Iš viso (€):</label>
+            <input 
+              type="number"
+              step="0.01"
+              className="border rounded p-2 w-32 text-right font-bold text-lg"
+              value={totalSum}
+              onChange={(e) => setTotalSum(e.target.value)}
+            />
+          </div>
 
           <button
             type="submit"
-            className="w-full font-bold py-2 rounded transition"
+            className="w-full font-bold py-3 mt-4 rounded transition shadow-lg"
             style={{ backgroundColor: "#2563eb", color: "#ffffff", border: "none" }}
           >
             Generuoti PDF
           </button>
         </form>
 
-        {/* Hidden invoice div for PDF */}
+        {/* ─── HIDDEN INVOICE TEMPLATE ─────────────────────────────────────── */}
         <div
           ref={invoiceRef}
           style={{
@@ -286,62 +397,82 @@ export default function InvoiceGenerator() {
           }}
         >
           {/* Header */}
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 40 }}>
-            <div>
-              <h1 style={{ fontSize: "24pt", margin: 0, color: "#003366", fontWeight: "bold" }}>tiksliukai.lt</h1>
-              <p style={{ margin: "6px 0", fontSize: "10pt", lineHeight: 1.3 }}>
-                Saulėtekio al. 4, Vilnius
-                <br />
-                Tel.: +370 603 95532
-                <br />
-                el. paštas: info.tiksliukai@gmail.com
-              </p>
+          <div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 40 }}>
+              <div>
+                <h1 style={{ fontSize: "24pt", margin: 0, color: "#003366", fontWeight: "bold" }}>tiksliukai.lt</h1>
+                <p style={{ margin: "6px 0", fontSize: "10pt", lineHeight: 1.3 }}>
+                  Saulėtekio al. 4, Vilnius<br />
+                  Tel.: +370 603 95532<br />
+                  el. paštas: info.tiksliukai@gmail.com
+                </p>
+              </div>
+              <div style={{ textAlign: "right" }}>
+                <h2 style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>Sąskaita faktūra</h2>
+                <p style={{ margin: 0 }}><strong>Nr.:</strong> {formatInvoiceNumber(invoiceNumber)}</p>
+                <p style={{ margin: 0 }}><strong>Data:</strong> {formattedDate}</p>
+              </div>
             </div>
-            <div style={{ textAlign: "right" }}>
-              <h2 style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>Sąskaita faktūra</h2>
-              <p style={{ margin: 0 }}><strong>Nr.:</strong> {formatInvoiceNumber(invoiceNumber)}</p>
-              <p style={{ margin: 0 }}><strong>Data:</strong> {formattedDate}</p>
-            </div>
-          </div>
 
-          {/* Client & Seller */}
-          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 40 }}>
-            <div style={{ width: "48%" }}>
-              <h3 style={{ borderBottom: "1px solid #ccc", paddingBottom: 4, marginBottom: 8 }}>Klientas</h3>
-              <p style={{ margin: 0 }}>{klientas}</p>
+            {/* Client & Seller */}
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 40 }}>
+              <div style={{ width: "48%" }}>
+                <h3 style={{ borderBottom: "1px solid #ccc", paddingBottom: 4, marginBottom: 8 }}>Klientas</h3>
+                <p style={{ margin: 0 }}>{klientas}</p>
+              </div>
+              <div style={{ width: "48%" }}>
+                <h3 style={{ borderBottom: "1px solid #ccc", paddingBottom: 4, marginBottom: 8 }}>Pardavėjas</h3>
+                <p style={{ margin: 0 }}>Vardas: {vardas} {pavarde}<br />IV Nr.: {individualNr}</p>
+              </div>
             </div>
-            <div style={{ width: "48%" }}>
-              <h3 style={{ borderBottom: "1px solid #ccc", paddingBottom: 4, marginBottom: 8 }}>Pardavėjas</h3>
-              <p style={{ margin: 0 }}>Vardas: {vardas} {pavarde}<br />Individualios veiklos Nr.: {individualNr}</p>
-            </div>
-          </div>
 
-          {/* Table */}
-          <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 40, fontSize: "11pt" }}>
-            <thead>
-              <tr style={{ backgroundColor: "#f2f2f2", borderBottom: "2px solid #003366" }}>
-                <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "left" }}>Aprašymas</th>
-                <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "right", width: 80 }}>Kiekis</th>
-                <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "right", width: 100 }}>Vnt. kaina (€)</th>
-                <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "right", width: 120 }}>Suma (€)</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{ border: "1px solid #ccc", padding: 8 }}>Mokymo paslaugos (tutoring services)</td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>1</td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
-              </tr>
-              <tr style={{ fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
-                <td colSpan={3} style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>Iš viso:</td>
-                <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>{parseFloat(suma).toFixed(2)}</td>
-              </tr>
-            </tbody>
-          </table>
+            {/* Dynamic Table */}
+            <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 40, fontSize: "11pt" }}>
+              <thead>
+                <tr style={{ backgroundColor: "#f2f2f2", borderBottom: "2px solid #003366" }}>
+                  <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "left" }}>Aprašymas</th>
+                  <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "right", width: 80 }}>Kiekis</th>
+                  <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "right", width: 100 }}>Vnt. kaina</th>
+                  <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "right", width: 120 }}>Suma (€)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {students.map((student) => {
+                  const qty = parseFloat(student.lessonCount) || 0;
+                  const price = parseFloat(pricePerLesson) || 0;
+                  const lineTotal = qty * price;
+
+                  return (
+                    <tr key={student.id}>
+                      <td style={{ border: "1px solid #ccc", padding: 8 }}>
+                        Mokymo paslaugos ({student.name})
+                      </td>
+                      <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                        {qty}
+                      </td>
+                      <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                        {price.toFixed(2)}
+                      </td>
+                      <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                        {lineTotal.toFixed(2)}
+                      </td>
+                    </tr>
+                  );
+                })}
+
+                {/* Total Row uses the totalSum State (which is editable) */}
+                <tr style={{ fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
+                  <td colSpan={3} style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>Iš viso:</td>
+                  <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                    {parseFloat(totalSum || "0").toFixed(2)}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
           {/* Footer */}
-          <div style={{ fontSize: "10pt", color: "#666" }}>
+          <div style={{ fontSize: "10pt", color: "#666", marginTop: "auto" }}>
             Sąskaita faktūra išrašyta pagal Lietuvos Respublikos įstatymus.
           </div>
         </div>
