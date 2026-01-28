@@ -8,6 +8,7 @@ import {
   RefreshCcw, 
   Compass, 
   ArrowRight, 
+  ArrowLeft, // Added for Back button
   BookOpen, 
   Building2, 
   Briefcase,
@@ -209,31 +210,26 @@ const RESULTS: Record<CareerType, ResultData> = {
 };
 
 const RAW_QUESTIONS = [
-  // A - TECHNOLOGIJOS
   { q: "Mėgstu spręsti loginius galvosūkius ir mįsles.", t: "A" }, { q: "Man įdomu, kaip veikia algoritmai ir kodas.", t: "A" },
   { q: "Galiu ilgai sėdėti prie vienos techninės problemos.", t: "A" }, { q: "Man patinka aiški struktūra ir skaičiai.", t: "A" },
   { q: "Greitai pastebiu sistemos klaidas ar neefektyvumą.", t: "A" }, { q: "Mėgstu automatizuoti pasikartojančius darbus.", t: "A" },
   { q: "Man įdomu ardyti prietaisus ir suprasti jų veikimą.", t: "A" }, { q: "Suprantu kompiuterių tinklų logiką.", t: "A" },
   { q: "Analizuoju statistiką ir grafikus savo malonumui.", t: "A" }, { q: "Mane domina duomenų saugumas ir privatumas.", t: "A" },
-  // B - ŽMONĖS
   { q: "Moku išklausyti žmogų jo nepertraukdamas.", t: "B" }, { q: "Socialinės problemos ir nelygybė man rūpi.", t: "B" },
   { q: "Galiu lengvai paaiškinti sudėtingą dalyką vaikui.", t: "B" }, { q: "Jaučiu prasmę padėdamas kitiems tobulėti.", t: "B" },
   { q: "Gera atmosfera komandoje man svarbiau už rezultatą.", t: "B" }, { q: "Domiuosi psichologija ir žmonių elgsena.", t: "B" },
   { q: "Nuoširdžiai džiaugiuosi kitų sėkme.", t: "B" }, { q: "Moku motyvuoti nusivylusį žmogų.", t: "B" },
   { q: "Darbas be prasmės man būtų kančia.", t: "B" }, { q: "Mėgstu pažinti skirtingas kultūras.", t: "B" },
-  // C - KŪRYBA
   { q: "Pastebiu, kai spalvos ar formos nedera tarpusavyje.", t: "C" }, { q: "Daug laiko praleidžiu svajodamas apie idėjas.", t: "C" },
   { q: "Mėgstu kurti video, fotografuoti ar piešti.", t: "C" }, { q: "Originalumas man svarbiau už taisykles.", t: "C" },
   { q: "Mėgstu keisti savo aplinkos dizainą.", t: "C" }, { q: "Mada, kinas ir menas mane įkvepia.", t: "C" },
   { q: "Man svarbu, kad rezultatas būtų estetiškas.", t: "C" }, { q: "Mano idėjos kitiems kartais atrodo keistos.", t: "C" },
   { q: "Norėčiau sukurti savo prekinį ženklą.", t: "C" }, { q: "Mėgstu gaminti ar meistrauti rankomis.", t: "C" },
-  // D - VERSLAS
   { q: "Mėgstu derėtis ir gauti geriausią kainą.", t: "D" }, { q: "Konkurencija mane motyvuoja stengtis labiau.", t: "D" },
   { q: "Galiu priimti sprendimus spaudimo metu.", t: "D" }, { q: "Finansinė sėkmė man yra svarbus rodiklis.", t: "D" },
   { q: "Visada turiu planą B ir C.", t: "D" }, { q: "Nebijau finansinės rizikos, jei matau galimybę.", t: "D" },
   { q: "Mėgstu vadovauti grupiniams projektams.", t: "D" }, { q: "Galiu įtikinti kitus savo tiesa.", t: "D" },
   { q: "Svajoju turėti savo verslą ar įmonę.", t: "D" }, { q: "Statusas ir pripažinimas man svarbu.", t: "D" },
-  // E - MOKSLAS
   { q: "Mėgstu klasifikuoti ir rūšiuoti informaciją.", t: "E" }, { q: "Visada pastebiu rašybos ar faktines klaidas.", t: "E" },
   { q: "Gamtos mokslai (biologija, chemija) man patinka.", t: "E" }, { q: "Aiškios instrukcijos ir rutina manęs negąsdina.", t: "E" },
   { q: "Mėgstu atlikti tikslius eksperimentus.", t: "E" }, { q: "Sveikata ir ekologija man prioritetas.", t: "E" },
@@ -505,25 +501,42 @@ export default function CareerQuiz() {
   const [questions, setQuestions] = useState([...RAW_QUESTIONS]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [scores, setScores] = useState<Record<string, number>>({ A: 0, B: 0, C: 0, D: 0, E: 0 });
+  const [history, setHistory] = useState<{ type: string; isYes: boolean }[]>([]);
 
   const startGame = () => {
     setQuestions([...RAW_QUESTIONS].sort(() => Math.random() - 0.5));
     setCurrentIdx(0);
     setScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
+    setHistory([]);
     setGameState('playing');
   };
 
   const handleAnswer = (isYes: boolean) => {
+    const type = questions[currentIdx].t;
     if (isYes) {
-      const type = questions[currentIdx].t;
       setScores(prev => ({ ...prev, [type]: prev[type] + 1 }));
     }
+    
+    // Save to history
+    setHistory(prev => [...prev, { type, isYes }]);
 
     if (currentIdx + 1 < questions.length) {
       setCurrentIdx(prev => prev + 1);
     } else {
       setGameState('result');
     }
+  };
+
+  const handleBack = () => {
+    if (currentIdx === 0) return;
+
+    const lastEntry = history[history.length - 1];
+    if (lastEntry.isYes) {
+      setScores(prev => ({ ...prev, [lastEntry.type]: prev[lastEntry.type] - 1 }));
+    }
+
+    setHistory(prev => prev.slice(0, -1));
+    setCurrentIdx(prev => prev - 1);
   };
 
   const getWinner = () => {
@@ -588,13 +601,24 @@ export default function CareerQuiz() {
                 key="quiz"
                 className="flex flex-col flex-1 max-w-3xl mx-auto w-full p-6 md:p-12 justify-center"
               >
-                {/* Progress Bar */}
-                <div className="w-full h-4 bg-slate-100 rounded-full mb-16 overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${((currentIdx) / questions.length) * 100}%` }}
-                    className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
-                  />
+                {/* Back Button and Progress Bar */}
+                <div className="mb-12">
+                    <div className="flex justify-between items-center mb-4">
+                        <button 
+                          onClick={handleBack}
+                          disabled={currentIdx === 0}
+                          className={`flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors ${currentIdx === 0 ? 'invisible' : 'visible'}`}
+                        >
+                          <ArrowLeft className="w-4 h-4" /> Buvęs klausimas
+                        </button>
+                    </div>
+                    <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden">
+                        <motion.div 
+                          initial={{ width: 0 }}
+                          animate={{ width: `${((currentIdx) / questions.length) * 100}%` }}
+                          className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
+                        />
+                    </div>
                 </div>
 
                 <motion.div
