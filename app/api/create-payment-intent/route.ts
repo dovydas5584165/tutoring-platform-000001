@@ -9,6 +9,8 @@ export async function POST(request: NextRequest) {
 
     const stripe = getServerStripe();
 
+    const TEST_PRICE_CENTS = 1400; // 14.00 EUR
+
     // ==========================================
     // SCENARIO 1: Tutoring Booking (Existing Logic)
     // ==========================================
@@ -75,7 +77,7 @@ export async function POST(request: NextRequest) {
     // ==========================================
     else if (product_type === 'career_test') {
       // Fixed price: 30.00 EUR
-      const amount = 3000; 
+      const amount = TEST_PRICE_CENTS; 
 
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
