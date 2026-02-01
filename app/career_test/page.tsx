@@ -348,7 +348,7 @@ export default function KarjerosPristatymas() {
       <section className="py-24 text-center container mx-auto px-6">
         <div className="bg-blue-50 rounded-[40px] py-16 px-6 border border-blue-100">
           {/* Note: Kept the "more than 30" text as it acts as a value anchor, not necessarily the price itself */}
-          <h2 className="text-4xl font-black text-slate-900 mb-6">Tavo ateitis verta daugiau nei 30 €</h2>
+          <h2 className="text-4xl font-black text-slate-900 mb-6">Tavo ateitis verta daugiau nei {PRODUCT_PRICE}€</h2>
           <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
             Tai investicija, kuri atsipirks jau pirmą studijų dieną. Užpildyk testą dabar ir gauk rezultatus akimirksniu.
           </p>
