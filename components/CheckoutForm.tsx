@@ -8,34 +8,40 @@ import {
   useElements
 } from '@stripe/react-stripe-js';
 
-// UPDATE 1: Interface now allows either bookingId OR returnUrl
+// --- CONFIGURATION ---
+const TEST_PRICE = 14;   // Default price for Career Test
+const LESSON_PRICE = 25; // Default price for Lessons (if bookingId exists)
+
 interface CheckoutFormProps {
-  bookingId?: string; // Made optional ( ? )
-  returnUrl?: string; // New optional prop
+  bookingId?: string; 
+  returnUrl?: string; 
+  amount?: number; // Optional: Overrides both defaults if provided
 }
 
-export default function CheckoutForm({ bookingId, returnUrl }: CheckoutFormProps) {
+export default function CheckoutForm({ bookingId, returnUrl, amount }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
-  const router = useRouter(); // Kept for consistency, though Stripe handles the redirect
+  const router = useRouter(); 
 
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState<string>('');
+  
+  // LOGIC: 
+  // 1. If 'amount' prop is passed, use that.
+  // 2. Else if 'bookingId' exists, use LESSON_PRICE (25).
+  // 3. Else use TEST_PRICE (14).
+  const priceToDisplay = amount || (bookingId ? LESSON_PRICE : TEST_PRICE);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!stripe || !elements) {
-      // Stripe.js hasn't yet loaded.
       return;
     }
 
     setIsLoading(true);
     setMessage('');
 
-    // UPDATE 2: Smart Logic to decide where to send the user
-    // If Landing Page passed a 'returnUrl', use it. 
-    // Otherwise, fall back to the old booking success page.
     const finalReturnUrl = returnUrl 
       ? returnUrl 
       : `${window.location.origin}/payment-success?booking_id=${bookingId}`;
@@ -43,7 +49,6 @@ export default function CheckoutForm({ bookingId, returnUrl }: CheckoutFormProps
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        // UPDATE 3: Use the variable we calculated above
         return_url: finalReturnUrl,
       },
     });
@@ -87,8 +92,8 @@ export default function CheckoutForm({ bookingId, returnUrl }: CheckoutFormProps
               Processing...
             </div>
           ) : (
-            // UPDATE 4: Button text changes based on what we are buying
-            bookingId ? "Pay Now" : "Pay 30.00 €"
+            // Always shows the calculated price (14 € or 25 €)
+            `Pay ${priceToDisplay.toFixed(2)} €`
           )}
         </span>
       </button>
