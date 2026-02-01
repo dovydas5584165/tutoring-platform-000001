@@ -26,6 +26,10 @@ import CheckoutForm from '../../components/CheckoutForm';
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
+// --- CONFIGURATION ---
+// Change the price here to update it throughout the entire page
+const PRODUCT_PRICE = 14;
+
 // --- MOBILE OPTIMIZED PAYMENT MODAL COMPONENT ---
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [clientSecret, setClientSecret] = useState('');
@@ -91,7 +95,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
               {/* Mobile Only: Price Header */}
               <div className="flex justify-between items-end mb-4 md:hidden">
                  <span className="text-slate-500 font-medium text-sm">Mokėti:</span>
-                 <span className="text-3xl font-black text-slate-900">30.00 €</span>
+                 <span className="text-3xl font-black text-slate-900">{PRODUCT_PRICE.toFixed(2)} €</span>
               </div>
 
               {/* Mobile Toggle for Details */}
@@ -106,7 +110,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
               {/* Product Details Box - Hidden on Mobile unless toggled */}
               <div className={`${showDetails ? 'block' : 'hidden'} md:block bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-all`}>
                 <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Produktas</span>
-                <p className="font-bold text-slate-900 text-lg leading-tight mt-1">Karjeros analizė 2026</p>
+                <p className="font-bold text-slate-900 text-lg leading-tight mt-1">Karjeros Žemėlapis 2026</p>
                 <ul className="mt-4 space-y-3 text-sm text-slate-500">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
@@ -128,7 +132,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             <div className="hidden md:block mt-6 pt-6 border-t border-slate-200">
               <div className="flex justify-between items-end">
                 <span className="text-slate-500 font-medium">Iš viso:</span>
-                <span className="text-3xl font-black text-slate-900">30.00 €</span>
+                <span className="text-3xl font-black text-slate-900">{PRODUCT_PRICE.toFixed(2)} €</span>
               </div>
             </div>
           </div>
@@ -200,7 +204,6 @@ export default function KarjerosPristatymas() {
 <section className="relative overflow-hidden bg-white py-20 lg:py-32">
   <div className="container mx-auto px-6 relative z-10">
     
-    {/* PAKEITIMAS 1: Pridėta 'mx-auto', 'text-center' ir 'flex flex-col items-center' */}
     <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
       
       <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
@@ -211,10 +214,9 @@ export default function KarjerosPristatymas() {
         Tavo ateitis- ne <span className="text-blue-600">atsitiktinumas.</span>
       </h1>
       
-      {/* PAKEITIMAS 2: Pridėta 'mx-auto' aprašymui */}
       <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto">
         Gauk profesionalią asmenybės analizę, tinkančių profesijų sąrašą ir studijų planą. 
-        <span className="block mt-2 font-semibold text-slate-800">Investicija į tavo karjerą- tik 30 €.</span>
+        <span className="block mt-2 font-semibold text-slate-800">Investicija į tavo karjerą- tik {PRODUCT_PRICE} €.</span>
       </p>
       
       <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
@@ -223,7 +225,7 @@ export default function KarjerosPristatymas() {
           onClick={handleBuyClick}
           className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-xl shadow-blue-200 group"
         >
-          <span>Įsigyti ir atlikti testą (30 €)</span> 
+          <span>Įsigyti ir atlikti testą ({PRODUCT_PRICE} €)</span> 
           <ArrowRight className="group-hover:translate-x-1 transition-transform" />
         </button>
         
@@ -232,7 +234,6 @@ export default function KarjerosPristatymas() {
         </Link>
       </div>
       
-      {/* PAKEITIMAS 3: Pridėta 'justify-center', kad ikonėlė būtų centre */}
       <p className="mt-4 text-xs text-slate-400 font-medium flex items-center justify-center gap-1">
         <ShieldCheck size={14} /> Saugus apmokėjimas · Rezultatai iškart po testo
       </p>
@@ -240,14 +241,12 @@ export default function KarjerosPristatymas() {
     </div>
   </div>
   
-  {/* PAKEITIMAS 4: IŠTRINTAS 'Dekoratyvinis elementas' div'as, kuris buvo čia */}
-
 </section>
 
-      {/* --- REZULTATŲ VERTĖ (Ką gausi už 30 EUR?) --- */}
+      {/* --- REZULTATŲ VERTĖ --- */}
       <section id="kaip-veikia" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Kodėl verta investuoti 30 €?</h2>
+          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Kodėl verta investuoti {PRODUCT_PRICE} €?</h2>
           <p className="text-slate-500">Tai ne šiaip testas, o išsami 50 klausimų analizė, kuri sutaupys tau mėnesius blaškymosi.</p>
         </div>
 
@@ -316,7 +315,7 @@ export default function KarjerosPristatymas() {
           </div>
           
           <div className="lg:w-1/2 flex justify-center">
-             <div className="relative">
+              <div className="relative">
                 <div className="absolute -inset-4 bg-blue-500/20 blur-3xl rounded-full"></div>
                 <div className="bg-slate-800/80 backdrop-blur border border-slate-700 p-8 rounded-3xl max-w-md w-full relative z-10 shadow-2xl">
                     <div className="flex items-center gap-4 mb-6">
@@ -348,6 +347,7 @@ export default function KarjerosPristatymas() {
       {/* --- FOOTER / FINAL CTA --- */}
       <section className="py-24 text-center container mx-auto px-6">
         <div className="bg-blue-50 rounded-[40px] py-16 px-6 border border-blue-100">
+          {/* Note: Kept the "more than 30" text as it acts as a value anchor, not necessarily the price itself */}
           <h2 className="text-4xl font-black text-slate-900 mb-6">Tavo ateitis verta daugiau nei 30 €</h2>
           <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
             Tai investicija, kuri atsipirks jau pirmą studijų dieną. Užpildyk testą dabar ir gauk rezultatus akimirksniu.
