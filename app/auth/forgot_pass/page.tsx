@@ -5,20 +5,31 @@ import { supabase } from "@/lib/supabaseClient";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState({ type: "", message: "" });
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus("");
+    setLoading(true);
+    setStatus({ type: "", message: "" });
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
-    // no redirectTo option here — so it uses Supabase hosted page
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      // This tells Supabase to send the user to your update page on the live site
+      redirectTo: "https://tiksliukai.lt/atnaujinti-slaptazodi",
+    });
 
     if (error) {
-      setStatus("Nepavyko išsiųsti laiško. Patikrinkite el. paštą.");
+      setStatus({ 
+        type: "error", 
+        message: "Nepavyko išsiųsti laiško. " + error.message 
+      });
     } else {
-      setStatus("Nuoroda slaptažodžio atkūrimui išsiųsta.");
+      setStatus({ 
+        type: "success", 
+        message: "Nuoroda slaptažodžio atkūrimui išsiųsta į jūsų el. paštą." 
+      });
     }
+    setLoading(false);
   };
 
   return (
@@ -43,9 +54,12 @@ export default function ForgotPasswordPage() {
           color: "#000",
         }}
       >
-        <h2 style={{ textAlign: "center", marginBottom: 20 }}>
+        <h2 style={{ textAlign: "center", marginBottom: 10 }}>
           Pamiršote slaptažodį?
         </h2>
+        <p style={{ textAlign: "center", color: "#666", marginBottom: 20, fontSize: 14 }}>
+          Įveskite savo el. pašto adresą ir mes atsiųsime jums nuorodą.
+        </p>
 
         <form
           onSubmit={handleSubmit}
@@ -53,12 +67,13 @@ export default function ForgotPasswordPage() {
         >
           <input
             type="email"
-            placeholder="Įveskite el. paštą"
+            placeholder="Vardas@pavyzdys.lt"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={loading}
             style={{
-              padding: 10,
+              padding: 12,
               fontSize: 16,
               borderRadius: 8,
               border: "1px solid #ccc",
@@ -67,31 +82,44 @@ export default function ForgotPasswordPage() {
 
           <button
             type="submit"
+            disabled={loading}
             style={{
               padding: 12,
-              backgroundColor: "#0070f3",
+              backgroundColor: loading ? "#ccc" : "#0070f3",
               color: "#fff",
               fontWeight: "bold",
               border: "none",
               borderRadius: 8,
-              cursor: "pointer",
+              cursor: loading ? "not-allowed" : "pointer",
+              transition: "background 0.2s",
             }}
           >
-            Siųsti nuorodą
+            {loading ? "Siunčiama..." : "Siųsti nuorodą"}
           </button>
         </form>
 
-        {status && (
-          <p
+        {status.message && (
+          <div
             style={{
-              marginTop: 12,
+              marginTop: 16,
+              padding: 10,
+              borderRadius: 6,
+              fontSize: 14,
               textAlign: "center",
-              color: status.startsWith("Nuoroda") ? "green" : "red",
+              backgroundColor: status.type === "success" ? "#e6fffa" : "#fff5f5",
+              color: status.type === "success" ? "#2c7a7b" : "#c53030",
+              border: `1px solid ${status.type === "success" ? "#b2f5ea" : "#feb2b2"}`,
             }}
           >
-            {status}
-          </p>
+            {status.message}
+          </div>
         )}
+
+        <div style={{ marginTop: 20, textAlign: "center" }}>
+          <a href="/prisijungti" style={{ color: "#0070f3", fontSize: 14, textDecoration: "none" }}>
+            Grįžti į prisijungimą
+          </a>
+        </div>
       </div>
     </div>
   );
