@@ -15,7 +15,7 @@ export default function ForgotPasswordPage() {
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       // This tells Supabase to send the user to your update page on the live site
-      redirectTo: "https://tiksliukai.lt/atnaujinti-slaptazodi",
+      redirectTo: "https://tiksliukai.lt/atnaujinti_slaptazodi",
     });
 
     if (error) {
