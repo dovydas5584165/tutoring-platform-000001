@@ -403,6 +403,15 @@ export default function Home() {
                   <Compass size={20} className="group-hover:rotate-45 transition-transform duration-500" />
                   <span>Karjeros testas</span>
                 </Link>
+                 <Link
+                  href="/grupines"
+                  className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 overflow-hidden"
+                >
+                  {/* Mažas "badge" kampe */}
+                
+                  
+                  <span>Grupinės pamokos</span>
+                </Link>
               </div>
 
               <p className="text-xs text-blue-200 ml-1">* Karjeros testas padės pasirinkti tinkamus egzaminus.</p>
