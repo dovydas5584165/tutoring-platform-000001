@@ -2,14 +2,14 @@
 
 import { useRef, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link"; // Added missing Link import
+import Link from "next/link";
 import { motion, animate } from "framer-motion";
 import { supabase } from "../lib/supabaseClient";
 import { Button } from "@/components/ui/button";
 import { FaInstagram, FaFacebook, FaTrophy } from "react-icons/fa";
 import Image from "next/image";
-// Added missing Icon imports
-import { ArrowRight, Compass } from "lucide-react"; 
+// Nepamirškite importuoti Users ikonos grupinėms pamokoms
+import { ArrowRight, Compass, Users } from "lucide-react"; 
 
 export default function Home() {
   const router = useRouter();
@@ -19,6 +19,10 @@ export default function Home() {
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Group Registration State (jei vėliau prireiks formos)
+  const [groupEmail, setGroupEmail] = useState("");
+  const [groupStatus, setGroupStatus] = useState<"idle" | "success" | "error">("idle");
 
   const lastScrollY = useRef(0);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -154,6 +158,26 @@ export default function Home() {
     await supabase.auth.signOut();
     setUser(null);
     setUserRole(null);
+  };
+
+  // Handle Group Registration Submit
+  const handleGroupRegistration = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setGroupStatus("idle");
+    
+    if (!groupEmail) return;
+
+    try {
+      // TODO: Pakeiskite šį kodą su savo Supabase logika
+      setTimeout(() => {
+        setGroupStatus("success");
+        setGroupEmail("");
+      }, 500);
+      
+    } catch (error) {
+      console.error("Klaida registruojantis į grupę:", error);
+      setGroupStatus("error");
+    }
   };
 
   const lessons = [
@@ -382,42 +406,35 @@ export default function Home() {
               </h2>
 
               {/* CTA BUTTONS GROUP */}
-<div className="flex flex-col sm:flex-row flex-wrap gap-4 mt-6">
-  {/* 1. Pagrindinis mygtukas (Pamokos) */}
-  <Button
-    onClick={scrollToLessons}
-    className="group px-8 py-4 text-lg font-bold rounded-2xl bg-red-500 text-white hover:bg-red-600 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-red-500/40 flex items-center justify-center gap-3"
-  >
-    Atrask pamokas 
-    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-  </Button>
+              <div className="flex flex-col sm:flex-row flex-wrap gap-4 mt-6">
+                {/* 1. Pagrindinis mygtukas (Pamokos) */}
+                <Button
+                  onClick={scrollToLessons}
+                  className="group px-8 py-4 text-lg font-bold rounded-2xl bg-red-500 text-white hover:bg-red-600 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-red-500/40 flex items-center justify-center gap-3"
+                >
+                  Atrask pamokas 
+                  <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                </Button>
 
-  {/* 2. Naujas mygtukas (Karjeros testas) */}
-  <Link
-    href="/career_test"
-    className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-yellow-400 text-slate-900 hover:bg-yellow-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-yellow-400/40 flex items-center justify-center gap-3 overflow-hidden"
-  >
-    {/* Pataisytas "badge" - kontrastuojanti spalva */}
-    <span className="absolute top-0 right-0 bg-red-500 text-[10px] font-black text-white px-3 py-1 rounded-bl-xl uppercase tracking-wider z-10 shadow-sm">
-      Naujiena
-    </span>
-    <Compass size={20} className="group-hover:rotate-45 transition-transform duration-500" />
-    <span>Karjeros testas</span>
-  </Link>
+                {/* 2. Naujas mygtukas (Karjeros testas) */}
+                <Link
+                  href="/career_test"
+                  className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-yellow-400 text-slate-900 hover:bg-yellow-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-yellow-400/40 flex items-center justify-center gap-3 overflow-hidden"
+                >
+                  {/* Pataisytas "badge" - kontrastuojanti spalva */}
+                  <span className="absolute top-0 right-0 bg-red-500 text-[10px] font-black text-white px-3 py-1 rounded-bl-xl uppercase tracking-wider z-10 shadow-sm">
+                    Naujiena
+                  </span>
+                  <Compass size={20} className="group-hover:rotate-45 transition-transform duration-500" />
+                  <span>Karjeros testas</span>
+                </Link>
 
-  {/* 3. Grupinės pamokos */}
-  <Link
-    href="/grupines"
-    className="group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
-  >
-    {/* Jei naudojate lucide-react, importuokite Users ikoną komponento viršuje */}
-    <Users size={20} className="group-hover:scale-110 transition-transform duration-300" />
-    <span>Grupinės pamokos</span>
-  </Link>
-</div>
-                  {/* Mažas "badge" kampe */}
-                
-                  
+                {/* 3. Grupinės pamokos */}
+                <Link
+                  href="/grupines"
+                  className="group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
+                >
+                  <Users size={20} className="group-hover:scale-110 transition-transform duration-300" />
                   <span>Grupinės pamokos</span>
                 </Link>
               </div>
@@ -789,6 +806,60 @@ export default function Home() {
                 <div className="mt-2 text-xl text-gray-700 text-center">{label}</div>
               </div>
             ))}
+          </div>
+        </motion.section>
+
+        {/* NAUJA SEKCIJA: Grupių formavimas */}
+        <motion.section
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="w-full flex flex-col justify-center items-center bg-gray-50 snap-start px-6 py-24"
+        >
+          <div className="max-w-4xl w-full bg-white rounded-[2.5rem] shadow-xl p-8 sm:p-12 text-center border-t-8 border-yellow-400">
+            <h2 className="text-4xl sm:text-5xl font-extrabold mb-8 text-[#3B65CE]">Grupių Formavimas</h2>
+            
+            <div className="flex flex-col md:flex-row justify-center gap-6 mb-10">
+              <div className="bg-blue-50 p-8 rounded-3xl flex-1 border border-blue-100 shadow-sm transition-transform hover:-translate-y-1">
+                <h3 className="text-2xl font-bold mb-3 text-blue-900">Python grupė</h3>
+                <p className="text-gray-700 text-lg">Formuojama kas <br/><span className="text-2xl font-black text-blue-600">3 savaites</span></p>
+              </div>
+              <div className="bg-blue-50 p-8 rounded-3xl flex-1 border border-blue-100 shadow-sm transition-transform hover:-translate-y-1">
+                <h3 className="text-2xl font-bold mb-3 text-blue-900">PUPP, VBE ir NMPP</h3>
+                <p className="text-gray-700 text-lg">Grupės formuojamos kas <br/><span className="text-2xl font-black text-blue-600">2 savaites</span></p>
+              </div>
+            </div>
+
+            <h3 className="text-2xl font-bold mb-4 text-gray-800">Registruokitės į laukiančiųjų sąrašą</h3>
+            <form onSubmit={handleGroupRegistration} className="max-w-lg mx-auto flex flex-col sm:flex-row gap-3">
+              <input
+                type="email"
+                required
+                placeholder="Jūsų el. paštas"
+                value={groupEmail}
+                onChange={(e) => setGroupEmail(e.target.value)}
+                className="flex-1 px-5 py-4 rounded-2xl border border-gray-300 focus:ring-4 focus:ring-blue-100 focus:border-[#3B65CE] outline-none transition-all"
+              />
+              <Button 
+                type="submit" 
+                className="bg-[#3B65CE] hover:bg-[#2C4A8E] text-white px-8 py-4 h-auto rounded-2xl font-bold transition-colors shadow-md text-lg"
+              >
+                Registruotis
+              </Button>
+            </form>
+            
+            {/* Sėkmės/klaidos žinutės */}
+            {groupStatus === 'success' && (
+              <motion.p initial={{opacity: 0}} animate={{opacity: 1}} className="text-green-600 mt-4 font-semibold text-lg">
+                Sėkmingai užsiregistravote! Susisieksime su jumis greitai. 🎉
+              </motion.p>
+            )}
+            {groupStatus === 'error' && (
+              <motion.p initial={{opacity: 0}} animate={{opacity: 1}} className="text-red-600 mt-4 font-semibold">
+                Įvyko klaida. Prašome pabandyti dar kartą.
+              </motion.p>
+            )}
           </div>
         </motion.section>
 
