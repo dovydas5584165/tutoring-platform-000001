@@ -419,7 +419,7 @@ export default function Home() {
                 {/* 2. Naujas mygtukas (Karjeros testas) */}
                 <Link
                   href="/career_test"
-                  className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-yellow-400 text-slate-900 hover:bg-yellow-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-yellow-400/40 flex items-center justify-center gap-3 overflow-hidden"
+                  className="group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
                 >
                   {/* Pataisytas "badge" - kontrastuojanti spalva */}
                   <span className="absolute top-0 right-0 bg-red-500 text-[10px] font-black text-white px-3 py-1 rounded-bl-xl uppercase tracking-wider z-10 shadow-sm">
