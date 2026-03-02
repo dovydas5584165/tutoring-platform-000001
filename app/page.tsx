@@ -809,59 +809,6 @@ export default function Home() {
           </div>
         </motion.section>
 
-        {/* NAUJA SEKCIJA: Grupių formavimas */}
-        <motion.section
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="w-full flex flex-col justify-center items-center bg-gray-50 snap-start px-6 py-24"
-        >
-          <div className="max-w-4xl w-full bg-white rounded-[2.5rem] shadow-xl p-8 sm:p-12 text-center border-t-8 border-yellow-400">
-            <h2 className="text-4xl sm:text-5xl font-extrabold mb-8 text-[#3B65CE]">Grupių Formavimas</h2>
-            
-            <div className="flex flex-col md:flex-row justify-center gap-6 mb-10">
-              <div className="bg-blue-50 p-8 rounded-3xl flex-1 border border-blue-100 shadow-sm transition-transform hover:-translate-y-1">
-                <h3 className="text-2xl font-bold mb-3 text-blue-900">Python grupė</h3>
-                <p className="text-gray-700 text-lg">Formuojama kas <br/><span className="text-2xl font-black text-blue-600">3 savaites</span></p>
-              </div>
-              <div className="bg-blue-50 p-8 rounded-3xl flex-1 border border-blue-100 shadow-sm transition-transform hover:-translate-y-1">
-                <h3 className="text-2xl font-bold mb-3 text-blue-900">PUPP, VBE ir NMPP</h3>
-                <p className="text-gray-700 text-lg">Grupės formuojamos kas <br/><span className="text-2xl font-black text-blue-600">2 savaites</span></p>
-              </div>
-            </div>
-
-            <h3 className="text-2xl font-bold mb-4 text-gray-800">Registruokitės į laukiančiųjų sąrašą</h3>
-            <form onSubmit={handleGroupRegistration} className="max-w-lg mx-auto flex flex-col sm:flex-row gap-3">
-              <input
-                type="email"
-                required
-                placeholder="Jūsų el. paštas"
-                value={groupEmail}
-                onChange={(e) => setGroupEmail(e.target.value)}
-                className="flex-1 px-5 py-4 rounded-2xl border border-gray-300 focus:ring-4 focus:ring-blue-100 focus:border-[#3B65CE] outline-none transition-all"
-              />
-              <Button 
-                type="submit" 
-                className="bg-[#3B65CE] hover:bg-[#2C4A8E] text-white px-8 py-4 h-auto rounded-2xl font-bold transition-colors shadow-md text-lg"
-              >
-                Registruotis
-              </Button>
-            </form>
-            
-            {/* Sėkmės/klaidos žinutės */}
-            {groupStatus === 'success' && (
-              <motion.p initial={{opacity: 0}} animate={{opacity: 1}} className="text-green-600 mt-4 font-semibold text-lg">
-                Sėkmingai užsiregistravote! Susisieksime su jumis greitai. 🎉
-              </motion.p>
-            )}
-            {groupStatus === 'error' && (
-              <motion.p initial={{opacity: 0}} animate={{opacity: 1}} className="text-red-600 mt-4 font-semibold">
-                Įvyko klaida. Prašome pabandyti dar kartą.
-              </motion.p>
-            )}
-          </div>
-        </motion.section>
 
         {/* Section 3: Kam man registruotis */}
         <motion.section
