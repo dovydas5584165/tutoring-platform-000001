@@ -7,6 +7,11 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Users, Code, GraduationCap, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+// PRIDĖTA: Importuojame jūsų Supabase klientą. 
+// Jei failas yra "app/grupines/page.tsx", kelias greičiausiai bus "../../lib/supabaseClient".
+// Jei naudojate "@", galite pakeisti į "@/lib/supabaseClient".
+import { supabase } from "../../lib/supabaseClient"; 
+
 export default function GrupinesPamokos() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -18,16 +23,22 @@ export default function GrupinesPamokos() {
     setStatus("loading");
 
     try {
-      // TODO: Čia įdėkite Supabase logiką. Pvz.:
-      // await supabase.from('group_registrations').insert([{ email }]);
+      // TIKRA SUPABASE UŽKLAUSA:
+      // Įrašome el. paštą į "group_registrations" lentelę
+      const { error } = await supabase
+        .from('group_registrations')
+        .insert([{ email: email }]);
+
+      if (error) {
+        throw error;
+      }
       
-      // Simuliuojame serverio užklausą
-      setTimeout(() => {
-        setStatus("success");
-        setEmail("");
-      }, 800);
+      // Jei viskas pavyko, parodome sėkmės žinutę
+      setStatus("success");
+      setEmail("");
+      
     } catch (error) {
-      console.error("Klaida:", error);
+      console.error("Klaida išsaugant el. paštą:", error);
       setStatus("error");
     }
   };
