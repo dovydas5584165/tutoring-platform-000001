@@ -382,31 +382,39 @@ export default function Home() {
               </h2>
 
               {/* CTA BUTTONS GROUP */}
-              <div className="flex flex-col sm:flex-row gap-4 mt-2">
-                {/* 1. Pagrindinis mygtukas (Pamokos) */}
-                <Button
-                  onClick={scrollToLessons}
-                  className="px-8 py-4 text-lg font-bold rounded-2xl bg-red-400 text-slate-900 hover:bg-yellow-400 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
-                >
-                  Atrask pamokas <ArrowRight size={20} />
-                </Button>
+<div className="flex flex-col sm:flex-row flex-wrap gap-4 mt-6">
+  {/* 1. Pagrindinis mygtukas (Pamokos) */}
+  <Button
+    onClick={scrollToLessons}
+    className="group px-8 py-4 text-lg font-bold rounded-2xl bg-red-500 text-white hover:bg-red-600 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-red-500/40 flex items-center justify-center gap-3"
+  >
+    Atrask pamokas 
+    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+  </Button>
 
-                {/* 2. Naujas mygtukas (Karjeros testas) */}
-                <Link
-                  href="/career_test"
-                  className="px-8 py-4 text-lg font-bold rounded-2xl bg-yellow-400 text-slate-900 hover:bg-red-400 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
-                >
-                  {/* Mažas "badge" kampe */}
-                  <span className="absolute top-0 right-0 bg-yellow-400 text-[10px] font-black text-slate-900 px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">
-                    Naujiena
-                  </span>
-                  <Compass size={20} className="group-hover:rotate-45 transition-transform duration-500" />
-                  <span>Karjeros testas</span>
-                </Link>
-                 <Link
-                  href="/grupines"
-                  className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 overflow-hidden"
-                >
+  {/* 2. Naujas mygtukas (Karjeros testas) */}
+  <Link
+    href="/career_test"
+    className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-yellow-400 text-slate-900 hover:bg-yellow-500 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-yellow-400/40 flex items-center justify-center gap-3 overflow-hidden"
+  >
+    {/* Pataisytas "badge" - kontrastuojanti spalva */}
+    <span className="absolute top-0 right-0 bg-red-500 text-[10px] font-black text-white px-3 py-1 rounded-bl-xl uppercase tracking-wider z-10 shadow-sm">
+      Naujiena
+    </span>
+    <Compass size={20} className="group-hover:rotate-45 transition-transform duration-500" />
+    <span>Karjeros testas</span>
+  </Link>
+
+  {/* 3. Grupinės pamokos */}
+  <Link
+    href="/grupines"
+    className="group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
+  >
+    {/* Jei naudojate lucide-react, importuokite Users ikoną komponento viršuje */}
+    <Users size={20} className="group-hover:scale-110 transition-transform duration-300" />
+    <span>Grupinės pamokos</span>
+  </Link>
+</div>
                   {/* Mažas "badge" kampe */}
                 
                   
