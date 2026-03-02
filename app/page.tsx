@@ -394,7 +394,7 @@ export default function Home() {
                 {/* 2. Naujas mygtukas (Karjeros testas) */}
                 <Link
                   href="/career_test"
-                  className="group relative px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2 overflow-hidden"
+                  className="px-8 py-4 text-lg font-bold rounded-2xl bg-yellow-400 text-slate-900 hover:bg-red-400 transition-all transform hover:scale-105 shadow-lg flex items-center justify-center gap-2"
                 >
                   {/* Mažas "badge" kampe */}
                   <span className="absolute top-0 right-0 bg-yellow-400 text-[10px] font-black text-slate-900 px-2 py-0.5 rounded-bl-lg uppercase tracking-wider">
