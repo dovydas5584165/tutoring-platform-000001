@@ -364,14 +364,7 @@ export default function ScheduleLanding() {
 
           <div className="flex gap-8 justify-center flex-wrap max-w-6xl mx-auto">
             {[
-              {
-                name: "Justė Giedraitytė",
-                subject: "Matematika, anglų kalba",
-                experience: "2 metai",
-                description:
-                  "Esu Justė, politikos mokslų studentė iš Vilniaus. Ne visada mylėjau matematiką ir prisiekinėjau sau, jog nieko bendro su tuo neturėsiu ateityje. Tačiau ilgainiui, su daug sunkaus darbo, pamilau matematiką ir net vienus savo gyvenimo metus ją studijavau! Tas, manau, ir yra unikalu apie mane - žinau, kaip paaiškinti užduotis, taip, kad net visiškai žalias suprastų:) ",
-                img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/IMG_5420.jpeg",
-              },
+              
               {
                 name: "Aleksandras Šileika",
                 subject: "Matematika",
@@ -405,13 +398,14 @@ export default function ScheduleLanding() {
                 img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/anon.avif",
               },
               {
-                name: "Kristina Balnytė",
-                subject: "Matematika, anglų kalba",
+                name: "Dovydas Žilinskas",
+                subject: "Matematika, IT",
                 experience: "2 metai",
                 description:
-                  "Esu matematikos ir lietuvių kalbos korepetitorė. Padedu pasiruošti atsiskaitymams, kontroliniams darbams, atlikti namų darbus ar pagilinti žinias. Kiekvienam mokiniui taikau individualią mokymo strategiją, nes žinau, kad vieno „stebuklingo“ metodo nėra. Mano tikslas - ne tik geresni pažymiai, bet ir augantis pasitikėjimas savimi. Jei ieškote korepetitoriaus, kuris aiškiai paaiškina, palaiko ir motyvuoja, mielai padėsiu jūsų vaikui žengti pirmyn.",
-                img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/kr.jpg",
-              },
+                  "Esu kiekybinės ekonomikos studentas ir šiuo metu studijuoju Prancūzijoje.",
+                img: "hhttps://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
+              }
+              
             ].map((teacher, i) => (
               <div
                 key={i}
