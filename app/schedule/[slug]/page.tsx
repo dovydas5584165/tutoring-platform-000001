@@ -403,7 +403,7 @@ export default function ScheduleLanding() {
                 experience: "2 metai",
                 description:
                   "Esu kiekybinės ekonomikos studentas ir šiuo metu studijuoju Prancūzijoje.",
-                img: "hhttps://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
+                img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
               }
               
             ].map((teacher, i) => (
