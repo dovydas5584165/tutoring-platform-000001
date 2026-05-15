@@ -19,7 +19,8 @@ import {
   ChevronDown,
   ChevronUp,
   BrainCircuit,
-  Activity
+  Compass,
+  AlertTriangle
 } from 'lucide-react';
 
 // --- IMPORT CHECKOUT FORM (Up 2 levels) ---
@@ -29,19 +30,16 @@ import CheckoutForm from '../../components/CheckoutForm';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // --- CONFIGURATION ---
-// Change the price here to update it throughout the entire page
 const PRODUCT_PRICE = 14;
 
 // --- MOBILE OPTIMIZED PAYMENT MODAL COMPONENT ---
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
-  // New state to toggle details on mobile
   const [showDetails, setShowDetails] = useState(false); 
 
   useEffect(() => {
     if (isOpen && !clientSecret) {
-      // 1. Ask API for a payment intent
       fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -68,16 +66,13 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center sm:p-4">
-      {/* Dark Background Backdrop */}
       <div 
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
         onClick={onClose}
       />
       
-      {/* Modal Window - Full screen on mobile, Rounded on desktop */}
       <div className="relative bg-white w-full h-[95vh] md:h-auto md:max-h-[90vh] md:max-w-4xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden transition-all transform">
         
-        {/* CLOSE BUTTON (Mobile: Top Right) */}
         <button 
           onClick={onClose}
           className="md:hidden absolute top-4 right-4 z-20 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200"
@@ -87,50 +82,45 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
         {/* --- LEFT SIDE (SUMMARY) --- */}
         <div className="bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 md:w-2/5 flex-shrink-0">
-          
           <div className="p-6 md:p-8 flex flex-col justify-between h-full">
             <div>
               <h3 className="text-xl font-bold text-slate-900 mb-2 md:mb-6 flex items-center gap-2">
-                <Lock className="w-5 h-5 text-blue-600" /> Užsakymas
+                <Lock className="w-5 h-5 text-blue-600" /> Tavo investicija
               </h3>
               
-              {/* Mobile Only: Price Header */}
               <div className="flex justify-between items-end mb-4 md:hidden">
                  <span className="text-slate-500 font-medium text-sm">Mokėti:</span>
                  <span className="text-3xl font-black text-slate-900">{PRODUCT_PRICE.toFixed(2)} €</span>
               </div>
 
-              {/* Mobile Toggle for Details */}
               <button 
                 onClick={() => setShowDetails(!showDetails)}
                 className="flex items-center gap-1 text-blue-600 text-sm font-bold md:hidden mb-4"
               >
-                {showDetails ? 'Slėpti informaciją' : 'Ką aš perku?'}
+                {showDetails ? 'Slėpti informaciją' : 'Kas sudaro ataskaitą?'}
                 {showDetails ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
               </button>
 
-              {/* Product Details Box - Hidden on Mobile unless toggled */}
               <div className={`${showDetails ? 'block' : 'hidden'} md:block bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-all`}>
-                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Produktas</span>
-                <p className="font-bold text-slate-900 text-lg leading-tight mt-1">Profesionalus Karjeros ir Elgsenos Tyrimas 2026</p>
+                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Patikima metodika</span>
+                <p className="font-bold text-slate-900 text-lg leading-tight mt-1">Karjeros ir asmenybės profilis 2026</p>
                 <ul className="mt-4 space-y-3 text-sm text-slate-500">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
-                    <span>Išsami darbo elgsenos ataskaita (7 karjeros dimensijos).</span>
+                    <span>Detali psichologinė ataskaita pagal 7 elgsenos dimensijas.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
-                    <span>10 profesijų, idealiai tinkančių tavo psichologiniam profiliui.</span>
+                    <span>Top 10 profesijų, kuriose tu natūraliai dominuosi.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
-                    <span>Individualus studijų ir pasiruošimo planas.</span>
+                    <span>Konkretus egzaminų (VBE) ir studijų planas tavo tikslui.</span>
                   </li>
                 </ul>
               </div>
             </div>
 
-            {/* Desktop Only: Price Footer */}
             <div className="hidden md:block mt-6 pt-6 border-t border-slate-200">
               <div className="flex justify-between items-end">
                 <span className="text-slate-500 font-medium">Iš viso:</span>
@@ -142,7 +132,6 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
         {/* --- RIGHT SIDE (STRIPE FORM) --- */}
         <div className="flex-1 bg-white flex flex-col h-full overflow-hidden">
-          {/* Desktop Close Button */}
           <button 
             onClick={onClose}
             className="hidden md:block absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors z-10"
@@ -150,10 +139,9 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             <X size={20} />
           </button>
 
-          {/* Scrollable Form Area */}
           <div className="overflow-y-auto p-6 md:p-8 h-full pb-20 md:pb-8">
             <h2 className="text-2xl font-bold mb-2">Apmokėjimas</h2>
-            <p className="text-slate-500 text-sm mb-6">Saugus atsiskaitymas kortele per Stripe.</p>
+            <p className="text-slate-500 text-sm mb-6">Saugus atsiskaitymas kortele. Rezultatus gausi iškart po testo.</p>
 
             {!clientSecret && !error && (
               <div className="flex justify-center items-center py-12">
@@ -187,102 +175,137 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 export default function KarjerosPristatymas() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  // Function to open the modal instead of following a link
   const handleBuyClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsCheckoutOpen(true);
   };
 
   return (
-    <div className="bg-white text-slate-900 font-sans">
+    <div className="bg-slate-50 text-slate-900 font-sans">
       
-      {/* 1. RENDER THE MODAL (Initially Hidden) */}
       <PaymentModal 
         isOpen={isCheckoutOpen} 
         onClose={() => setIsCheckoutOpen(false)} 
       />
       
-    {/* --- HERO SECTION --- */}
-<section className="relative overflow-hidden bg-white py-20 lg:py-32">
-  <div className="container mx-auto px-6 relative z-10">
-    
-    <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
-      
-      <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
-        <Zap size={16} className="text-blue-600" /> Naujiena: Moksliškai pagrįstas darbo elgsenos tyrimas
-      </div>
-      
-      <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 mb-6 leading-tight">
-        Tavo ateitis - ne <span className="text-blue-600">atsitiktinumas.</span>
-      </h1>
-      
-      <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-        Gauk išsamią darbo elgsenos ir asmenybės analizę: įvertink savo sprendimų priėmimo, bendradarbiavimo bei emocinio stabilumo stilių. Sužinok, kurios profesijos geriausiai atskleis tavo potencialą. 
-        <span className="block mt-2 font-semibold text-slate-800">Investicija į profesionalų savęs pažinimą - tik {PRODUCT_PRICE} €.</span>
-      </p>
-      
-      <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
-        {/* BUTTON: NOW OPENS MODAL */}
-        <button 
-          onClick={handleBuyClick}
-          className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-xl shadow-blue-200 group"
-        >
-          <span>Įsigyti ir atlikti testą ({PRODUCT_PRICE} €)</span> 
-          <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-        </button>
-        
-        <Link href="#kaip-veikia" className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-600 text-slate-700 px-8 py-5 rounded-2xl font-bold text-lg transition-all">
-          Ką aš gausiu?
-        </Link>
-      </div>
-      
-      <p className="mt-4 text-xs text-slate-400 font-medium flex items-center justify-center gap-1">
-        <ShieldCheck size={14} /> Saugus apmokėjimas · Rezultatai iškart po testo
-      </p>
+      {/* --- HERO SECTION --- */}
+      <section className="relative overflow-hidden bg-white py-20 lg:py-28 border-b border-slate-100">
+        <div className="container mx-auto px-6 relative z-10">
+          
+          <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+            
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-8 shadow-sm">
+              <Zap size={16} className="text-blue-600" /> Sukurta specialiai moksleiviams ir abiturientams
+            </div>
+            
+            <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 mb-8 leading-[1.1]">
+              Nežinai, ką studijuoti? <br/> <span className="text-blue-600 underline decoration-blue-200 underline-offset-8">Nesirink iš lempos.</span>
+            </h1>
+            
+            <p className="text-xl text-slate-600 mb-10 leading-relaxed max-w-2xl mx-auto">
+              Daugiau nei 30% studentų meta studijas po pirmo kurso, nes pasirinko aklai. Išvenk šios klaidos. Atlik profesionalų asmenybės testą ir sužinok 10 profesijų, kurioms esi sutvertas.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
+              <button 
+                onClick={handleBuyClick}
+                className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-xl shadow-blue-200 hover:-translate-y-1 group"
+              >
+                <span>Noriu sužinoti savo kelią ({PRODUCT_PRICE} €)</span> 
+                <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </button>
+              
+              <Link href="#verte" className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-600 hover:bg-slate-50 text-slate-700 px-8 py-5 rounded-2xl font-bold text-lg transition-all">
+                Kaip tai veikia?
+              </Link>
+            </div>
+            
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-500 font-medium">
+              <span className="flex items-center gap-1"><ShieldCheck size={16} className="text-green-500"/> Saugus apmokėjimas</span>
+              <span className="hidden sm:inline-block text-slate-300">•</span>
+              <span className="flex items-center gap-1"><Zap size={16} className="text-yellow-500"/> Rezultatai per 15 minučių</span>
+            </div>
 
-    </div>
-  </div>
-  
-</section>
+          </div>
+        </div>
+      </section>
 
-      {/* --- REZULTATŲ VERTĖ --- */}
-      <section id="kaip-veikia" className="py-24 container mx-auto px-6">
+      {/* --- PROBLEM/SOLUTION SECTION (Student Focus) --- */}
+      <section className="py-20 bg-slate-900 text-white">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 text-red-400 font-bold mb-4 uppercase tracking-wider text-sm">
+                <AlertTriangle size={18} /> Realybė
+              </div>
+              <h2 className="text-3xl lg:text-4xl font-extrabold mb-6">Metai netinkamose studijose kainuoja brangiai.</h2>
+              <p className="text-slate-300 text-lg leading-relaxed mb-6">
+                Vidutinė studijų kaina ir pragyvenimas per metus siekia ~3000-5000 €. Negana to - tai prarastas tavo laikas, stresas ir nusivylimas. 
+              </p>
+              <p className="text-slate-300 text-lg leading-relaxed font-semibold">
+                Sutaupyk šiuos pinigus ir nervus investuodamas vos {PRODUCT_PRICE} € į mokslu pagrįstą savo elgsenos ir potencialo analizę.
+              </p>
+            </div>
+            <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
+              <div className="absolute -top-4 -right-4 bg-blue-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg transform rotate-3">
+                Geriausia investicija
+              </div>
+              <h3 className="text-2xl font-bold mb-4 text-white">Ką gausi atlikęs testą?</h3>
+              <ul className="space-y-4">
+                {[
+                  "Aiškų atsakymą, kas tau iš tikrųjų tinka.",
+                  "Jokio spaudimo iš tėvų ar mokytojų - tik objektyvūs duomenys.",
+                  "Ramybę dėl savo ateities pasirinkimų.",
+                  "Konkretų planą, ką daryti toliau (kokius VBE rinktis)."
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-3">
+                    <CheckCircle2 className="text-blue-400 shrink-0 mt-1" size={20} />
+                    <span className="text-slate-200">{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- FEATURE SECTION (Translated dimensions to student benefits) --- */}
+      <section id="verte" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Kodėl verta investuoti {PRODUCT_PRICE} €?</h2>
-          <p className="text-slate-500">Tai ne šiaip testas, o profesionali elgsenos analizė, vertinanti 7 esmines psichologines sritis, lemsiančias tavo sėkmę darbo rinkoje.</p>
+          <h2 className="text-3xl lg:text-5xl font-extrabold mb-6 text-slate-900">Tai ne eilinė mokyklos anketa.</h2>
+          <p className="text-lg text-slate-500">
+            Naudojame 7 dimensijų asmenybės vertinimo metodiką, kurią naudoja didžiausios įmonės atsirinkdamos darbuotojus. Dabar ji pritaikyta padėti tau išsirinkti studijas.
+          </p>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { 
               icon: <BrainCircuit className="text-blue-600" />, 
-              title: "Darbo elgsenos profilis", 
-              desc: "Gili analizė, apimanti tavo įtaką, motyvaciją, organizuotumą bei požiūrį į inovacijas." 
+              title: "Tavo supergalios", 
+              desc: "Išsiaiškinsime tavo stiprybes: ar esi lyderis, analitikas, kūrėjas, o gal komandos siela?" 
             },
             { 
-              icon: <LineChart className="text-blue-600" />, 
-              title: "Karjeros kryptys", 
-              desc: "Pagal tavo asmenybės modelį atrinktos 10 profesijų, kuriose natūraliai pasieksi aukščiausių rezultatų." 
+              icon: <Target className="text-blue-600" />, 
+              title: "Top 10 profesijų", 
+              desc: "Jokių spėliojimų. Gausi konkretų 10 specialybių sąrašą, kuriose tavo asmenybė natūraliai atneš sėkmę." 
             },
             { 
-              icon: <Activity className="text-blue-600" />, 
-              title: "Darbinių situacijų valdymas", 
-              desc: "Įvertinsime tavo sprendimų priėmimo greitį bei emocinę pusiausvyrą streso metu." 
+              icon: <Compass className="text-blue-600" />, 
+              title: "Egzaminų žemėlapis", 
+              desc: "Parodysime, kokių tiksliai valstybinių brandos egzaminų reikės norint įstoti į tavo idealiausias profesijas." 
             },
             { 
               icon: <Users className="text-blue-600" />, 
-              title: "Komunikacijos gidas", 
-              desc: "Asmeninės įžvalgos apie tavo komandinio darbo stilių, potencialą bei ryšių kūrimą organizacijoje." 
+              title: "Mokymosi stilius", 
+              desc: "Sužinosi, kaip geriausiai įsimeni informaciją ir kaip valdyti stresą artėjant egzaminams." 
             }
           ].map((item, idx) => (
-            <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-4 opacity-5">
-                {item.icon}
+            <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 relative overflow-hidden group">
+              <div className="w-14 h-14 bg-blue-50 group-hover:bg-blue-600 transition-colors rounded-2xl flex items-center justify-center mb-6">
+                {React.cloneElement(item.icon, { className: "group-hover:text-white transition-colors" })}
               </div>
-              <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center mb-6 text-blue-600">
-                {item.icon}
-              </div>
-              <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+              <h3 className="text-xl font-bold mb-3 text-slate-900">{item.title}</h3>
               <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
             </div>
           ))}
@@ -290,79 +313,92 @@ export default function KarjerosPristatymas() {
       </section>
 
       {/* --- TIKSLIUKAI.LT INTEGRACIJA --- */}
-      <section className="bg-slate-900 py-24 text-white overflow-hidden relative">
-        <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
-          <div className="lg:w-1/2 relative z-10">
+      <section className="bg-blue-600 py-24 text-white overflow-hidden relative">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16 relative z-10">
+          <div className="lg:w-1/2">
+            <div className="inline-flex items-center gap-2 bg-blue-800/50 text-blue-100 px-4 py-2 rounded-full text-sm font-bold mb-6 backdrop-blur-sm border border-blue-500">
+              <GraduationCap size={16} /> Nuo testo iki įstojimo
+            </div>
             <h2 className="text-3xl lg:text-5xl font-black mb-6 leading-tight">
-              Savo profilio pažinimas - tik pradžia. <br/>
-              <span className="text-blue-400">Pasiekti tikslą padėsime mes.</span>
+              Padėsime ne tik sužinoti, <br/>
+              <span className="text-blue-200">bet ir įstoti.</span>
             </h2>
             
-            <p className="text-blue-100/70 text-lg mb-8 leading-relaxed">
-              Profesionali ataskaita parodys tavo stiprybes ir reikalingus egzaminus svajonių karjerai. Tiksliukai.lt komanda padės užpildyti žinių spragas per individualias nuotolines pamokas.
+            <p className="text-blue-100 text-lg mb-8 leading-relaxed">
+              Kai žinosi, kokią kryptį pasirinkti ir kokius egzaminus laikyti, „Tiksliukai.lt“ komanda bus tavo užnugaris. Mes jungiame geriausius korepetitorius, kurie padės užpildyti spragas ir pasiruošti VBE aukščiausiu balu.
             </p>
-
-            <ul className="space-y-4 mb-10">
-              {["Geriausi matematikos, fizikos ir IT korepetitoriai", "Individualus mokymosi planas", "Fokusas į maksimalų VBE rezultatą"].map((point, i) => (
-                <li key={i} className="flex items-center gap-3 font-semibold text-blue-100">
-                  <CheckCircle2 className="text-blue-400 shrink-0" /> {point}
-                </li>
-              ))}
-            </ul>
             
-            <a href="https://tiksliukai.lt" target="_blank" className="inline-block bg-white hover:bg-blue-50 text-slate-900 px-10 py-5 rounded-2xl font-bold text-lg transition-transform hover:scale-105 shadow-xl">
-              Rasti korepetitorių
+            <a href="https://tiksliukai.lt" target="_blank" className="inline-block bg-white hover:bg-slate-100 text-blue-700 px-10 py-4 rounded-2xl font-bold text-lg transition-transform hover:scale-105 shadow-xl">
+              Ieškoti korepetitoriaus
             </a>
           </div>
           
-          <div className="lg:w-1/2 flex justify-center">
-              <div className="relative">
-                <div className="absolute -inset-4 bg-blue-500/20 blur-3xl rounded-full"></div>
-                <div className="bg-slate-800/80 backdrop-blur border border-slate-700 p-8 rounded-3xl max-w-md w-full relative z-10 shadow-2xl">
-                    <div className="flex items-center gap-4 mb-6">
-                        <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center font-bold text-xl">
-                            T
-                        </div>
-                        <div>
-                            <h4 className="font-bold text-lg">Tiksliukai.lt</h4>
-                            <p className="text-blue-300 text-sm">Korepetitorių platforma</p>
-                        </div>
+          <div className="lg:w-1/2 flex justify-center w-full">
+              <div className="bg-white text-slate-900 p-8 rounded-3xl max-w-md w-full shadow-2xl transform rotate-1 hover:rotate-0 transition-transform">
+                  <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+                      <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                          T
+                      </div>
+                      <div>
+                          <h4 className="font-bold text-lg leading-tight">Tiksliukai.lt mokytojai</h4>
+                          <p className="text-slate-500 text-sm">Pasiruošimas VBE ir mokyklos kursui</p>
+                      </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-slate-700">Matematika</span>
+                      <span className="text-green-500 font-bold text-sm bg-green-50 px-2 py-1 rounded-md">100 balų sistema</span>
                     </div>
-                    <p className="text-slate-300 italic mb-6">
-                        „Mūsų tikslas - ne tik padėti išlaikyti egzaminus, bet ir nukreipti tave ta linkme, kurioje tavo elgsenos profilis garantuos asmeninę ir profesinę sėkmę.“
-                    </p>
-                    <div className="flex items-center gap-1 text-yellow-400">
-                        <Star fill="currentColor" size={16} />
-                        <Star fill="currentColor" size={16} />
-                        <Star fill="currentColor" size={16} />
-                        <Star fill="currentColor" size={16} />
-                        <Star fill="currentColor" size={16} />
-                        <span className="text-slate-400 text-xs ml-2">(500+ mokinių)</span>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-slate-700">Fizika</span>
+                      <span className="text-blue-500 font-bold text-sm bg-blue-50 px-2 py-1 rounded-md">Patyrę dėstytojai</span>
                     </div>
-                </div>
-             </div>
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-slate-700">IT</span>
+                      <span className="text-purple-500 font-bold text-sm bg-purple-50 px-2 py-1 rounded-md">Programavimo pagrindai</span>
+                    </div>
+                  </div>
+                  <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
+                      <div className="flex items-center gap-1 text-yellow-400">
+                          <Star fill="currentColor" size={16} />
+                          <Star fill="currentColor" size={16} />
+                          <Star fill="currentColor" size={16} />
+                          <Star fill="currentColor" size={16} />
+                          <Star fill="currentColor" size={16} />
+                      </div>
+                      <span className="text-slate-400 text-sm font-medium">500+ laimingų mokinių</span>
+                  </div>
+              </div>
           </div>
         </div>
       </section>
 
       {/* --- FOOTER / FINAL CTA --- */}
       <section className="py-24 text-center container mx-auto px-6">
-        <div className="bg-blue-50 rounded-[40px] py-16 px-6 border border-blue-100">
-          <h2 className="text-4xl font-black text-slate-900 mb-6">Tavo potencialo atskleidimas vertas daugiau nei {PRODUCT_PRICE}€</h2>
+        <div className="bg-gradient-to-b from-blue-50 to-white rounded-[40px] py-20 px-6 border border-blue-100 shadow-sm max-w-4xl mx-auto">
+          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 mb-6">Pradėk planuoti savo sėkmę šiandien</h2>
           <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
-            Tai gili asmeninė įžvalga, kuri padės formuoti tavo profesinį kelią nuo pat pirmos studijų dienos. Atlik testą dabar ir gauk savo ataskaitą.
+            Atsakyk į 50 klausimų ir gauk pilną savo asmenybės ataskaitą per kelias minutes. Tai protingiausi {PRODUCT_PRICE} €, kuriuos išleisi savo ateičiai.
           </p>
           <button 
             onClick={handleBuyClick}
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-2xl font-extrabold text-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
+            className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-2xl font-extrabold text-xl transition-all shadow-2xl shadow-blue-300 hover:-translate-y-2 animate-pulse hover:animate-none"
           >
-            Pradėti elgsenos testą <ArrowRight />
+            Atlikti testą dabar <ArrowRight size={24}/>
           </button>
+          <p className="mt-6 text-sm text-slate-400">Jokių paslėptų mokesčių. Vienkartinis mokėjimas.</p>
         </div>
       </section>
 
-      <footer className="py-12 border-t border-slate-100 text-center text-slate-400 text-sm">
-        <p>&copy; {new Date().getFullYear()} Tiksliukai.lt Karjeros Tyrimas. Visos teisės saugomos.</p>
+      <footer className="py-8 border-t border-slate-200 text-center bg-white">
+        <div className="container mx-auto px-6 text-slate-400 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
+          <p>&copy; {new Date().getFullYear()} Tiksliukai.lt Karjeros Tyrimas. Visos teisės saugomos.</p>
+          <div className="flex gap-6">
+            <Link href="#" className="hover:text-blue-600 transition-colors">Naudojimo taisyklės</Link>
+            <Link href="#" className="hover:text-blue-600 transition-colors">Privatumo politika</Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
