@@ -178,6 +178,59 @@ export default function GrupinesPamokos() {
               <p className="text-sm font-bold text-emerald-600">Grupės renkamos</p>
             </div>
           </motion.div>
+          {/* VBE grupė */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            className="bg-white rounded-[2rem] shadow-lg p-8 border-t-8 border-violet-600 relative overflow-hidden group hover:shadow-xl transition-shadow flex flex-col"
+          >
+            <div className="text-violet-600 mb-4 bg-violet-50 inline-block p-4 rounded-2xl w-fit group-hover:scale-110 transition-transform">
+              <GraduationCap size={32} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">VBE paruošimas</h2>
+            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+              Intensyvus ir kryptingas pasiruošimas Valstybiniams Brandos Egzaminams. Sprendžiame konspektus bei praėjusių metų užduotis.
+            </p>
+            <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
+              <p className="text-sm font-bold text-violet-600">Grupės renkamos</p>
+            </div>
+          </motion.div>
+
+          {/* PUPP grupė */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="bg-white rounded-[2rem] shadow-lg p-8 border-t-8 border-orange-500 relative overflow-hidden group hover:shadow-xl transition-shadow flex flex-col"
+          >
+            <div className="text-orange-500 mb-4 bg-orange-50 inline-block p-4 rounded-2xl w-fit group-hover:scale-110 transition-transform">
+              <CheckCircle2 size={32} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">PUPP paruošimas</h2>
+            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+              Padedame dešimtokams (II gimnazijos klasėms) pasiruošti Pagrindinio Ugdymo Pasiekimų Patikrinimui be streso.
+            </p>
+            <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
+              <p className="text-sm font-bold text-orange-500">Grupės renkamos</p>
+            </div>
+          </motion.div>
+
+          {/* NMPP grupė */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            className="bg-white rounded-[2rem] shadow-lg p-8 border-t-8 border-cyan-500 relative overflow-hidden group hover:shadow-xl transition-shadow flex flex-col"
+          >
+            <div className="text-cyan-500 mb-4 bg-cyan-50 inline-block p-4 rounded-2xl w-fit group-hover:scale-110 transition-transform">
+              <BookOpen size={32} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">NMPP paruošimas</h2>
+            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+              Sustipriname 4-os ir 8-os
 
         </div>
 
