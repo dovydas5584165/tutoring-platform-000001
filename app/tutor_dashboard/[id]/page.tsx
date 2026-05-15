@@ -18,6 +18,7 @@ type GroupRegistration = {
   email: string;
   status: string;
   created_at: string;
+  subject: string | null;
 };
 
 type Booking = {
@@ -70,18 +71,69 @@ export default function TutorDashboard() {
 
   // --- DATA LOADING FUNCTIONS ---
   const loadGroupRegistrations = async () => {
+    if (!id) return;
     setGroupLoading(true);
-    const { data, error } = await supabase
-      .from("group_registrations")
-      .select("*")
-      .order("created_at", { ascending: false });
 
-    if (error) {
+    try {
+      // 1. Gauname pamokas, kurias dėsto šis mokytojas
+      const { data: tutorLessonsData, error: lessonsError } = await supabase
+        .from("user_lessons")
+        .select(`
+          lesson_id,
+          lessons (
+            name
+          )
+        `)
+        .eq("user_id", id);
+
+      if (lessonsError) throw lessonsError;
+
+      const taughtLessons = tutorLessonsData
+        ?.map((ul: any) => ul.lessons?.name?.toLowerCase())
+        .filter(Boolean) || [];
+
+      if (taughtLessons.length === 0) {
+        setGroupRegistrations([]);
+        setGroupLoading(false);
+        return;
+      }
+
+      // 2. Atsisiunčiame visas grupines registracijas
+      const { data: registrations, error: regError } = await supabase
+        .from("group_registrations")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (regError) throw regError;
+
+      // 3. Filtruojame registracijas pagal mokytojo kompetencijas
+      const filteredRegistrations = (registrations || []).filter((reg) => {
+        if (!reg.subject) return false;
+        const registrationSubject = reg.subject.toLowerCase();
+
+        return taughtLessons.some((lessonName) => {
+          // Jei mokytojas dėsto matematiką, mato matematikos registracijas ir bendrus egzaminus
+          if (lessonName.includes("matematika")) {
+            return (
+              registrationSubject.includes("matematika") ||
+              registrationSubject.includes("vbe") ||
+              registrationSubject.includes("pupp") ||
+              registrationSubject.includes("nmpp")
+            );
+          }
+
+          // Kalbų filtravimas (iš "Anglų kalba" padaroma "anglų", kad atitiktų pvz. "Anglų VBE")
+          const coreSubjectName = lessonName.replace(" kalba", "").trim();
+          return registrationSubject.includes(coreSubjectName);
+        });
+      });
+
+      setGroupRegistrations(filteredRegistrations);
+    } catch (error: any) {
       console.error("Klaida gaunant grupės registracijas:", error.message);
-    } else {
-      setGroupRegistrations(data || []);
+    } finally {
+      setGroupLoading(false);
     }
-    setGroupLoading(false);
   };
 
   const loadNotifications = async () => {
@@ -183,6 +235,27 @@ export default function TutorDashboard() {
     } catch (err) {
       console.error(err);
       alert("Klaida atnaujinant statusą.");
+    }
+  };
+
+  const handleDeleteRegistration = async (registrationId: string) => {
+    const confirmed = window.confirm("Ar tikrai norite ištrinti šį asmenį iš registracijų sąrašo?");
+    if (!confirmed) return;
+
+    try {
+      const { error } = await supabase
+        .from("group_registrations")
+        .delete()
+        .eq("id", registrationId);
+
+      if (error) throw error;
+
+      setGroupRegistrations((prev) => prev.filter((r) => r.id !== registrationId));
+      setSelectedRegistrations((prev) => prev.filter((id) => id !== registrationId));
+      alert("✅ Registracija sėkmingai pašalinta.");
+    } catch (err: any) {
+      console.error(err);
+      alert("Klaida trinant registraciją.");
     }
   };
 
@@ -337,10 +410,6 @@ export default function TutorDashboard() {
   }, [router]);
 
   useEffect(() => {
-    loadGroupRegistrations();
-  }, []);
-
-  useEffect(() => {
     if (!id) return;
     
     // Load availability
@@ -358,6 +427,7 @@ export default function TutorDashboard() {
 
     loadNotifications();
     loadOrders();
+    loadGroupRegistrations();
   }, [id]);
 
   // --- RENDER ---
@@ -538,7 +608,7 @@ export default function TutorDashboard() {
                     <div>
                       <p className="font-medium text-gray-900">{req.email}</p>
                       <p className="text-xs text-gray-500">
-                        Registruota: {new Date(req.created_at).toLocaleString("lt-LT")}
+                        Dalykas: <span className="font-semibold text-gray-700">{req.subject || "Nenurodytas"}</span> | Registruota: {new Date(req.created_at).toLocaleString("lt-LT")}
                       </p>
                     </div>
                   </div>
@@ -555,6 +625,12 @@ export default function TutorDashboard() {
                       className="text-sm text-gray-500 hover:text-blue-600 underline whitespace-nowrap"
                     >
                       Keisti statusą
+                    </button>
+                    <button
+                      onClick={() => handleDeleteRegistration(req.id)}
+                      className="text-sm text-red-500 hover:text-red-700 underline whitespace-nowrap"
+                    >
+                      Ištrinti
                     </button>
                   </div>
                 </li>
@@ -580,8 +656,6 @@ export default function TutorDashboard() {
         <section className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Prieinamumas</h2>
           <WeeklyAvailabilitySelector
-            //initialSlots={availabilitySlots}
-            //onSave={handleSave}
             userId={id}
           />
         </section>
