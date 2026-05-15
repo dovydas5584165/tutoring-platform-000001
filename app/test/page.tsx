@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   CheckCircle2, 
@@ -9,637 +9,565 @@ import {
   Compass, 
   ArrowRight, 
   ArrowLeft, 
-  BookOpen, 
-  Building2, 
-  Briefcase, 
-  GraduationCap, 
-  Star, 
-  X, 
-  Info 
+  Download,
+  FileText,
+  Loader2,
+  User,
+  Target,
+  BrainCircuit,
+  Activity,
+  Users,
+  Clock,
+  ShieldAlert,
+  Zap
 } from "lucide-react";
 
-// --- DATA & TYPES SECTION ---
+// --- TIPAI IR DUOMENŲ STRUKTŪROS ---
 
-type CareerType = 'A' | 'B' | 'C' | 'D' | 'E';
+type Dimension = 'impact' | 'structure' | 'ideas' | 'interaction' | 'momentum' | 'composure' | 'engagement';
 
-interface Profession {
-  title: string;
-  salary: string;
-  description: string;
+interface Question {
+  id: number;
+  text: string;
+  dimension: Dimension;
+  positive: boolean; // Ar atsakymas "Taip" prideda tašką, ar atima
 }
 
-interface University {
-  name: string;
-  score: string; 
-}
+// Demonstracinis klausimų masyvas. Tikroje sistemoje čia būtų 214 klausimų.
+const DEMO_QUESTIONS: Question[] = [
+  { id: 1, text: "Grupiniuose darbuose dažniausiai aš imuosi lyderio vaidmens.", dimension: "impact", positive: true },
+  { id: 2, text: "Mano mokymosi užrašai ir failai kompiuteryje visada yra idealiai surūšiuoti.", dimension: "structure", positive: true },
+  { id: 3, text: "Mane dažnai aplanko neįprastos, originalios idėjos, kurios kitiems atrodo keistos.", dimension: "ideas", positive: true },
+  { id: 4, text: "Man labai lengva pajausti, kai klasės draugas yra nusiminęs.", dimension: "interaction", positive: true },
+  { id: 5, text: "Sprendimus priimu greitai, net ir neturėdamas visos informacijos.", dimension: "momentum", positive: true },
+  { id: 6, text: "Prieš svarbius kontrolinius ar egzaminus stipriai stresuoju ir sunkiai užmiegu.", dimension: "composure", positive: false },
+  { id: 7, text: "Mokausi papildomai net ir tuos dalykus, kurių mokytojai neužduoda.", dimension: "engagement", positive: true },
+  { id: 8, text: "Man labiau patinka sekti tiksliomis instrukcijomis, o ne improvizuoti.", dimension: "structure", positive: true },
+  { id: 9, text: "Konkurencija su bendraklasiais mane skatina mokytis geriau.", dimension: "impact", positive: true },
+  { id: 10, text: "Mieliau atlieku praktines, rutinines užduotis nei diskutuoju apie teorijas.", dimension: "ideas", positive: false },
+  { id: 11, text: "Galiu lengvai užkalbinti nepažįstamą žmogų renginyje ar būrelyje.", dimension: "interaction", positive: true },
+  { id: 12, text: "Atlikdamas užduotį linkęs ilgai dvejoti ir tikrinti kelis kartus.", dimension: "momentum", positive: false },
+  { id: 13, text: "Kai gaunu blogą pažymį, greitai jį pamirštu ir judu toliau.", dimension: "composure", positive: true },
+  { id: 14, text: "Mokyklos taisyklės man atrodo prasmingos ir aš jų laikausi.", dimension: "engagement", positive: true },
+];
 
-interface FamousPerson {
-  name: string;
-  role: string;
-}
-
-interface ResultData {
-  title: string;
-  summary: string;
-  positives: string[];
-  negatives: string[];
-  communication: string;
-  exams: string;
-  uniLt: University[];
-  uniEu: string; // Comma separated string
-  famousPeople: FamousPerson[];
-  professions: Profession[];
-}
-
-const RESULTS: Record<CareerType, ResultData> = {
-  A: {
-    title: "Sistemų Architektas (Inžinerinis-Techninis)",
-    summary: "Tu esi strategas, kuris mato pasaulį per logikos ir struktūros prizmę. Tavo smegenys geriausiai veikia sprendžiant sudėtingas technines mįsles, optimizuojant procesus ir kuriant ateities inovacijas.",
-    positives: ["Loginis mąstymas", "Preciziškumas", "Algoritminis mąstymas", "Savarankiškumas"],
-    negatives: ["Socialinis nuovargis", "Per didelis kritiškumas", "Perfekcionizmas"],
-    communication: "Draugai tave vertina už tavo objektyvumą. Tu nemėgsti tuščių kalbų, kalbi faktais ir vertini intelektualų ryšį.",
-    exams: "Matematika (valstybinis), Fizika, Informacinės Technologijos, Anglų kalba.",
-    uniLt: [
-      { name: "KTU Informatikos fak.", score: "KB: >8.2" },
-      { name: "VU Matematikos ir informatikos fak.", score: "KB: >8.8" },
-      { name: "VILNIUS TECH", score: "KB: >7.5" }
-    ],
-    uniEu: "TU Delft (Olandija), ETH Zurich (Šveicarija), Miuncheno technikos universitetas",
-    famousPeople: [
-      { name: "Elon Musk", role: "Tesla & SpaceX įkūrėjas" },
-      { name: "Bill Gates", role: "Microsoft įkūrėjas" },
-      { name: "Margaret Hamilton", role: "NASA programuotoja" }
-    ],
-    professions: [
-      { title: "Programinės įrangos inžinierius", salary: "2000-5500€", description: "Kuria, testuoja ir diegia kompiuterines programas. Rašo kodą, kuris valdo viską – nuo mobiliųjų programėlių iki kosminių laivų sistemų." },
-      { title: "Duomenų mokslininkas", salary: "2500-5000€", description: "Analizuoja didžiulius duomenų kiekius naudodamas statistiką ir mašininį mokymąsi, kad padėtų įmonėms priimti pagrįstus sprendimus." },
-      { title: "Kibernetinio saugumo analitikas", salary: "2200-4800€", description: "Apsaugo organizacijų tinklus ir duomenis nuo programišių atakų. Tai nuolatinė kova tarp gynybos ir puolimo skaitmeninėje erdvėje." },
-      { title: "Dirbtinio intelekto kūrėjas", salary: "3000-6500€", description: "Kuria algoritmus, kurie leidžia kompiuteriams mokytis ir priimti sprendimus (pvz., ChatGPT, savavaldžiai automobiliai)." },
-      { title: "Debesijos architektas", salary: "2800-5800€", description: "Projektuoja serverių infrastruktūrą 'debesyse' (AWS, Azure), užtikrinant, kad sistemos veiktų greitai ir patikimai." },
-      { title: "Robotikos inžinierius", salary: "1800-4000€", description: "Projektuoja ir konstruoja robotus bei automatizuotas sistemas, kurios pakeičia žmogaus darbą gamyboje ar pavojingose zonose." },
-      { title: "DevOps inžinierius", salary: "2500-5200€", description: "Sujungia programavimą ir sistemų administravimą, automatizuodamas programinės įrangos diegimo procesus." },
-      { title: "Blockchain vystytojas", salary: "2500-6000€", description: "Kuria decentralizuotas sistemas ir kriptovaliutų technologijas, užtikrinančias saugius sandorius be tarpininkų." },
-      { title: "Sistemų administratorius", salary: "1500-3000€", description: "Prižiūri įmonės kompiuterių tinklus, serverius ir įrangą, užtikrindamas sklandų kasdienį darbą." },
-      { title: "Elektronikos inžinierius", salary: "1600-3500€", description: "Kuria elektronines grandines ir prietaisus – nuo išmaniųjų telefonų komponentų iki medicininės įrangos." }
-    ]
-  },
-  B: {
-    title: "Žmonių Ugdytojas (Socialinis-Emocinis)",
-    summary: "Tavo stiprybė – empatija ir komunikacija. Tu jauti kitų emocijas, gebi juos motyvuoti, suprasti ir nukreipti teisinga linkme. Tau svarbu darbas, turintis prasmę.",
-    positives: ["Empatija", "Klausymo įgūdžiai", "Diplomatija", "Kantrybė"],
-    negatives: ["Sunkumas brėžti ribas", "Emocinis jautrumas kitiems", "Kritikos baimė"],
-    communication: "Esi draugų būrio patarėjas. Moki išklausyti, suprasti be žodžių ir visada rasti tinkamą paguodos ar palaikymo frazę.",
-    exams: "Lietuvių kalba, Anglų kalba, Biologija (psichologijai) arba Istorija.",
-    uniLt: [
-      { name: "VU Psichologijos fak.", score: "KB: >9.0" },
-      { name: "LSMU (Sveikatos psichologija)", score: "KB: >8.5" },
-      { name: "VDU Socialinių mokslų fak.", score: "KB: >7.0" }
-    ],
-    uniEu: "Amsterdamo universitetas (Olandija), KU Leuven (Belgija), Kopenhagos universitetas",
-    famousPeople: [
-      { name: "Oprah Winfrey", role: "TV laidų vedėja, filantropė" },
-      { name: "Michelle Obama", role: "Advokatė, rašytoja" },
-      { name: "Princess Diana", role: "Humanitarė" }
-    ],
-    professions: [
-      { title: "Klinikinis psichologas", salary: "1500-3000€", description: "Diagnozuoja ir gydo emocinius bei psichinius sutrikimus, padeda žmonėms įveikti krizes." },
-      { title: "Personalo vadovas (HR)", salary: "1800-3800€", description: "Rūpinasi įmonės darbuotojų gerove, atrankomis, motyvacija ir vidine kultūra." },
-      { title: "Karjeros konsultantas", salary: "1200-2500€", description: "Padeda žmonėms atrasti savo profesinį kelią, ruošti CV ir pasiruošti darbo pokalbiams." },
-      { title: "Socialinis darbuotojas", salary: "1100-2000€", description: "Teikia pagalbą pažeidžiamoms visuomenės grupėms, vaikams ar senjorams, sprendžia socialines problemas." },
-      { title: "Mediatorius (Taikytojas)", salary: "1500-3200€", description: "Nešališkas asmuo, padedantis spręsti konfliktus tarp dviejų šalių (pvz., skyrybų ar verslo ginčų metu)." },
-      { title: "Ryšių su visuomene (PR) specialistas", salary: "1400-3500€", description: "Formuoja organizacijos ar asmens įvaizdį viešojoje erdvėje, bendrauja su žiniasklaida." },
-      { title: "Mokymų treneris (Lektorius)", salary: "1500-4000€", description: "Veda seminarus ir mokymus įmonėms ar grupėms, ugdydamas specifinius įgūdžius." },
-      { title: "Ergoterapeutas", salary: "1300-2400€", description: "Padeda žmonėms po traumų ar ligų susigrąžinti kasdienius įgūdžius ir savarankiškumą." },
-      { title: "Renginių organizatorius", salary: "1200-3000€", description: "Planuoja ir koordinuoja šventes, konferencijas ar festivalius, užtikrindamas geras dalyvių emocijas." },
-      { title: "Specialusis pedagogas", salary: "1300-2200€", description: "Dirba su vaikais, turinčiais specialiųjų poreikių, padėdamas jiems integruotis ir mokytis." }
-    ]
-  },
-  C: {
-    title: "Vizijų Kūrėjas (Kūrybinis-Meninis)",
-    summary: "Tu esi idėjų generatorius, kuriam reikia laisvės. Pasaulį matai ne tokį, koks jis yra, o tokį, koks galėtų būti. Rutina tave žudo, o laisvė – įkvepia.",
-    positives: ["Kūrybiškumas", "Originalumas", "Vizualinis mąstymas", "Intuicija"],
-    negatives: ["Chaotiškumas", "Rutinos netoleravimas", "Nepastovumas"],
-    communication: "Esi charizmatiškas. Draugai tave vertina už kitokį požiūrį į gyvenimą, estetiką ir gebėjimą nustebinti.",
-    exams: "Lietuvių kalba, Anglų kalba, Dailės/Architektūros stojamieji, Istorija.",
-    uniLt: [
-      { name: "Vilniaus Dailės Akademija (VDA)", score: "KB: Portfelis + Egz." },
-      { name: "LMTA (Muzikos ir teatro)", score: "KB: Stojamasis" },
-      { name: "VU Kūrybinės industrijos", score: "KB: >6.5" }
-    ],
-    uniEu: "UAL Londonas (JK), Dizaino akademija Eindhoven (Olandija), Aalto universitetas (Suomija)",
-    famousPeople: [
-      { name: "Steve Jobs", role: "Apple įkūrėjas" },
-      { name: "Coco Chanel", role: "Dizainerė" },
-      { name: "Walt Disney", role: "Animacijos pionierius" }
-    ],
-    professions: [
-      { title: "UX/UI Dizaineris", salary: "1800-4200€", description: "Kuria patogias ir estetiškas interneto svetainių bei programėlių sąsajas, rūpinasi vartotojo patirtimi." },
-      { title: "Meno vadovas (Art Director)", salary: "2500-5000€", description: "Vadovauja kūrybinei komandai reklamos agentūrose ar leidyklose, atsako už bendrą vizualinį stilių." },
-      { title: "Vaizdo montuotojas", salary: "1400-3200€", description: "Montuoja filmuotą medžiagą filmams, reklamoms ar YouTube kanalams, kurdamas pasakojimą vaizdais." },
-      { title: "Architektas", salary: "1600-4000€", description: "Projektuoja pastatus ir erdves, derindamas inžineriją, funkcionalumą ir estetiką." },
-      { title: "Žaidimų dizaineris (Game Designer)", salary: "1800-4500€", description: "Kuria vaizdo žaidimų koncepcijas, taisykles, lygius ir istorijas." },
-      { title: "Turinio kūrėjas (Content Creator)", salary: "1000-5000€+", description: "Kuria tekstinį, vaizdinį ar video turinį socialiniams tinklams ir prekių ženklams." },
-      { title: "Interjero dizaineris", salary: "1500-3500€", description: "Planuoja ir dekoruoja vidaus erdves, parinkdamas baldus, spalvas ir apšvietimą." },
-      { title: "3D modeliuotojas", salary: "1600-3800€", description: "Kuria trimačius objektus žaidimams, filmams arba produktų vizualizacijoms." },
-      { title: "Mados dizaineris", salary: "1200-4000€", description: "Kuria drabužių ir aksesuarų kolekcijas, seka mados tendencijas." },
-      { title: "Copywriter (Tekstų kūrėjas)", salary: "1300-2800€", description: "Rašo įtraukiančius tekstus reklamoms, svetainėms ir straipsniams." }
-    ]
-  },
-  D: {
-    title: "Strategas & Lyderis (Verslo-Vadybinis)",
-    summary: "Esi ambicingas žmogus, orientuotas į rezultatą, galią ir sėkmę. Gebi matyti didįjį paveikslą, nebijai rizikos ir moki vesti komandas į priekį.",
-    positives: ["Lyderystė", "Ryžtingumas", "Strategija", "Derybiniai įgūdžiai"],
-    negatives: ["Nekantrumas", "Poilsio ignoravimas", "Polinkis dominuoti"],
-    communication: "Esi organizatorius. Kalbi užtikrintai, argumentuotai, motyvuoji kitus veikti. Mėgsti laimėti diskusijas.",
-    exams: "Matematika (valstybinis), Anglų kalba, Geografija arba Istorija.",
-    uniLt: [
-      { name: "ISM Vadybos ir ekonomikos univ.", score: "KB: >7.0" },
-      { name: "VU Verslo mokykla", score: "KB: >7.5" },
-      { name: "KTU Ekonomikos ir verslo fak.", score: "KB: >6.5" }
-    ],
-    uniEu: "SSE Stokholmas (Švedija), IE verslo mokykla (Ispanija), HEC Paryžius (Prancūzija)",
-    famousPeople: [
-      { name: "Jeff Bezos", role: "Amazon įkūrėjas" },
-      { name: "Richard Branson", role: "Virgin Group įkūrėjas" },
-      { name: "Sheryl Sandberg", role: "Facebook COO" }
-    ],
-    professions: [
-      { title: "Verslininkas (Antrepreneris)", salary: "Neribota", description: "Kuria savo verslą nuo idėjos iki realizavimo, prisiima riziką ir valdo procesus." },
-      { title: "Investicijų valdytojas", salary: "3000-8000€", description: "Valdo dideles pinigų sumas, investuoja į akcijas, fondus ar nekilnojamąjį turtą." },
-      { title: "Projektų vadovas (PM)", salary: "2000-4500€", description: "Planuoja, vykdo ir užbaigia projektus, koordinuoja komandos darbą ir biudžetą." },
-      { title: "Pardavimų direktorius", salary: "2500-6000€", description: "Vadovauja pardavimų komandai, kuria strategijas, kaip padidinti įmonės pajamas." },
-      { title: "Verslo konsultantas", salary: "2200-5500€", description: "Analizuoja kitų įmonių problemas ir teikia rekomendacijas, kaip pagerinti veiklą." },
-      { title: "Produkto vadovas (Product Owner)", salary: "2400-5000€", description: "Atsako už konkretaus produkto viziją, vystymą ir sėkmę rinkoje." },
-      { title: "Rinkodaros vadovas (CMO)", salary: "2000-5000€", description: "Kuria prekės ženklo strategiją, reklamnines kampanijas ir rūpinasi žinomumu." },
-      { title: "Nekilnojamojo turto vystytojas", salary: "Neribota", description: "Inicijuoja statybų projektus, perka žemę ir organizuoja pastatų statybą bei pardavimą." },
-      { title: "Logistikos vadovas", salary: "1800-3500€", description: "Organizuoja prekių judėjimą tarptautiniu mastu, optimizuoja tiekimo grandines." },
-      { title: "Finansų direktorius (CFO)", salary: "3000-7000€", description: "Atsako už visus įmonės finansus, biudžeto planavimą ir finansines ataskaitas." }
-    ]
-  },
-  E: {
-    title: "Saugotojas & Tyrėjas (Mokslo-Struktūrinis)",
-    summary: "Tu vertini faktus, tvarką ir preciziškumą. Esi patikimas, kruopštus žmogus. Mokslo, medicinos ar teisės sritys tau tinka, nes ten klaidos kaina yra didelė.",
-    positives: ["Atsakomybė", "Atidumas detalėms", "Sąžiningumas", "Metodiškumas"],
-    negatives: ["Baimė keisti planus", "Perfekcionizmas detalėse", "Sunkus prisitaikymas"],
-    communication: "Komunikuoji ramiai, logiškai. Nemėgsti pagražinimų, vertini punktualumą ir konkretumą. Tavo žodis yra šventas.",
-    exams: "Biologija, Chemija, Matematika, Lietuvių kalba.",
-    uniLt: [
-      { name: "LSMU (Medicina)", score: "KB: >9.5" },
-      { name: "VU Medicinos fak.", score: "KB: >9.2" },
-      { name: "VU Gyvybės mokslų centras", score: "KB: >8.5" }
-    ],
-    uniEu: "Heidelbergo universitetas (Vokietija), Karolinska Institutet (Švedija), Sorbona (Prancūzija)",
-    famousPeople: [
-      { name: "Marie Curie", role: "Mokslininkė" },
-      { name: "Angela Merkel", role: "Politikė, fizikė" },
-      { name: "Dr. House (Personažas)", role: "Diagnostikas" }
-    ],
-    professions: [
-      { title: "Gydytojas / Chirurgas", salary: "2500-7000€", description: "Diagnozuoja ligas, atlieka operacijas ir skiria gydymą. Reikalauja ilgų studijų ir atsakomybės." },
-      { title: "Biotechnologas", salary: "1600-3500€", description: "Naudoja gyvus organizmus kurdamas vaistus, maisto produktus ar naujas medžiagas." },
-      { title: "Auditorius", salary: "1500-3200€", description: "Tikrina įmonių finansines ataskaitas, užtikrina, kad jos atitiktų įstatymus ir būtų tikslios." },
-      { title: "Farmacininkas", salary: "1500-2800€", description: "Kuria arba išduoda vaistus, konsultuoja pacientus dėl vaistų vartojimo ir sąveikos." },
-      { title: "Teismo medicinos ekspertas", salary: "1600-3000€", description: "Tiria nusikaltimų vietas ir įkalčius naudodamas mokslo metodus tiesai nustatyti." },
-      { title: "Inžinierius-konstruktorius", salary: "1800-4000€", description: "Projektuoja pastatų konstrukcijas, užtikrindamas, kad jie būtų saugūs ir stabilūs." },
-      { title: "Draudimo rizikos vertintojas", salary: "1700-3500€", description: "Analizuoja duomenis ir skaičiuoja tikimybes, kad nustatytų draudimo kainas ir rizikas." },
-      { title: "Laboratorijos vedėjas", salary: "1600-3200€", description: "Vadovauja moksliniams tyrimams, prižiūri įrangą ir užtikrina tyrimų tikslumą." },
-      { title: "Apskaitininkas / Buhalteris", salary: "1200-2800€", description: "Tvarko įmonės finansinius dokumentus, skaičiuoja atlyginimus ir mokesčius." },
-      { title: "Odontologas", salary: "2500-6000€", description: "Rūpinasi pacientų burnos sveikata, gydo dantis ir atlieka estetines procedūras." }
-    ]
-  }
+const DIMENSION_NAMES: Record<Dimension, string> = {
+  impact: "Poveikis ir ambicijos",
+  structure: "Organizavimas ir struktūra",
+  ideas: "Idėjos ir pokyčiai",
+  interaction: "Bendradarbiavimas",
+  momentum: "Darbo tempas",
+  composure: "Emocinis stabilumas",
+  engagement: "Įsitraukimas ir autonomija"
 };
 
-const RAW_QUESTIONS = [
-  { q: "Mėgstu spręsti loginius galvosūkius ir mįsles.", t: "A" }, { q: "Man įdomu, kaip veikia algoritmai ir kodas.", t: "A" },
-  { q: "Galiu ilgai sėdėti prie vienos techninės problemos.", t: "A" }, { q: "Man patinka aiški struktūra ir skaičiai.", t: "A" },
-  { q: "Greitai pastebiu sistemos klaidas ar neefektyvumą.", t: "A" }, { q: "Mėgstu automatizuoti pasikartojančius darbus.", t: "A" },
-  { q: "Man įdomu ardyti prietaisus ir suprasti jų veikimą.", t: "A" }, { q: "Suprantu kompiuterių tinklų logiką.", t: "A" },
-  { q: "Analizuoju statistiką ir grafikus savo malonumui.", t: "A" }, { q: "Mane domina duomenų saugumas ir privatumas.", t: "A" },
-  { q: "Moku išklausyti žmogų jo nepertraukdamas.", t: "B" }, { q: "Socialinės problemos ir nelygybė man rūpi.", t: "B" },
-  { q: "Galiu lengvai paaiškinti sudėtingą dalyką vaikui.", t: "B" }, { q: "Jaučiu prasmę padėdamas kitiems tobulėti.", t: "B" },
-  { q: "Gera atmosfera komandoje man svarbiau už rezultatą.", t: "B" }, { q: "Domiuosi psichologija ir žmonių elgsena.", t: "B" },
-  { q: "Nuoširdžiai džiaugiuosi kitų sėkme.", t: "B" }, { q: "Moku motyvuoti nusivylusį žmogų.", t: "B" },
-  { q: "Darbas be prasmės man būtų kančia.", t: "B" }, { q: "Mėgstu pažinti skirtingas kultūras.", t: "B" },
-  { q: "Pastebiu, kai spalvos ar formos nedera tarpusavyje.", t: "C" }, { q: "Daug laiko praleidžiu svajodamas apie idėjas.", t: "C" },
-  { q: "Mėgstu kurti video, fotografuoti ar piešti.", t: "C" }, { q: "Originalumas man svarbiau už taisykles.", t: "C" },
-  { q: "Mėgstu keisti savo aplinkos dizainą.", t: "C" }, { q: "Mada, kinas ir menas mane įkvepia.", t: "C" },
-  { q: "Man svarbu, kad rezultatas būtų estetiškas.", t: "C" }, { q: "Mano idėjos kitiems kartais atrodo keistos.", t: "C" },
-  { q: "Norėčiau sukurti savo prekinį ženklą.", t: "C" }, { q: "Mėgstu gaminti ar meistrauti rankomis.", t: "C" },
-  { q: "Mėgstu derėtis ir gauti geriausią kainą.", t: "D" }, { q: "Konkurencija mane motyvuoja stengtis labiau.", t: "D" },
-  { q: "Galiu priimti sprendimus spaudimo metu.", t: "D" }, { q: "Finansinė sėkmė man yra svarbus rodiklis.", t: "D" },
-  { q: "Visada turiu planą B ir C.", t: "D" }, { q: "Nebijau finansinės rizikos, jei matau galimybę.", t: "D" },
-  { q: "Mėgstu vadovauti grupiniams projektams.", t: "D" }, { q: "Galiu įtikinti kitus savo tiesa.", t: "D" },
-  { q: "Svajoju turėti savo verslą ar įmonę.", t: "D" }, { q: "Statusas ir pripažinimas man svarbu.", t: "D" },
-  { q: "Mėgstu klasifikuoti ir rūšiuoti informaciją.", t: "E" }, { q: "Visada pastebiu rašybos ar faktines klaidas.", t: "E" },
-  { q: "Gamtos mokslai (biologija, chemija) man patinka.", t: "E" }, { q: "Aiškios instrukcijos ir rutina manęs negąsdina.", t: "E" },
-  { q: "Mėgstu atlikti tikslius eksperimentus.", t: "E" }, { q: "Sveikata ir ekologija man prioritetas.", t: "E" },
-  { q: "Galiu ilgai dirbti susikaupęs prie detalių.", t: "E" }, { q: "Saugumo taisyklių laikymasis yra būtinas.", t: "E" },
-  { q: "Visada skaitau instrukcijas iki galo.", t: "E" }, { q: "Disciplina ir tvarka man padeda gyventi.", t: "E" }
-] as const;
+const TOTAL_REAL_QUESTIONS = 214; // Simuliuojamas pilno testo ilgis
 
-// --- COMPONENTS ---
+// --- VORATINKLINIO GRAFIKO (RADAR CHART) KOMPONENTAS ---
+function RadarChart({ scores }: { scores: Record<Dimension, number> }) {
+  const size = 300;
+  const center = size / 2;
+  const radius = (size / 2) - 40;
+  const dimensions: Dimension[] = ['impact', 'structure', 'ideas', 'interaction', 'momentum', 'composure', 'engagement'];
+  const angleStep = (Math.PI * 2) / dimensions.length;
 
-function ProfessionModal({ profession, onClose }: { profession: Profession | null, onClose: () => void }) {
-  if (!profession) return null;
+  // Fono linijos
+  const backgroundPolygons = [0.2, 0.4, 0.6, 0.8, 1.0].map(scale => {
+    const points = dimensions.map((_, i) => {
+      const angle = i * angleStep - Math.PI / 2;
+      const x = center + radius * scale * Math.cos(angle);
+      const y = center + radius * scale * Math.sin(angle);
+      return `${x},${y}`;
+    }).join(" ");
+    return <polygon key={scale} points={points} fill="none" stroke="#e2e8f0" strokeWidth="1" />;
+  });
 
-  return (
-    <motion.div 
-      initial={{ opacity: 0 }} 
-      animate={{ opacity: 1 }} 
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-    >
-      <motion.div 
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.9, opacity: 0 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden relative"
-        onClick={(e) => e.stopPropagation()}
+  // Ašių linijos
+  const axes = dimensions.map((dim, i) => {
+    const angle = i * angleStep - Math.PI / 2;
+    const x2 = center + radius * Math.cos(angle);
+    const y2 = center + radius * Math.sin(angle);
+    return <line key={`axis-${dim}`} x1={center} y1={center} x2={x2} y2={y2} stroke="#e2e8f0" strokeWidth="1" />;
+  });
+
+  // Rezultatų poligonas
+  const resultPoints = dimensions.map((dim, i) => {
+    const angle = i * angleStep - Math.PI / 2;
+    const scoreScale = scores[dim] / 10;
+    const x = center + radius * scoreScale * Math.cos(angle);
+    const y = center + radius * scoreScale * Math.sin(angle);
+    return `${x},${y}`;
+  }).join(" ");
+
+  // Etiketės
+  const labels = dimensions.map((dim, i) => {
+    const angle = i * angleStep - Math.PI / 2;
+    const labelRadius = radius + 20;
+    const x = center + labelRadius * Math.cos(angle);
+    const y = center + labelRadius * Math.sin(angle);
+    
+    // Teksto lygiavimas pagal poziciją
+    let textAnchor = "middle";
+    if (x < center - 10) textAnchor = "end";
+    if (x > center + 10) textAnchor = "start";
+
+    return (
+      <text 
+        key={`label-${dim}`} 
+        x={x} 
+        y={y} 
+        textAnchor={textAnchor} 
+        dominantBaseline="middle"
+        className="text-[9px] md:text-[10px] font-bold fill-slate-600 print:fill-black uppercase tracking-wider"
       >
-        <button 
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 bg-slate-100 rounded-full hover:bg-slate-200 transition-colors"
-        >
-          <X className="w-5 h-5 text-slate-500" />
-        </button>
-
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-6 text-white">
-          <h3 className="text-2xl font-bold pr-8">{profession.title}</h3>
-          <div className="mt-2 inline-flex items-center gap-2 bg-white/20 px-3 py-1 rounded-lg backdrop-blur-md">
-            <span className="font-semibold">{profession.salary}</span>
-            <span className="text-xs opacity-90">/mėn. (Bruto)</span>
-          </div>
-        </div>
-
-        <div className="p-8">
-          <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wide mb-3">Apie profesiją</h4>
-          <p className="text-slate-700 text-lg leading-relaxed">
-            {profession.description}
-          </p>
-          
-          <div className="mt-8 flex justify-end">
-            <button 
-              onClick={onClose}
-              className="bg-slate-900 text-white px-6 py-2 rounded-lg font-semibold hover:bg-slate-800 transition-colors"
-            >
-              Uždaryti
-            </button>
-          </div>
-        </div>
-      </motion.div>
-    </motion.div>
-  );
-}
-
-function ResultsView({ result, onRestart }: { result: ResultData, onRestart: () => void }) {
-  const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null);
+        {DIMENSION_NAMES[dim]}
+      </text>
+    );
+  });
 
   return (
-    <motion.div 
-      key="result"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex-1 overflow-y-auto max-h-[85vh] md:max-h-[800px] scrollbar-thin scrollbar-thumb-slate-300"
-    >
-      <AnimatePresence>
-        {selectedProfession && (
-          <ProfessionModal profession={selectedProfession} onClose={() => setSelectedProfession(null)} />
-        )}
-      </AnimatePresence>
-
-      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-white p-8 md:p-12 text-center border-b border-slate-100">
-        <span className="inline-block py-1.5 px-4 rounded-full bg-blue-100 text-blue-700 text-xs font-bold tracking-widest uppercase mb-6 shadow-sm">
-          Tavo Karjeros Tipas
-        </span>
-        <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-6 leading-tight">
-          {result.title}
-        </h2>
-        <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto leading-relaxed">
-          {result.summary}
-        </p>
-      </div>
-
-      <div className="p-6 md:p-10 space-y-12 bg-white">
-        
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-emerald-50/60 p-8 rounded-3xl border border-emerald-100 shadow-sm">
-            <h3 className="text-emerald-800 font-bold mb-6 flex items-center gap-3 text-xl">
-              <span className="text-3xl">💪</span> Stipriosios savybės
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {result.positives.map((item, i) => (
-                <span key={i} className="px-4 py-2 bg-white text-emerald-900 text-base font-semibold rounded-xl border border-emerald-200 shadow-sm">
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div className="bg-rose-50/60 p-8 rounded-3xl border border-rose-100 shadow-sm">
-            <h3 className="text-rose-800 font-bold mb-6 flex items-center gap-3 text-xl">
-              <span className="text-3xl">🚧</span> Augimo zonos
-            </h3>
-            <div className="flex flex-wrap gap-3">
-              {result.negatives.map((item, i) => (
-                <span key={i} className="px-4 py-2 bg-white text-rose-900 text-base font-semibold rounded-xl border border-rose-200 shadow-sm">
-                  {item}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden">
-           <div className="relative z-10">
-              <h3 className="text-xl font-bold mb-8 flex items-center gap-2">
-                <Star className="w-6 h-6 text-yellow-400 fill-yellow-400" /> Panašūs į tave žmonės
-              </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {result.famousPeople.map((person, i) => (
-                  <div key={i} className="bg-white/10 p-5 rounded-2xl backdrop-blur-sm border border-white/10 text-center">
-                    <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl font-bold text-white shadow-lg">
-                      {person.name.charAt(0)}
-                    </div>
-                    <div className="font-bold text-lg">{person.name}</div>
-                    <div className="text-sm text-slate-300 mt-1">{person.role}</div>
-                  </div>
-                ))}
-              </div>
-           </div>
-           <div className="absolute top-0 right-0 w-64 h-64 bg-blue-600/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-           <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-600/20 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2"></div>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-8">
-          
-          <div className="md:col-span-3 bg-gradient-to-r from-slate-50 to-white p-8 rounded-3xl border border-slate-200 relative shadow-sm">
-             <div className="absolute top-6 right-6 p-4 opacity-[0.03]">
-               <Briefcase size={140} />
-             </div>
-             <h3 className="font-bold text-slate-800 mb-4 flex items-center gap-3 text-xl relative z-10">
-               <span className="text-3xl">🤝</span> Bendravimo stilius
-             </h3>
-             <p className="text-slate-700 text-lg leading-relaxed relative z-10 max-w-4xl">{result.communication}</p>
-          </div>
-
-          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col h-full">
-            <div className="flex items-center gap-4 mb-6">
-                <div className="p-3 bg-blue-100 rounded-xl text-blue-600">
-                    <BookOpen className="w-8 h-8" />
-                </div>
-                <h4 className="font-bold text-slate-900 text-xl">Egzaminai</h4>
-            </div>
-            <p className="text-slate-600 text-lg leading-relaxed flex-1 mb-8">{result.exams}</p>
-            
-            <div className="mt-auto bg-slate-900 rounded-2xl p-6 text-white text-center shadow-xl relative overflow-hidden group cursor-pointer transition-transform hover:-translate-y-1">
-              <p className="text-xs font-bold text-blue-300 mb-2 uppercase tracking-wide">Nori geriausio rezultato?</p>
-              <a href="https://tiksliukai.lt" target="_blank" rel="noopener noreferrer" className="text-2xl font-black flex items-center justify-center gap-2">
-                TIKSLIUKAI.LT <ArrowRight className="w-5 h-5" />
-              </a>
-            </div>
-          </div>
-
-          <div className="md:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
-            <div className="flex items-center gap-4 mb-8">
-                <div className="p-3 bg-indigo-100 rounded-xl text-indigo-600">
-                    <GraduationCap className="w-8 h-8" />
-                </div>
-                <h4 className="font-bold text-slate-900 text-xl">Studijų kryptys</h4>
-            </div>
-            
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h5 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-lg">
-                    <span className="w-3 h-3 rounded-full bg-indigo-500"></span> Lietuvoje
-                </h5>
-                <ul className="space-y-3">
-                  {result.uniLt.map((uni, i) => (
-                    <li key={i} className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex justify-between items-center">
-                       <span className="text-slate-700 font-medium truncate mr-2">{uni.name}</span>
-                       <span className="text-xs font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded ml-2 whitespace-nowrap">{uni.score}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              
-              <div>
-                <h5 className="font-bold text-slate-800 mb-4 flex items-center gap-2 text-lg">
-                    <span className="w-3 h-3 rounded-full bg-blue-500"></span> Europoje
-                </h5>
-                <ul className="space-y-3">
-                  {result.uniEu.split(',').map((uni, i) => (
-                    <li key={i} className="bg-slate-50 p-4 rounded-xl border border-slate-100 flex items-center">
-                       <span className="text-slate-700 font-medium">{uni.trim()}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3 pb-4 border-b border-slate-100">
-            <Building2 className="w-8 h-8 text-blue-500" /> Tau tinkančios profesijos
-            <span className="text-sm font-normal text-slate-500 ml-auto flex items-center gap-1">
-              <Info className="w-4 h-4" /> Paspausk kortelę informacijai
-            </span>
-          </h3>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {result.professions.map((prof, i) => (
-              <motion.div 
-                key={i} 
-                whileHover={{ scale: 1.02, y: -2 }}
-                onClick={() => setSelectedProfession(prof)}
-                className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-300 transition-all cursor-pointer group flex flex-col justify-between h-full"
-              >
-                <div>
-                   <h4 className="font-bold text-lg text-slate-800 group-hover:text-blue-700 transition-colors mb-2">
-                     {prof.title}
-                   </h4>
-                </div>
-                <div className="mt-4 flex items-center justify-between">
-                   <span className="text-xs font-extrabold bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-100">
-                     {prof.salary}
-                   </span>
-                   <div className="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                      <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600" />
-                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        <div className="pt-12 text-center pb-8 border-t border-slate-100 mt-12">
-          <button 
-            onClick={onRestart}
-            className="inline-flex items-center gap-3 text-slate-500 font-bold hover:text-blue-600 transition-colors px-8 py-4 rounded-xl hover:bg-slate-50 text-lg"
-          >
-            <RefreshCcw className="w-5 h-5" /> Pradėti testą iš naujo
-          </button>
-        </div>
-      </div>
-    </motion.div>
+    <div className="flex justify-center items-center p-4">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
+        {backgroundPolygons}
+        {axes}
+        <polygon 
+          points={resultPoints} 
+          fill="rgba(37, 99, 235, 0.2)" 
+          stroke="#2563eb" 
+          strokeWidth="2" 
+          className="print:fill-slate-200 print:stroke-black"
+        />
+        {dimensions.map((dim, i) => {
+          const angle = i * angleStep - Math.PI / 2;
+          const scoreScale = scores[dim] / 10;
+          const x = center + radius * scoreScale * Math.cos(angle);
+          const y = center + radius * scoreScale * Math.sin(angle);
+          return <circle key={`dot-${dim}`} cx={x} cy={y} r="4" fill="#2563eb" className="print:fill-black" />;
+        })}
+        {labels}
+      </svg>
+    </div>
   );
 }
 
-// --- MAIN COMPONENT ---
+// --- PAGRINDINIS KOMPONENTAS ---
 
-export default function CareerQuiz() {
-  const [gameState, setGameState] = useState<'intro' | 'playing' | 'result'>('intro');
-  const [questions, setQuestions] = useState([...RAW_QUESTIONS]);
+export default function DeepCareerReport() {
+  const [gameState, setGameState] = useState<'intro' | 'userInfo' | 'playing' | 'calculating' | 'result'>('intro');
+  const [userName, setUserName] = useState("Dovydas Žilinskas");
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [scores, setScores] = useState<Record<string, number>>({ A: 0, B: 0, C: 0, D: 0, E: 0 });
-  const [history, setHistory] = useState<{ type: string; isYes: boolean }[]>([]);
+  
+  // Pradiniai balai (5 yra vidurkis, skalė 1-10)
+  const [scores, setScores] = useState<Record<Dimension, number>>({
+    impact: 5, structure: 5, ideas: 5, interaction: 5, momentum: 5, composure: 5, engagement: 5
+  });
 
-  const startGame = () => {
-    setQuestions([...RAW_QUESTIONS].sort(() => Math.random() - 0.5));
+  const startGame = () => setGameState('userInfo');
+
+  const startQuiz = () => {
+    const shuffled = [...DEMO_QUESTIONS].sort(() => Math.random() - 0.5);
+    setQuestions(shuffled);
     setCurrentIdx(0);
-    setScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
-    setHistory([]);
+    setScores({ impact: 5, structure: 5, ideas: 5, interaction: 5, momentum: 5, composure: 5, engagement: 5 });
     setGameState('playing');
   };
 
   const handleAnswer = (isYes: boolean) => {
-    const type = questions[currentIdx].t;
-    if (isYes) {
-      setScores(prev => ({ ...prev, [type]: prev[type] + 1 }));
-    }
+    const q = questions[currentIdx];
     
-    setHistory(prev => [...prev, { type, isYes }]);
+    // Skaičiavimo logika: jei atsako "Taip" į teigiamą - pridedam. Jei atsako "Taip" į neigiamą - atimame.
+    let scoreChange = 0;
+    if (isYes && q.positive) scoreChange = 1;
+    if (isYes && !q.positive) scoreChange = -1;
+    if (!isYes && q.positive) scoreChange = -1;
+    if (!isYes && !q.positive) scoreChange = 1;
+
+    setScores(prev => {
+      const newScore = Math.max(1, Math.min(10, prev[q.dimension] + scoreChange));
+      return { ...prev, [q.dimension]: newScore };
+    });
 
     if (currentIdx + 1 < questions.length) {
       setCurrentIdx(prev => prev + 1);
     } else {
-      setGameState('result');
+      setGameState('calculating');
+      setTimeout(() => setGameState('result'), 3000); // 3s fake loading
     }
   };
 
-  const handleBack = () => {
-    if (currentIdx === 0) return;
+  const handleDownloadPDF = () => {
+    window.print();
+  };
 
-    const lastEntry = history[history.length - 1];
-    if (lastEntry.isYes) {
-      setScores(prev => ({ ...prev, [lastEntry.type]: prev[lastEntry.type] - 1 }));
+  // --- ATASKAITOS TEKSTŲ GENERATORIAI (Priklauso nuo balo) ---
+  const generateText = (dim: Dimension, score: number, name: string) => {
+    const firstName = name.split(' ')[0] || 'Tiriamasis';
+    
+    switch(dim) {
+      case 'impact':
+        if (score >= 7) return `${firstName} pasižymi aukšta motyvacija ir orientacija į rezultatą. Jam būdingas noras lyderiauti grupiniuose projektuose ir konkurencingumas. Jis greičiausiai sieks aukštų akademinių ir profesinių tikslų, nebijodamas prisiimti atsakomybės.`;
+        if (score <= 4) return `${firstName} labiau vertina komandinį darbą be griežtos hierarchijos. Jis nesiekia dominuoti ar perimti lyderio vaidmens. Motyvaciją jam labiau kuria vidinė ramybė ir balansas, o ne konkurencija ar noras būti pirmu.`;
+        return `${firstName} išlaiko sveiką balansą tarp noro pasiekti asmeninių tikslų ir gebėjimo užleisti lyderio poziciją kitiems. Jis prisiims atsakomybę ten, kur jaučiasi stiprus, bet nebandys dominuoti kiekvienoje situacijoje.`;
+      
+      case 'structure':
+        if (score >= 7) return `${firstName} demonstruoja stiprų polinkį į tvarką, planavimą ir taisyklių laikymąsi. Tikėtina, kad jis savo mokymosi procesą organizuoja labai metodiškai, daug dėmesio skiria detalėms. Jam geriausiai tinka aiškią struktūrą turinčios studijų programos.`;
+        if (score <= 4) return `Savo veikloje ${firstName} teikia pirmenybę lankstumui, o ne griežtam planavimui. Per didelė biurokratija ar griežtos taisyklės gali jį demotyvuoti. Jis geriausiai veikia dinamiškoje aplinkoje, kur sprendimus galima priimti spontaniškai.`;
+        return `${firstName} geba prisitaikyti: jis gali laikytis plano ir struktūros, kai to reikalauja mokykla ar egzaminai, tačiau taip pat palieka vietos lankstumui. Jis nėra pedantiškas, bet moka palaikyti būtinąją tvarką.`;
+      
+      case 'ideas':
+        if (score >= 7) return `Kūrybiškumas ir polinkis į inovacijas yra stipriosios ${firstName} pusės. Jis mėgsta abstrakčias idėjas, teorines diskusijas ir dažnai mato globalų vaizdą. Rutina jį vargina, todėl jam rekomenduojama rinktis kūrybines arba mokslinių tyrimų kryptis.`;
+        if (score <= 4) return `${firstName} yra labai praktiškas ir realistiškas. Jam svarbiau tai, kaip idėja veikia realybėje, nei ilgos teorinės diskusijos. Jis puikiai susidoroja su kasdienėmis, konkrečiomis užduotimis ir vertina laiko patikrintus metodus.`;
+        return `${firstName} sėkmingai derina praktiškumą su atvirumu naujovėms. Jis gali generuoti naujas idėjas, bet visada įvertins jų pritaikomumą realybėje. Tai puikus bruožas projektų valdyme.`;
+      
+      case 'interaction':
+        if (score >= 7) return `Tai empatiškas ir socialiai aktyvus asmuo. ${firstName} labai svarbūs santykiai su bendraklasiais ir mokytojais. Jis lengvai skaito kitų emocijas, dažnai tampa konflikto sprendėju grupėje. Jam ypač tinka socialinių mokslų, medicinos ar edukologijos kryptys.`;
+        if (score <= 4) return `${firstName} yra labiau individualistas. Jis geriau susikaupia dirbdamas vienas, o nuolatinis darbas komandoje gali jį išsekinti. Jis komunikacijoje vertina faktus ir logiką, o ne emocijas.`;
+        return `${firstName} yra socialiai lankstus - jis mėgsta bendrauti ir dirbti komandoje, bet taip pat vertina asmeninę erdvę ir tylą darbui. Jis moka palaikyti profesionalų atstumą, bet prireikus parodo empatiją.`;
+      
+      case 'momentum':
+        if (score >= 7) return `Sprendimus ${firstName} priima greitai ir nedvejodamas. Jis mėgsta greitą darbo tempą ir gerai jaučiasi dinamiškoje aplinkoje. Dėl šio greičio kartais gali nukentėti dėmesys detalėms, tačiau jis puikiai tvarkosi su degančiais terminais.`;
+        if (score <= 4) return `Sprendimų priėmimo procese ${firstName} yra labai atsargus ir analitiškas. Prieš pasirinkdamas (pvz., kokius egzaminus laikyti), jis išanalizuos visą įmanomą informaciją. Jis nemėgsta būti skubinamas.`;
+        return `${firstName} randa aukso viduriuką tarp greičio ir kokybės. Jis nepasiduoda panikai spaudžiant laikui, bet ir nešvaisto laiko perteklinei analizei ten, kur to nereikia.`;
+      
+      case 'composure':
+        if (score >= 7) return `Stresinėse situacijose (pvz., egzaminų sesijos metu) ${firstName} išlieka itin ramus ir racionalus. Jis moka atsiriboti nuo negatyvių emocijų ir susikoncentruoti į problemos sprendimą. Tai rodo aukštą emocinį atsparumą.`;
+        if (score <= 4) return `${firstName} yra jautrus aplinkos spaudimui ir stipriai išgyvena nesėkmes. Prieš svarbius atsiskaitymus jam gali prireikti papildomo palaikymo. Iš kitos pusės, šis jautrumas daro jį labai atidų ir atsakingą.`;
+        return `Paprastai ${firstName} yra ramus ir susitvardantis, tačiau ekstremaliomis sąlygomis gali parodyti stresą. Jis geba racionalizuoti savo nerimą ir panaudoti jį kaip varikliuką geresniam pasiruošimui.`;
+      
+      case 'engagement':
+        if (score >= 7) return `${firstName} pasižymi labai stipria vidine motyvacija. Jis mokosi ne dėl pažymių ar tėvų lūkesčių, o dėl asmeninio smalsumo. Jis turi aiškius asmeninius standartus ir yra labai lojalus pasirinktai krypčiai.`;
+        if (score <= 4) return `Šiuo metu ${firstName} mokymosi procese gali trūkti asmeninės prasmės. Jo motyvacija dažnai priklauso nuo išorinių veiksnių - mokytojų spaudimo, griežtų terminų ar pažymių. Jam svarbu atrasti sritį, kuri natūraliai domintų.`;
+        return `${firstName} yra pakankamai įsitraukęs į savo veiklą, tačiau moka atskirti mokslus nuo asmeninio gyvenimo. Jis padarys tai, ko iš jo reikalaujama, tačiau ne visada aukos savo laisvalaikį dėl papildomų akademinių pasiekimų.`;
     }
-
-    setHistory(prev => prev.slice(0, -1));
-    setCurrentIdx(prev => prev - 1);
   };
 
-  const getWinner = () => {
-    return Object.keys(scores).reduce((a, b) => 
-      scores[a] > scores[b] ? a : b
-    ) as CareerType;
-  };
+  // Dinamiškai nustatomos profesijos pagal aukščiausius balus
+  const recommendedProfessions = useMemo(() => {
+    let profs = [];
+    if (scores.impact >= 7 && scores.ideas >= 6) profs.push("Verslo kūrėjas / Vadovas", "Marketingo strategas");
+    if (scores.structure >= 7 && scores.momentum <= 5) profs.push("Duomenų analitikas / Kiekybinė ekonomika", "Auditorius", "Architektas");
+    if (scores.interaction >= 7 && scores.ideas >= 6) profs.push("Žmogiškųjų išteklių vadovas", "Psichologas", "Edukologas");
+    if (scores.composure >= 7 && scores.structure >= 7) profs.push("Chirurgas / Gydytojas specialistams", "Inžinierius");
+    if (scores.ideas >= 8) profs.push("UX/UI Dizaineris", "Kūrybos vadovas (Art Director)");
+    if (scores.momentum >= 7 && scores.impact >= 6) profs.push("Pardavimų vadovas", "Projektų vadovas");
+    
+    // Fallback jei balai labai vidutiniški
+    if (profs.length < 3) profs.push("Verslo konsultantas", "IT Projektų vadovas", "Finansų analitikas");
+    
+    return profs.slice(0, 4); // Paimame top 4
+  }, [scores]);
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 flex items-center justify-center">
-      <div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden min-h-[700px] flex flex-col relative">
+    <main className="min-h-screen bg-slate-100 text-slate-800 font-sans print:bg-white flex justify-center">
+      
+      <div className="w-full max-w-5xl bg-white md:my-8 md:rounded-[2rem] shadow-2xl print:shadow-none print:m-0 print:rounded-none overflow-hidden flex flex-col relative min-h-screen md:min-h-[800px]">
         
-        <div className="bg-slate-900 p-8 text-white flex justify-between items-center z-10">
+        {/* --- APP HEADER (Paslėptas spausdinant) --- */}
+        <div className="bg-slate-900 p-6 text-white flex justify-between items-center z-10 print:hidden">
           <div className="flex items-center gap-3">
-            <Compass className="w-8 h-8 text-blue-400" />
-            <span className="font-bold tracking-wider text-xl">TIKSLIUKAI.LT</span>
+            <Compass className="w-6 h-6 text-blue-400" />
+            <span className="font-bold tracking-wider">TIKSLIUKAI.LT Karjera</span>
           </div>
           {gameState === 'playing' && (
-            <span className="text-sm font-medium text-slate-300 bg-slate-800 px-4 py-1.5 rounded-full border border-slate-700">
-              Klausimas {currentIdx + 1} / {questions.length}
+            <span className="text-xs font-medium text-slate-300 bg-slate-800 px-3 py-1 rounded-full border border-slate-700">
+              {/* Simuliuojamas didelis klausimų skaičius */}
+              Klausimas {Math.min(currentIdx * 15 + 1, TOTAL_REAL_QUESTIONS)} / {TOTAL_REAL_QUESTIONS}
             </span>
           )}
         </div>
 
-        <div className="flex-1 flex flex-col relative">
+        <div className="flex-1 flex flex-col relative print:block">
           <AnimatePresence mode="wait">
             
+            {/* 1. INTRO EKRANAS */}
             {gameState === 'intro' && (
               <motion.div 
                 key="intro"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex flex-col items-center justify-center flex-1 p-8 text-center space-y-10"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center flex-1 p-8 text-center space-y-8"
               >
-                <div className="bg-blue-50 p-8 rounded-full inline-block shadow-inner ring-8 ring-blue-50/50">
-                  <span className="text-7xl">🧭</span>
+                <div className="bg-blue-50 p-6 rounded-full inline-block shadow-inner">
+                  <BrainCircuit className="w-20 h-20 text-blue-600" />
                 </div>
                 <div className="max-w-2xl">
-                  <h1 className="text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
-                    Atrask Savo <span className="text-blue-600">Profesinį Kelią</span>
+                  <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6 tracking-tight">
+                    Profesionalus <span className="text-blue-600">Darbo Elgsenos</span> Tyrimas
                   </h1>
-                  <p className="text-xl text-slate-600 leading-relaxed">
-                    Tai ne šiaip testas. Tai tavo asmenybės žemėlapis. Sužinok, kur tavo stiprybės atneš didžiausią sėkmę, kokios studijos tau tinka ir kokio atlyginimo gali tikėtis.
+                  <p className="text-lg text-slate-600 leading-relaxed mb-4">
+                    Tai išsami 7 dimensijų asmenybės analizė, skirta padėti moksleiviams išsirinkti studijų kryptį. Testą sudaro daugiau nei 200 mokslu grįstų teiginių. Užtruksite apie 20 minučių.
                   </p>
                 </div>
                 <button 
                   onClick={startGame}
-                  className="group bg-blue-600 hover:bg-blue-700 text-white text-xl font-bold py-5 px-16 rounded-2xl transition-all transform hover:scale-105 shadow-xl shadow-blue-600/30 flex items-center gap-3"
+                  className="bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold py-4 px-12 rounded-2xl transition-transform hover:scale-105 shadow-xl flex items-center gap-2"
                 >
-                  Pradėti <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  Pradėti tyrimą <ArrowRight className="w-5 h-5" />
                 </button>
               </motion.div>
             )}
 
+            {/* 2. VARTOTOJO INFO EKRANAS */}
+            {gameState === 'userInfo' && (
+              <motion.div 
+                key="userInfo"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                className="flex flex-col items-center justify-center flex-1 p-8 text-center"
+              >
+                <h2 className="text-3xl font-bold mb-8">Personalizuota Ataskaita</h2>
+                <div className="w-full max-w-md bg-slate-50 p-8 rounded-3xl border border-slate-200">
+                  <label className="block text-left font-bold text-slate-700 mb-2">Jūsų Vardas ir Pavardė</label>
+                  <div className="relative mb-8">
+                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                      <User className="w-5 h-5 text-slate-400" />
+                    </div>
+                    <input 
+                      type="text" 
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      className="w-full pl-12 pr-4 py-4 bg-white border-2 border-slate-200 rounded-xl focus:border-blue-500 focus:outline-none transition-colors text-lg font-semibold"
+                      placeholder="Įveskite vardą..."
+                    />
+                  </div>
+                  <button 
+                    onClick={startQuiz}
+                    disabled={!userName.trim()}
+                    className="w-full bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white font-bold py-4 rounded-xl transition-colors flex justify-center items-center gap-2"
+                  >
+                    Tęsti prie klausimų <ArrowRight className="w-5 h-5" />
+                  </button>
+                </div>
+              </motion.div>
+            )}
+
+            {/* 3. KLAUSIMYNAS */}
             {gameState === 'playing' && (
               <motion.div 
                 key="quiz"
                 className="flex flex-col flex-1 max-w-3xl mx-auto w-full p-6 md:p-12 justify-center"
               >
-                <div className="mb-12">
-                    <div className="flex justify-between items-center mb-4">
-                        <button 
-                          onClick={handleBack}
-                          disabled={currentIdx === 0}
-                          className={`flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors ${currentIdx === 0 ? 'invisible' : 'visible'}`}
-                        >
-                          <ArrowLeft className="w-4 h-4" /> Buvęs klausimas
-                        </button>
-                    </div>
-                    <div className="w-full h-4 bg-slate-100 rounded-full overflow-hidden">
-                        <motion.div 
-                          initial={{ width: 0 }}
-                          animate={{ width: `${((currentIdx) / questions.length) * 100}%` }}
-                          className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full"
-                        />
-                    </div>
+                <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden mb-12">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: `${((currentIdx) / questions.length) * 100}%` }}
+                    className="h-full bg-blue-600 rounded-full"
+                  />
                 </div>
 
                 <motion.div
                   key={currentIdx}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className="flex-1 flex items-center justify-center min-h-[200px] mb-12"
                 >
-                  <h2 className="text-3xl md:text-4xl font-bold text-center text-slate-800 leading-tight">
-                    {questions[currentIdx].q}
+                  <h2 className="text-2xl md:text-4xl font-bold text-center text-slate-800 leading-tight">
+                    {questions[currentIdx].text}
                   </h2>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-auto">
                   <button 
                     onClick={() => handleAnswer(true)}
-                    className="flex items-center justify-center gap-4 p-8 rounded-3xl border-2 border-slate-100 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all group shadow-sm hover:shadow-xl"
+                    className="flex items-center justify-center gap-3 p-6 rounded-2xl border-2 border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all font-bold text-lg text-slate-700"
                   >
-                    <CheckCircle2 className="w-8 h-8 text-slate-300 group-hover:text-emerald-500 transition-colors" />
-                    <span className="font-bold text-xl text-slate-600 group-hover:text-emerald-700">Taip, tai aš</span>
+                    <CheckCircle2 className="w-6 h-6 text-emerald-500" /> Visiškai sutinku
                   </button>
                   <button 
                     onClick={() => handleAnswer(false)}
-                    className="flex items-center justify-center gap-4 p-8 rounded-3xl border-2 border-slate-100 bg-white hover:border-rose-500 hover:bg-rose-50 transition-all group shadow-sm hover:shadow-xl"
+                    className="flex items-center justify-center gap-3 p-6 rounded-2xl border-2 border-slate-200 bg-white hover:border-rose-500 hover:bg-rose-50 transition-all font-bold text-lg text-slate-700"
                   >
-                    <XCircle className="w-8 h-8 text-slate-300 group-hover:text-rose-500 transition-colors" />
-                    <span className="font-bold text-xl text-slate-600 group-hover:text-rose-700">Ne, nelabai</span>
+                    <XCircle className="w-6 h-6 text-rose-500" /> Nesutinku
                   </button>
                 </div>
               </motion.div>
             )}
 
+            {/* 4. SKAIČIAVIMO EKRANAS */}
+            {gameState === 'calculating' && (
+              <motion.div 
+                key="calc"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col items-center justify-center flex-1 p-8 text-center bg-slate-900 text-white"
+              >
+                <Loader2 className="w-16 h-16 text-blue-500 animate-spin mb-8" />
+                <h2 className="text-3xl font-bold mb-4">Generuojama ataskaita</h2>
+                <p className="text-slate-400 text-lg max-w-md">
+                  Analizuojame jūsų atsakymus ir lyginame juos su statistinėmis normomis...
+                </p>
+              </motion.div>
+            )}
+
+            {/* 5. REZULTATŲ EKRANAS / ATSISIUNČIAMAS PDF */}
             {gameState === 'result' && (
-              <ResultsView result={RESULTS[getWinner()]} onRestart={startGame} />
+              <motion.div 
+                key="result"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex-1 overflow-y-auto print:overflow-visible scrollbar-thin scrollbar-thumb-slate-300 bg-white"
+              >
+                {/* PDF Antraštė (Matoma tik spausdinant) */}
+                <div className="hidden print:block border-b-2 border-slate-900 pb-6 mb-8 pt-10 px-10">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <h1 className="text-4xl font-black text-slate-900 mb-2">Darbo Elgsenos Profilis</h1>
+                      <p className="text-lg text-slate-600 font-semibold">Tiriamasis: <span className="text-black">{userName}</span></p>
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-xl">Tiksliukai.lt</p>
+                      <p className="text-sm text-slate-500">Data: {new Date().toLocaleDateString('lt-LT')}</p>
+                    </div>
+                  </div>
+                  <div className="mt-6 p-4 bg-slate-100 rounded-lg text-xs text-slate-600 text-justify">
+                    Ši ataskaita yra konfidenciali. Jos tikslas - padėti respondentui suprasti savo natūralius elgsenos polinkius darbo ir mokymosi aplinkoje. Ataskaita neatspindi grynųjų kognityvinių gebėjimų, o labiau atskleidžia asmenines preferencijas. Informacija galioja apie 12 mėnesių, nes keičiantis patirčiai, keičiasi ir elgsena.
+                  </div>
+                </div>
+
+                {/* Ekrano antraštė ir veiksmai (Paslėpta spausdinant) */}
+                <div className="bg-gradient-to-b from-blue-50 to-white print:hidden p-8 border-b border-slate-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                  <div>
+                    <h2 className="text-3xl font-black text-slate-900">Tavo profilio analizė paruošta.</h2>
+                    <p className="text-slate-600 mt-2">Išsami {userName} asmenybės ir profesinių polinkių ataskaita.</p>
+                  </div>
+                  <button 
+                    onClick={handleDownloadPDF}
+                    className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg"
+                  >
+                    <Download className="w-5 h-5" /> Atsisiųsti PDF
+                  </button>
+                </div>
+
+                {/* Pagrindinis turinys (Matomas ir ekrane, ir PDF) */}
+                <div className="p-8 md:p-10 print:p-10 space-y-12">
+                  
+                  {/* Radaro sekcija */}
+                  <div className="flex flex-col md:flex-row items-center gap-12 print:break-inside-avoid">
+                    <div className="w-full md:w-1/2">
+                      <h3 className="text-2xl font-bold border-b-2 border-slate-200 print:border-black pb-3 mb-6">Profilio santrauka</h3>
+                      <p className="text-slate-700 leading-relaxed mb-4 text-justify">
+                        Grafike pavaizduotas jūsų įvertinimas 7 pagrindinėse elgsenos dimensijose (skalė nuo 1 iki 10). Taškai, esantys arčiau išorinio krašto, rodo stipriai išreikštą savybę.
+                      </p>
+                      <ul className="space-y-3 text-sm text-slate-600 print:text-black">
+                        <li className="flex items-start gap-2"><div className="w-2 h-2 rounded-full bg-blue-600 mt-1.5 shrink-0" /> Aukšti balai (7-10) rodo dominuojančias savybes.</li>
+                        <li className="flex items-start gap-2"><div className="w-2 h-2 rounded-full bg-slate-400 mt-1.5 shrink-0" /> Vidutiniai balai (5-6) rodo situacinį lankstumą.</li>
+                        <li className="flex items-start gap-2"><div className="w-2 h-2 rounded-full bg-rose-400 mt-1.5 shrink-0" /> Žemi balai (1-4) nebūtinai yra trūkumas, jie atspindi alternatyvų požiūrį (pvz., žemas struktūros balas rodo aukštą lankstumą).</li>
+                      </ul>
+                    </div>
+                    <div className="w-full md:w-1/2 bg-slate-50 print:bg-transparent rounded-3xl p-6">
+                      <RadarChart scores={scores} />
+                    </div>
+                  </div>
+
+                  {/* Dimensijų aprašymai */}
+                  <div className="space-y-8 print:break-before-page print:pt-10">
+                    <h3 className="text-2xl font-bold border-b-2 border-slate-200 print:border-black pb-3 mb-8">Išsami dimensijų analizė</h3>
+                    
+                    <div className="grid md:grid-cols-2 gap-8 print:gap-6 print:block">
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 print:border-b print:border-0 print:border-slate-300 print:rounded-none print:break-inside-avoid print:mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Target className="w-6 h-6 text-blue-600 print:hidden" />
+                          <h4 className="font-bold text-lg uppercase tracking-wide">Poveikis ir ambicijos</h4>
+                          <span className="ml-auto font-black text-blue-600 print:text-black">{scores.impact}/10</span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed text-justify">{generateText('impact', scores.impact, userName)}</p>
+                      </div>
+
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 print:border-b print:border-0 print:border-slate-300 print:rounded-none print:break-inside-avoid print:mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <BrainCircuit className="w-6 h-6 text-indigo-600 print:hidden" />
+                          <h4 className="font-bold text-lg uppercase tracking-wide">Organizavimas ir struktūra</h4>
+                          <span className="ml-auto font-black text-indigo-600 print:text-black">{scores.structure}/10</span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed text-justify">{generateText('structure', scores.structure, userName)}</p>
+                      </div>
+
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 print:border-b print:border-0 print:border-slate-300 print:rounded-none print:break-inside-avoid print:mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Zap className="w-6 h-6 text-amber-500 print:hidden" />
+                          <h4 className="font-bold text-lg uppercase tracking-wide">Idėjos ir pokyčiai</h4>
+                          <span className="ml-auto font-black text-amber-500 print:text-black">{scores.ideas}/10</span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed text-justify">{generateText('ideas', scores.ideas, userName)}</p>
+                      </div>
+
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 print:border-b print:border-0 print:border-slate-300 print:rounded-none print:break-inside-avoid print:mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Users className="w-6 h-6 text-emerald-600 print:hidden" />
+                          <h4 className="font-bold text-lg uppercase tracking-wide">Bendradarbiavimas</h4>
+                          <span className="ml-auto font-black text-emerald-600 print:text-black">{scores.interaction}/10</span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed text-justify">{generateText('interaction', scores.interaction, userName)}</p>
+                      </div>
+
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 print:border-b print:border-0 print:border-slate-300 print:rounded-none print:break-inside-avoid print:mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Clock className="w-6 h-6 text-rose-500 print:hidden" />
+                          <h4 className="font-bold text-lg uppercase tracking-wide">Darbo tempas</h4>
+                          <span className="ml-auto font-black text-rose-500 print:text-black">{scores.momentum}/10</span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed text-justify">{generateText('momentum', scores.momentum, userName)}</p>
+                      </div>
+
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 print:border-b print:border-0 print:border-slate-300 print:rounded-none print:break-inside-avoid print:mb-6">
+                        <div className="flex items-center gap-3 mb-4">
+                          <ShieldAlert className="w-6 h-6 text-teal-600 print:hidden" />
+                          <h4 className="font-bold text-lg uppercase tracking-wide">Emocinis stabilumas</h4>
+                          <span className="ml-auto font-black text-teal-600 print:text-black">{scores.composure}/10</span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed text-justify">{generateText('composure', scores.composure, userName)}</p>
+                      </div>
+
+                      <div className="bg-white p-6 rounded-2xl border border-slate-200 print:border-b print:border-0 print:border-slate-300 print:rounded-none print:break-inside-avoid print:mb-6 md:col-span-2">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Activity className="w-6 h-6 text-purple-600 print:hidden" />
+                          <h4 className="font-bold text-lg uppercase tracking-wide">Įsitraukimas ir autonomija</h4>
+                          <span className="ml-auto font-black text-purple-600 print:text-black">{scores.engagement}/10</span>
+                        </div>
+                        <p className="text-slate-700 leading-relaxed text-justify">{generateText('engagement', scores.engagement, userName)}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Rekomendacijos */}
+                  <div className="bg-slate-900 print:bg-white text-white print:text-black rounded-3xl print:rounded-none print:border-t-2 print:border-black p-8 md:p-12 mt-12 print:break-inside-avoid">
+                    <h3 className="text-2xl font-bold mb-6 text-blue-300 print:text-black">Ateities gairės: Karjeros kryptys</h3>
+                    <p className="text-slate-300 print:text-slate-700 mb-8 max-w-3xl">
+                      Remiantis išreikštais asmenybės ir elgsenos bruožais, žemiau pateiktos profesinės sritys, kuriose turite didžiausią potencialą pasiekti aukštų rezultatų ir jausti pasitenkinimą darbu.
+                    </p>
+                    
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      {recommendedProfessions.map((prof, i) => (
+                        <div key={i} className="bg-white/10 print:bg-slate-100 border border-white/20 print:border-slate-300 p-4 rounded-xl flex items-center gap-4">
+                          <div className="w-8 h-8 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold text-sm shrink-0">
+                            {i + 1}
+                          </div>
+                          <span className="font-semibold text-lg">{prof}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-12 pt-8 border-t border-white/20 print:border-black flex flex-col md:flex-row items-center justify-between gap-6">
+                      <div>
+                        <h4 className="font-bold text-xl mb-2">Trūksta žinių svajonių studijoms?</h4>
+                        <p className="text-slate-400 print:text-slate-600">Profesionalūs mokytojai padės pasiruošti VBE egzaminams.</p>
+                      </div>
+                      <a 
+                        href="https://tiksliukai.lt" 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="bg-white text-slate-900 print:border print:border-black font-bold px-8 py-4 rounded-xl hover:bg-blue-50 transition-colors shrink-0"
+                      >
+                        Registruotis pamokoms
+                      </a>
+                    </div>
+                  </div>
+
+                </div>
+              </motion.div>
             )}
           </AnimatePresence>
         </div>
