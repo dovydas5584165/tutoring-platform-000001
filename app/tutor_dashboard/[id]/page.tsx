@@ -27,9 +27,8 @@ type Booking = {
   student_phone?: string | null;
   topic?: string;
   created_at: string;
-  confirmed_by_tutor?: boolean | null;  // add this
+  confirmed_by_tutor?: boolean | null;
   payment_status?: "pending" | "paid" | "failed" | "cancelled" | "refunded" | null;
-
 };
 
 type UserFlags = {
@@ -52,9 +51,12 @@ export default function TutorDashboard() {
   const params = useParams();
   const id = Array.isArray(params?.id) ? params.id[0] : params?.id ?? "";
 
+  // --- STATE DECLARATIONS ---
   const [showTerms, setShowTerms] = useState(false);
   const [userFlags, setUserFlags] = useState<UserFlags | null>(null);
+  
   const [availabilitySlots, setAvailabilitySlots] = useState<AvailabilitySlot[]>([]);
+  
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifLoading, setNotifLoading] = useState(false);
 
@@ -62,60 +64,26 @@ export default function TutorDashboard() {
   const [hiddenBookings, setHiddenBookings] = useState<string[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
 
-  useEffect(() => {
-    loadGroupRegistrations();
-  }, []); // Palikite tuščią masyvą, jei traukiate visus, arba pridėkite id, jei ateityje filtruosite pagal mokytoją
+  const [groupRegistrations, setGroupRegistrations] = useState<GroupRegistration[]>([]);
+  const [selectedRegistrations, setSelectedRegistrations] = useState<string[]>([]);
+  const [groupLoading, setGroupLoading] = useState(false);
 
-  // Check user agreement on mount
-  useEffect(() => {
-    const checkAgreement = async () => {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-        if (!user) {
-          router.push("/auth/log-in");
-          return;
-        }
-
-        const { data, error } = await supabase
-          .from("users")
-          .select("signed, signed_at")
-          .eq("id", user.id)
-          .single();
-
-        if (error) {
-          console.error("Klaida tikrinant sutikimą:", error.message);
-          return;
-        }
-
-        if (!data?.signed) setShowTerms(true);
-        setUserFlags(data);
-      } catch (err) {
-        console.error("Error checking agreement:", err);
-      }
-    };
-
-    checkAgreement();
-  }, [router]);
-
-  // Load availability slots
-  useEffect(() => {
-    if (!id) return;
-    supabase
-      .from("availability")
+  // --- DATA LOADING FUNCTIONS ---
+  const loadGroupRegistrations = async () => {
+    setGroupLoading(true);
+    const { data, error } = await supabase
+      .from("group_registrations")
       .select("*")
-      .eq("user_id", id)
-      .then(({ data, error }) => {
-        if (error) {
-          console.error("Klaida gaunant prieinamumą:", error.message);
-          return;
-        }
-        setAvailabilitySlots(data || []);
-      });
-  }, [id]);
+      .order("created_at", { ascending: false });
 
-  // Load unread notifications
+    if (error) {
+      console.error("Klaida gaunant grupės registracijas:", error.message);
+    } else {
+      setGroupRegistrations(data || []);
+    }
+    setGroupLoading(false);
+  };
+
   const loadNotifications = async () => {
     if (!id) return;
     setNotifLoading(true);
@@ -134,24 +102,32 @@ export default function TutorDashboard() {
     setNotifLoading(false);
   };
 
-  const [groupRegistrations, setGroupRegistrations] = useState<GroupRegistration[]>([]);
-  const [selectedRegistrations, setSelectedRegistrations] = useState<string[]>([]);
-  const [groupLoading, setGroupLoading] = useState(false);
-
-
-  const loadGroupRegistrations = async () => {
-    setGroupLoading(true);
+  const loadOrders = async () => {
+    if (!id) return;
+    setOrdersLoading(true);
     const { data, error } = await supabase
-      .from("group_registrations")
-      .select("*")
+      .from("bookings")
+      .select("id, student_name, student_email, student_phone, topic, created_at, payment_status, confirmed_by_tutor")
+      .eq("tutor_id", id)
       .order("created_at", { ascending: false });
 
     if (error) {
-      console.error("Klaida gaunant grupės registracijas:", error.message);
+      console.error("Klaida gaunant užsakymus:", error.message);
     } else {
-      setGroupRegistrations(data || []);
+      setOrders(data || []);
     }
-    setGroupLoading(false);
+    setOrdersLoading(false);
+  };
+
+  // --- EVENT HANDLERS ---
+  const handleSave = async () => {
+    if (!id) return;
+    const { data, error } = await supabase.from("availability").select("*").eq("user_id", id);
+    if (error) {
+      console.error("Klaida atnaujinant prieinamumą:", error.message);
+      return;
+    }
+    setAvailabilitySlots(data || []);
   };
 
   const toggleRegistrationSelection = (registrationId: string) => {
@@ -209,56 +185,13 @@ export default function TutorDashboard() {
       alert("Klaida atnaujinant statusą.");
     }
   };
-  
-  // Load orders for tutor
-  const loadOrders = async () => {
-    if (!id) return;
-    setOrdersLoading(true);
-    const { data, error } = await supabase
-      .from("bookings")
-      .select("id, student_name, student_email, student_phone, topic, created_at, payment_status, confirmed_by_tutor")
-      .eq("tutor_id", id)
-      .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error("Klaida gaunant užsakymus:", error.message);
-    } else {
-      setOrders(data || []);
-    }
-    setOrdersLoading(false);
-  };
-
-  useEffect(() => {
-    loadNotifications();
-  }, [id]);
-
-  useEffect(() => {
-    loadOrders();
-  }, [id]);
-
-  // Save availability slots reload
-  const handleSave = async () => {
-    if (!id) return;
-
-    const { data, error } = await supabase.from("availability").select("*").eq("user_id", id);
-
-    if (error) {
-      console.error("Klaida atnaujinant prieinamumą:", error.message);
-      return;
-    }
-
-    setAvailabilitySlots(data || []);
-  };
-
-  // Handle notification response with optimistic UI and update is_read
   const handleNotificationResponse = async (notification: Notification, isYes: boolean) => {
     if (!id) return;
 
-    // Optimistic UI: remove notification immediately
     setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
 
     try {
-      // Mark notification as read
       const { error: updateError } = await supabase
         .from("notifications")
         .update({ is_read: true })
@@ -267,18 +200,11 @@ export default function TutorDashboard() {
       if (updateError) throw updateError;
 
       if (notification.booking_id) {
-        // Handle booking confirmation/cancellation
         if (isYes) {
-          // Confirm the booking using the new API
           const response = await fetch('/api/confirm-booking', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              bookingId: notification.booking_id,
-              confirmedBy: 'tutor'
-            }),
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ bookingId: notification.booking_id, confirmedBy: 'tutor' }),
           });
 
           const result = await response.json();
@@ -288,16 +214,11 @@ export default function TutorDashboard() {
             alert("Klaida patvirtinant užsakymą: " + result.error);
             return;
           }
-
-          console.log(`Booking ${notification.booking_id} confirmed by tutor`);
           alert("✅ Užsakymas patvirtintas! Studentas gaus el. laišką su jūsų kontaktais.");
         } else {
-          // Cancel the booking and process refund
           const response = await fetch('/api/cancel-booking', {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               bookingId: notification.booking_id,
               cancelledBy: 'tutor',
@@ -317,15 +238,9 @@ export default function TutorDashboard() {
             ? `Grąžinimas: €${result.refundAmount}` 
             : 'Mokėjimas nebuvo atliktas';
 
-          const detailMessage = result.paymentIntentId 
-            ? `Payment Intent: ${result.paymentIntentId}` 
-            : 'No payment intent';
-
-          console.log(`Booking ${notification.booking_id} cancelled by tutor. ${refundMessage}. ${detailMessage}`);
           alert(`❌ Užsakymas atšauktas. ${refundMessage}. Studentas gaus el. laišką.`);
         }
       } else if (!isYes && notification.related_slot_id) {
-        // Legacy handling for old notifications
         const { error } = await supabase
           .from("availability")
           .update({ status: 0 })
@@ -333,11 +248,9 @@ export default function TutorDashboard() {
           .eq("user_id", id);
 
         if (error) throw error;
-
         await handleSave();
       }
 
-      // Refresh the data
       await handleSave();
       loadNotifications();
       loadOrders();
@@ -345,16 +258,13 @@ export default function TutorDashboard() {
     } catch (err) {
       alert("Klaida apdorojant pranešimą.");
       console.error(err);
-      // Revert optimistic UI on error
       setNotifications((prev) => [notification, ...prev]);
     }
   };
 
   const acceptTerms = async () => {
     try {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
       const { error } = await supabase
@@ -396,6 +306,61 @@ export default function TutorDashboard() {
     router.push(`/tutor_dashboard/${id}/${path}`);
   };
 
+  // --- USE EFFECTS (HOOKS) ---
+  useEffect(() => {
+    const checkAgreement = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          router.push("/auth/log-in");
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from("users")
+          .select("signed, signed_at")
+          .eq("id", user.id)
+          .single();
+
+        if (error) {
+          console.error("Klaida tikrinant sutikimą:", error.message);
+          return;
+        }
+
+        if (!data?.signed) setShowTerms(true);
+        setUserFlags(data);
+      } catch (err) {
+        console.error("Error checking agreement:", err);
+      }
+    };
+    checkAgreement();
+  }, [router]);
+
+  useEffect(() => {
+    loadGroupRegistrations();
+  }, []);
+
+  useEffect(() => {
+    if (!id) return;
+    
+    // Load availability
+    supabase
+      .from("availability")
+      .select("*")
+      .eq("user_id", id)
+      .then(({ data, error }) => {
+        if (error) {
+          console.error("Klaida gaunant prieinamumą:", error.message);
+          return;
+        }
+        setAvailabilitySlots(data || []);
+      });
+
+    loadNotifications();
+    loadOrders();
+  }, [id]);
+
+  // --- RENDER ---
   if (showTerms) {
     return <TermsPopup onAccept={acceptTerms} />;
   }
@@ -427,7 +392,7 @@ export default function TutorDashboard() {
           <button
             onClick={() => window.open("https://drive.google.com/drive/u/1/folders/1uBSRCUxunwWaXNIIeAWP8keY1O5wlzm7", "_blank")}
             className="px-5 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition"
-            >
+          >
             Resursai
           </button>
           <button
@@ -440,6 +405,7 @@ export default function TutorDashboard() {
       </header>
 
       <main className="flex-grow container mx-auto px-6 sm:px-10 py-10 space-y-10 max-w-7xl">
+        
         <section className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-semibold mb-6 border-b pb-3 flex items-center justify-between">
             Pranešimai
@@ -481,60 +447,59 @@ export default function TutorDashboard() {
         </section>
 
         <section className="bg-white rounded-xl shadow-lg p-8">
-  <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Užsakymai</h2>
+          <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Užsakymai</h2>
+          {ordersLoading ? (
+            <p className="italic text-gray-500">Kraunama užsakymų informacija...</p>
+          ) : orders.filter(order => !hiddenBookings.includes(order.id)).length === 0 ? (
+            <p className="text-gray-600 italic">Nėra užsakymų.</p>
+          ) : (
+            <ul className="space-y-4 max-h-[400px] overflow-y-auto">
+              {orders
+                .filter(order => !hiddenBookings.includes(order.id))
+                .filter(order => order.payment_status === "paid" || order.payment_status === "refunded")
+                .map((order) => {
+                  const statusText = order.confirmed_by_tutor
+                    ? "Priimtas"
+                    : order.payment_status === "refunded"
+                    ? "Atšauktas"
+                    : "Laukiama";
 
-  {ordersLoading ? (
-    <p className="italic text-gray-500">Kraunama užsakymų informacija...</p>
-  ) : orders.filter(order => !hiddenBookings.includes(order.id)).length === 0 ? (
-    <p className="text-gray-600 italic">Nėra užsakymų.</p>
-  ) : (
-    <ul className="space-y-4 max-h-[400px] overflow-y-auto">
-      {orders
-        .filter(order => !hiddenBookings.includes(order.id))
-        .filter(order => order.payment_status === "paid" || order.payment_status === "refunded")
-        .map((order) => {
-          const statusText = order.confirmed_by_tutor
-            ? "Priimtas"
-            : order.payment_status === "refunded"
-            ? "Atšauktas"
-            : "Laukiama";
+                  const statusColor =
+                    statusText === "Priimtas"
+                      ? "text-green-600"
+                      : statusText === "Atšauktas"
+                      ? "text-red-600"
+                      : "text-yellow-600";
 
-          const statusColor =
-            statusText === "Priimtas"
-              ? "text-green-600"
-              : statusText === "Atšauktas"
-              ? "text-red-600"
-              : "text-yellow-600";
+                  return (
+                    <li
+                      key={order.id}
+                      className="relative border rounded-md p-4 hover:shadow-md transition"
+                    >
+                      <button
+                        onClick={() => setHiddenBookings(prev => [...prev, order.id])}
+                        className="absolute top-2 right-2 text-gray-500 hover:text-red-600 font-bold"
+                      >
+                        ×
+                      </button>
 
-          return (
-            <li
-              key={order.id}
-              className="relative border rounded-md p-4 hover:shadow-md transition"
-            >
-              {/* X button to hide booking */}
-              <button
-                onClick={() => setHiddenBookings(prev => [...prev, order.id])}
-                className="absolute top-2 right-2 text-gray-500 hover:text-red-600 font-bold"
-              >
-                ×
-              </button>
+                      <p><strong>Vardas:</strong> {order.student_name}</p>
+                      <p><strong>El. paštas:</strong> {order.student_email}</p>
+                      <p><strong>Telefonas:</strong> {order.student_phone ?? "Nenurodytas"}</p>
+                      {order.topic && <p><strong>Tema:</strong> {order.topic}</p>}
+                      <p className="text-xs text-gray-500">Užsakyta: {new Date(order.created_at).toLocaleString("lt-LT")}</p>
 
-              <p><strong>Vardas:</strong> {order.student_name}</p>
-              <p><strong>El. paštas:</strong> {order.student_email}</p>
-              <p><strong>Telefonas:</strong> {order.student_phone ?? "Nenurodytas"}</p>
-              {order.topic && <p><strong>Tema:</strong> {order.topic}</p>}
-              <p className="text-xs text-gray-500">Užsakyta: {new Date(order.created_at).toLocaleString("lt-LT")}</p>
+                      <p className={`font-semibold mt-2 ${statusColor}`}>
+                        <strong>Statusas:</strong> {statusText}
+                      </p>
+                    </li>
+                  );
+                })}
+            </ul>
+          )}
+        </section>
 
-              <p className={`font-semibold mt-2 ${statusColor}`}>
-                <strong>Statusas:</strong> {statusText}
-              </p>
-            </li>
-          );
-        })}
-    </ul>
-  )}
-</section>
-<section className="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+        <section className="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
           <div className="flex justify-between items-center mb-6 border-b pb-3">
             <h2 className="text-2xl font-semibold">Grupinės pamokos</h2>
             <button
@@ -598,21 +563,19 @@ export default function TutorDashboard() {
           )}
         </section>
 
-<section className="bg-white rounded-xl shadow-lg p-8">
-  <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Kokybės rodikliai:</h2>
-  <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-    <div className="bg-gray-50 rounded-lg p-6 text-center">
-      <p className="text-3xl font-bold text-blue-600">92%</p>
-      <p className="mt-1 text-sm text-gray-600">Priėmimo procentas, kurio tikimasi</p>
-    </div>
-    <div className="bg-gray-50 rounded-lg p-6 text-center">
-      <p className="text-3xl font-bold text-blue-600">10 min.</p>
-      <p className="mt-1 text-sm text-gray-600">Optimalus atsakymo greitis</p>
-    </div>
-  </div>
-</section>
-
-
+        <section className="bg-white rounded-xl shadow-lg p-8">
+          <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Kokybės rodikliai:</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="bg-gray-50 rounded-lg p-6 text-center">
+              <p className="text-3xl font-bold text-blue-600">92%</p>
+              <p className="mt-1 text-sm text-gray-600">Priėmimo procentas, kurio tikimasi</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-6 text-center">
+              <p className="text-3xl font-bold text-blue-600">10 min.</p>
+              <p className="mt-1 text-sm text-gray-600">Optimalus atsakymo greitis</p>
+            </div>
+          </div>
+        </section>
 
         <section className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Prieinamumas</h2>
@@ -692,7 +655,7 @@ function TermsPopup({ onAccept }: { onAccept: () => void }) {
               sutartį, informavusi kitą šalį raštu arba el. paštu.
             </li>
             <li>
-              Visi ginčai sprendžiami derybomis, o nesant susitarimo – pagal LR
+              Visi ginčai sprendžiami derybomis, o nesant susitarimo - pagal LR
               įstatymus.
             </li>
           </ol>
@@ -700,22 +663,22 @@ function TermsPopup({ onAccept }: { onAccept: () => void }) {
           <h3 className="text-xl font-bold mt-6 mb-2">Motyvacinė sistema</h3>
           <ul className="list-disc list-inside space-y-1">
             <li>
-              <b>Lygis I – Freshman’as („Bronze league“)</b>: 10–11 €/val.
+              <b>Lygis I - Freshman’as („Bronze league“)</b>: 10-11 €/val.
             </li>
             <li>
-              <b>Lygis II – Patikimas („Silver League“)</b>: 12–15 €/val. (≥90%
+              <b>Lygis II - Patikimas („Silver League“)</b>: 12-15 €/val. (≥90%
               pamokų, įvertinimas ≥4.5/5, ≥2 mėn. patirtis).
             </li>
             <li>
-              <b>Lygis III – Kokybiškas („Gold League“)</b>: 15–16 €/val.
+              <b>Lygis III - Kokybiškas („Gold League“)</b>: 15-16 €/val.
               (vid. įvert. ≥4.6/5, ≥5 mokinių, matoma pažanga).
             </li>
             <li>
-              <b>Lygis IV – Lyderis („Platinum League“)</b>: 17 €/val. (≥10
+              <b>Lygis IV - Lyderis („Platinum League“)</b>: 17 €/val. (≥10
               mokinių, stabilus grafikas, ≥6 mėn. patirtis).
             </li>
             <li>
-              <b>Lygis V – Meistras („Diamond League“)</b>: 18–22 €/val. (≥12–15
+              <b>Lygis V - Meistras („Diamond League“)</b>: 18-22 €/val. (≥12-15
               mokinių, ≥12 mėn. patirtis, įvert. ≥4.7/5).
             </li>
           </ul>
