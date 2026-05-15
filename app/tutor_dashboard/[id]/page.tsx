@@ -13,6 +13,13 @@ type AvailabilitySlot = {
   status: number;
 };
 
+type GroupRegistration = {
+  id: string;
+  email: string;
+  status: string;
+  created_at: string;
+};
+
 type Booking = {
   id: string;
   student_name: string;
@@ -54,7 +61,10 @@ export default function TutorDashboard() {
   const [orders, setOrders] = useState<Booking[]>([]);
   const [hiddenBookings, setHiddenBookings] = useState<string[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
-  
+
+  useEffect(() => {
+    loadGroupRegistrations();
+  }, []); // Palikite tuščią masyvą, jei traukiate visus, arba pridėkite id, jei ateityje filtruosite pagal mokytoją
 
   // Check user agreement on mount
   useEffect(() => {
@@ -124,6 +134,82 @@ export default function TutorDashboard() {
     setNotifLoading(false);
   };
 
+  const [groupRegistrations, setGroupRegistrations] = useState<GroupRegistration[]>([]);
+  const [selectedRegistrations, setSelectedRegistrations] = useState<string[]>([]);
+  const [groupLoading, setGroupLoading] = useState(false);
+
+
+  const loadGroupRegistrations = async () => {
+    setGroupLoading(true);
+    const { data, error } = await supabase
+      .from("group_registrations")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Klaida gaunant grupės registracijas:", error.message);
+    } else {
+      setGroupRegistrations(data || []);
+    }
+    setGroupLoading(false);
+  };
+
+  const toggleRegistrationSelection = (registrationId: string) => {
+    setSelectedRegistrations((prev) =>
+      prev.includes(registrationId)
+        ? prev.filter((id) => id !== registrationId)
+        : [...prev, registrationId]
+    );
+  };
+
+  const handleCopyEmails = async () => {
+    if (selectedRegistrations.length === 0) return;
+
+    const selectedStudents = groupRegistrations.filter((r) => selectedRegistrations.includes(r.id));
+    const emails = selectedStudents.map((s) => s.email).join(", ");
+
+    try {
+      await navigator.clipboard.writeText(emails);
+      alert("✅ El. paštai nukopijuoti į iškarpinę!");
+
+      const { error } = await supabase
+        .from("group_registrations")
+        .update({ status: "grupėje" })
+        .in("id", selectedRegistrations);
+
+      if (error) throw error;
+
+      setGroupRegistrations((prev) =>
+        prev.map((r) =>
+          selectedRegistrations.includes(r.id) ? { ...r, status: "grupėje" } : r
+        )
+      );
+      setSelectedRegistrations([]);
+    } catch (err) {
+      console.error(err);
+      alert("Klaida kopijuojant ar atnaujinant statusą.");
+    }
+  };
+
+  const handleManualStatusChange = async (registrationId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "laukia" ? "grupėje" : "laukia";
+    try {
+      const { error } = await supabase
+        .from("group_registrations")
+        .update({ status: newStatus })
+        .eq("id", registrationId);
+
+      if (error) throw error;
+
+      setGroupRegistrations((prev) =>
+        prev.map((r) => (r.id === registrationId ? { ...r, status: newStatus } : r))
+      );
+    } catch (err) {
+      console.error(err);
+      alert("Klaida atnaujinant statusą.");
+    }
+  };
+  
   // Load orders for tutor
   const loadOrders = async () => {
     if (!id) return;
@@ -448,7 +534,69 @@ export default function TutorDashboard() {
     </ul>
   )}
 </section>
+<section className="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
+          <div className="flex justify-between items-center mb-6 border-b pb-3">
+            <h2 className="text-2xl font-semibold">Grupinės pamokos</h2>
+            <button
+              onClick={handleCopyEmails}
+              disabled={selectedRegistrations.length === 0}
+              className={`px-5 py-2 rounded-lg text-white font-medium transition shadow-sm ${
+                selectedRegistrations.length > 0
+                  ? "bg-blue-600 hover:bg-blue-700"
+                  : "bg-gray-300 cursor-not-allowed"
+              }`}
+            >
+              Kopijuoti pasirinktus el. paštus
+            </button>
+          </div>
 
+          {groupLoading ? (
+            <p className="italic text-gray-500">Kraunama norinčiųjų informacija...</p>
+          ) : groupRegistrations.length === 0 ? (
+            <p className="text-gray-600 italic">Šiuo metu nėra norinčių mokytis grupėje.</p>
+          ) : (
+            <ul className="space-y-3 max-h-[400px] overflow-y-auto">
+              {groupRegistrations.map((req) => (
+                <li
+                  key={req.id}
+                  className={`border rounded-lg p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between transition gap-4 ${
+                    selectedRegistrations.includes(req.id) ? "border-blue-500 bg-blue-50" : "hover:shadow-md"
+                  }`}
+                >
+                  <div className="flex items-center space-x-4">
+                    <input
+                      type="checkbox"
+                      checked={selectedRegistrations.includes(req.id)}
+                      onChange={() => toggleRegistrationSelection(req.id)}
+                      className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                    />
+                    <div>
+                      <p className="font-medium text-gray-900">{req.email}</p>
+                      <p className="text-xs text-gray-500">
+                        Registruota: {new Date(req.created_at).toLocaleString("lt-LT")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-3 w-full sm:w-auto justify-end">
+                    <span
+                      className={`px-3 py-1 text-sm font-semibold rounded-full ${
+                        req.status === "grupėje" ? "bg-green-100 text-green-700" : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {req.status === "grupėje" ? "Grupėje" : "Laukia"}
+                    </span>
+                    <button
+                      onClick={() => handleManualStatusChange(req.id, req.status)}
+                      className="text-sm text-gray-500 hover:text-blue-600 underline whitespace-nowrap"
+                    >
+                      Keisti statusą
+                    </button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
 
 <section className="bg-white rounded-xl shadow-lg p-8">
   <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Kokybės rodikliai:</h2>
