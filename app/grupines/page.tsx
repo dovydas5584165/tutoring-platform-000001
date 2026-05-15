@@ -4,41 +4,46 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, Code, GraduationCap, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, Users, CheckCircle2, Globe2, MessageCircle, BookOpen, Languages } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// PRIDĖTA: Importuojame jūsų Supabase klientą. 
-// Jei failas yra "app/grupines/page.tsx", kelias greičiausiai bus "../../lib/supabaseClient".
-// Jei naudojate "@", galite pakeisti į "@/lib/supabaseClient".
+// Importuojame jūsų Supabase klientą
 import { supabase } from "../../lib/supabaseClient"; 
 
 export default function GrupinesPamokos() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [subject, setSubject] = useState(""); // Naujas state dalykui
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "validation_error">("idle");
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Patikriname, ar pasirinktas dalykas
+    if (!subject) {
+      setStatus("validation_error");
+      return;
+    }
+    
     if (!email) return;
 
     setStatus("loading");
 
     try {
-      // TIKRA SUPABASE UŽKLAUSA:
-      // Įrašome el. paštą į "group_registrations" lentelę
+      // Siunčiame el. paštą ir pasirinktą dalyką į duomenų bazę
       const { error } = await supabase
         .from('group_registrations')
-        .insert([{ email: email }]);
+        .insert([{ email: email, subject: subject }]);
 
       if (error) {
         throw error;
       }
       
-      // Jei viskas pavyko, parodome sėkmės žinutę
       setStatus("success");
       setEmail("");
+      setSubject("");
       
     } catch (error) {
-      console.error("Klaida išsaugant el. paštą:", error);
+      console.error("Klaida išsaugant registraciją:", error);
       setStatus("error");
     }
   };
@@ -80,58 +85,100 @@ export default function GrupinesPamokos() {
           className="text-center max-w-3xl mx-auto mb-16"
         >
           <div className="inline-flex items-center justify-center p-3 bg-blue-100 rounded-full mb-6 text-[#3B65CE]">
-            <Users size={32} />
+            <Languages size={32} />
           </div>
           <h1 className="text-4xl sm:text-6xl font-extrabold text-[#3B65CE] mb-6">
-            Grupinės Pamokos
+            Užsienio Kalbų Grupės
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
-            Mokykitės kartu su bendraamžiais, dalinkitės žiniomis ir siekite geriausių rezultatų. 
-            Grupinės pamokos – tai puikus būdas gauti aukščiausios kokybės žinias už prieinamesnę kainą.
+            Mokykitės naujų kalbų kartu su bendraamžiais, laužkite kalbėjimo barjerus ir siekite geriausių rezultatų. 
+            Grupinės pamokos – tai puikus būdas greičiau prabilti užsienio kalba.
           </p>
         </motion.div>
 
-        {/* GROUPS INFO CARDS */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-20 max-w-5xl mx-auto">
-          {/* Python Card */}
+        {/* GROUPS INFO CARDS (Language Courses) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+          
+          {/* Anglų kalba */}
           <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="bg-white rounded-[2rem] shadow-xl p-8 sm:p-10 border-t-8 border-yellow-400 relative overflow-hidden group hover:shadow-2xl transition-shadow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+            className="bg-white rounded-[2rem] shadow-lg p-8 border-t-8 border-blue-500 relative overflow-hidden group hover:shadow-xl transition-shadow flex flex-col"
           >
-            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-              <Code size={120} />
+            <div className="text-blue-500 mb-4 bg-blue-50 inline-block p-4 rounded-2xl w-fit group-hover:scale-110 transition-transform">
+              <Globe2 size={32} />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4 relative z-10">Python Programavimas</h2>
-            <p className="text-gray-600 mb-6 relative z-10">
-              Nuo pagrindų iki sudėtingų algoritmų. Išmokite vieną populiariausių programavimo kalbų pasaulyje.
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Anglų kalba</h2>
+            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+              Tobulinkite kalbėjimo, rašymo ir supratimo įgūdžius. Nuo pradedančiųjų (A1) iki pažengusių (C1).
             </p>
-            <div className="bg-blue-50 rounded-2xl p-4 inline-block relative z-10">
-              <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mb-1">Grupė formuojama</p>
-              <p className="text-2xl font-black text-[#3B65CE]">Kas 3 savaites</p>
+            <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
+              <p className="text-sm font-bold text-[#3B65CE]">Grupės renkamos</p>
             </div>
           </motion.div>
 
-          {/* Egzaminai Card */}
+          {/* Prancūzų kalba */}
           <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="bg-white rounded-[2rem] shadow-xl p-8 sm:p-10 border-t-8 border-red-500 relative overflow-hidden group hover:shadow-2xl transition-shadow"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="bg-white rounded-[2rem] shadow-lg p-8 border-t-8 border-red-500 relative overflow-hidden group hover:shadow-xl transition-shadow flex flex-col"
           >
-            <div className="absolute top-0 right-0 p-6 opacity-10 group-hover:scale-110 transition-transform duration-500">
-              <GraduationCap size={120} />
+            <div className="text-red-500 mb-4 bg-red-50 inline-block p-4 rounded-2xl w-fit group-hover:scale-110 transition-transform">
+              <MessageCircle size={32} />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4 relative z-10">PUPP, VBE ir NMPP</h2>
-            <p className="text-gray-600 mb-6 relative z-10">
-              Kryptingas pasiruošimas egzaminams ir patikrinimams. Sprendžiame praėjusių metų užduotis ir mokomės strategijų.
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Prancūzų kalba</h2>
+            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+              Išmokite meilės ir diplomatijos kalbą. Praktinės užduotys, akcentas į tarimą bei laisvą bendravimą.
             </p>
-            <div className="bg-red-50 rounded-2xl p-4 inline-block relative z-10">
-              <p className="text-sm text-gray-500 font-semibold uppercase tracking-wider mb-1">Grupės formuojamos</p>
-              <p className="text-2xl font-black text-red-600">Kas 2 savaites</p>
+            <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
+              <p className="text-sm font-bold text-red-600">Grupės renkamos</p>
             </div>
           </motion.div>
+
+          {/* Vokiečių kalba */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="bg-white rounded-[2rem] shadow-lg p-8 border-t-8 border-yellow-400 relative overflow-hidden group hover:shadow-xl transition-shadow flex flex-col"
+          >
+            <div className="text-yellow-600 mb-4 bg-yellow-50 inline-block p-4 rounded-2xl w-fit group-hover:scale-110 transition-transform">
+              <BookOpen size={32} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Vokiečių kalba</h2>
+            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+              Griežta, bet logiška gramatika. Puikus pasirinkimas norintiems studijuoti ar keliauti DACH regione.
+            </p>
+            <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
+              <p className="text-sm font-bold text-yellow-600">Grupės renkamos</p>
+            </div>
+          </motion.div>
+
+          {/* Arabų kalba */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="bg-white rounded-[2rem] shadow-lg p-8 border-t-8 border-emerald-500 relative overflow-hidden group hover:shadow-xl transition-shadow flex flex-col"
+          >
+            <div className="text-emerald-500 mb-4 bg-emerald-50 inline-block p-4 rounded-2xl w-fit group-hover:scale-110 transition-transform">
+              <Users size={32} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-3">Arabų kalba</h2>
+            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+              Atraskite naują pasaulį. Mokomės skaityti, rašyti ir bendrauti viena plačiausiai vartojamų kalbų.
+            </p>
+            <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
+              <p className="text-sm font-bold text-emerald-600">Grupės renkamos</p>
+            </div>
+          </motion.div>
+
         </div>
 
         {/* REGISTRATION FORM SECTION */}
@@ -150,7 +197,7 @@ export default function GrupinesPamokos() {
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-5xl font-extrabold mb-6">Prisijunkite prie laukiančiųjų sąrašo</h2>
             <p className="text-blue-100 text-lg mb-10 max-w-2xl mx-auto">
-              Įveskite savo el. paštą ir mes susisieksime su jumis iškart, kai tik prasidės naujos grupės formavimas!
+              Pasirinkite dominančią kalbą, įveskite el. paštą ir mes susisieksime, kai tik bus renkama jūsų grupė!
             </p>
 
             {status === "success" ? (
@@ -161,31 +208,56 @@ export default function GrupinesPamokos() {
               >
                 <CheckCircle2 size={64} className="text-yellow-400 mb-4" />
                 <h3 className="text-2xl font-bold mb-2">Sėkmingai užregistruota!</h3>
-                <p className="text-blue-100">Laukite laiško su tolimesnėmis instrukcijomis.</p>
+                <p className="text-blue-100">Informaciją perduosime atitinkamos kalbos mokytojams. Laukite laiško!</p>
               </motion.div>
             ) : (
-              <form onSubmit={handleRegistration} className="flex flex-col sm:flex-row gap-4 max-w-xl mx-auto">
-                <input
-                  type="email"
-                  required
-                  placeholder="Jūsų el. pašto adresas"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={status === "loading"}
-                  className="flex-1 px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70"
-                />
+              <form onSubmit={handleRegistration} className="flex flex-col gap-4 max-w-2xl mx-auto">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  {/* Dalyko pasirinkimas */}
+                  <select
+                    value={subject}
+                    onChange={(e) => {
+                      setSubject(e.target.value);
+                      if (status === "validation_error") setStatus("idle");
+                    }}
+                    disabled={status === "loading"}
+                    className="flex-1 px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70 bg-white cursor-pointer"
+                  >
+                    <option value="" disabled>Pasirinkite kalbą...</option>
+                    <option value="Anglų kalba">Anglų kalba</option>
+                    <option value="Prancūzų kalba">Prancūzų kalba</option>
+                    <option value="Vokiečių kalba">Vokiečių kalba</option>
+                    <option value="Arabų kalba">Arabų kalba</option>
+                  </select>
+
+                  {/* El. pašto įvestis */}
+                  <input
+                    type="email"
+                    required
+                    placeholder="Jūsų el. pašto adresas"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={status === "loading"}
+                    className="flex-[2] px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70"
+                  />
+                </div>
+
+                {status === "validation_error" && (
+                  <p className="text-yellow-300 text-sm font-medium text-left ml-2">Prašome pasirinkti dominančią kalbą.</p>
+                )}
+
                 <Button
                   type="submit"
                   disabled={status === "loading"}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 h-auto rounded-2xl font-bold text-lg transition-transform hover:-translate-y-1 shadow-lg disabled:opacity-70 disabled:hover:translate-y-0"
+                  className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 mt-2 h-auto rounded-2xl font-bold text-lg transition-transform hover:-translate-y-1 shadow-lg disabled:opacity-70 disabled:hover:translate-y-0 w-full sm:w-auto self-center"
                 >
-                  {status === "loading" ? "Siunčiama..." : "Registruotis"}
+                  {status === "loading" ? "Siunčiama..." : "Registruotis į grupę"}
                 </Button>
               </form>
             )}
             
             {status === "error" && (
-              <p className="text-red-300 mt-4 font-medium">Įvyko klaida. Prašome pabandyti dar kartą vėliau.</p>
+              <p className="text-red-300 mt-4 font-medium">Įvyko klaida duomenų bazėje. Prašome pabandyti vėliau.</p>
             )}
           </div>
         </motion.div>
