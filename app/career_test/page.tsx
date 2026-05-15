@@ -17,7 +17,9 @@ import {
   Lock,
   X,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  BrainCircuit,
+  Activity
 } from 'lucide-react';
 
 // --- IMPORT CHECKOUT FORM (Up 2 levels) ---
@@ -110,19 +112,19 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
               {/* Product Details Box - Hidden on Mobile unless toggled */}
               <div className={`${showDetails ? 'block' : 'hidden'} md:block bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-all`}>
                 <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Produktas</span>
-                <p className="font-bold text-slate-900 text-lg leading-tight mt-1">Karjeros Žemėlapis 2026</p>
+                <p className="font-bold text-slate-900 text-lg leading-tight mt-1">Profesionalus Karjeros ir Elgsenos Tyrimas 2026</p>
                 <ul className="mt-4 space-y-3 text-sm text-slate-500">
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
-                    <span>10 profesijų, kurios geriausiai tinka tau.</span>
+                    <span>Išsami darbo elgsenos ataskaita (7 karjeros dimensijos).</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
-                    <span>Profesionali ataskaita.</span>
+                    <span>10 profesijų, idealiai tinkančių tavo psichologiniam profiliui.</span>
                   </li>
                   <li className="flex items-start gap-2">
                     <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
-                    <span>Studijų ir egzaminų planas.</span>
+                    <span>Individualus studijų ir pasiruošimo planas.</span>
                   </li>
                 </ul>
               </div>
@@ -207,16 +209,16 @@ export default function KarjerosPristatymas() {
     <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
       
       <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
-        <Zap size={16} className="text-blue-600" /> Naujiena: Tiksliausias 2026-ųjų karjeros testas
+        <Zap size={16} className="text-blue-600" /> Naujiena: Moksliškai pagrįstas darbo elgsenos tyrimas
       </div>
       
       <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 mb-6 leading-tight">
-        Tavo ateitis- ne <span className="text-blue-600">atsitiktinumas.</span>
+        Tavo ateitis - ne <span className="text-blue-600">atsitiktinumas.</span>
       </h1>
       
       <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-        Gauk profesionalią asmenybės analizę, tinkančių profesijų sąrašą ir studijų planą. 
-        <span className="block mt-2 font-semibold text-slate-800">Investicija į tavo karjerą- tik {PRODUCT_PRICE} €.</span>
+        Gauk išsamią darbo elgsenos ir asmenybės analizę: įvertink savo sprendimų priėmimo, bendradarbiavimo bei emocinio stabilumo stilių. Sužinok, kurios profesijos geriausiai atskleis tavo potencialą. 
+        <span className="block mt-2 font-semibold text-slate-800">Investicija į profesionalų savęs pažinimą - tik {PRODUCT_PRICE} €.</span>
       </p>
       
       <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
@@ -247,30 +249,30 @@ export default function KarjerosPristatymas() {
       <section id="kaip-veikia" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl lg:text-4xl font-extrabold mb-4">Kodėl verta investuoti {PRODUCT_PRICE} €?</h2>
-          <p className="text-slate-500">Tai ne šiaip testas, o išsami 50 klausimų analizė, kuri sutaupys tau mėnesius blaškymosi.</p>
+          <p className="text-slate-500">Tai ne šiaip testas, o profesionali elgsenos analizė, vertinanti 7 esmines psichologines sritis, lemsiančias tavo sėkmę darbo rinkoje.</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {[
             { 
-              icon: <Target className="text-blue-600" />, 
-              title: "Profesionalus profilis", 
-              desc: "Gausi detalų psichologinį savo stiprybių ir silpnybių aprašymą." 
+              icon: <BrainCircuit className="text-blue-600" />, 
+              title: "Darbo elgsenos profilis", 
+              desc: "Gili analizė, apimanti tavo įtaką, motyvaciją, organizuotumą bei požiūrį į inovacijas." 
             },
             { 
               icon: <LineChart className="text-blue-600" />, 
               title: "Karjeros kryptys", 
-              desc: "10 konkrečių profesijų, kurios labiausiai atitinka tavo duomenis." 
+              desc: "Pagal tavo asmenybės modelį atrinktos 10 profesijų, kuriose natūraliai pasieksi aukščiausių rezultatų." 
             },
             { 
-              icon: <GraduationCap className="text-blue-600" />, 
-              title: "Studijų žemėlapis", 
-              desc: "Rekomendacijos, kur stoti Lietuvoje ir Europoje bei kokių egzaminų reikės." 
+              icon: <Activity className="text-blue-600" />, 
+              title: "Darbinių situacijų valdymas", 
+              desc: "Įvertinsime tavo sprendimų priėmimo greitį bei emocinę pusiausvyrą streso metu." 
             },
             { 
               icon: <Users className="text-blue-600" />, 
               title: "Komunikacijos gidas", 
-              desc: "Patarimai, kaip tavo asmenybės tipui geriausia bendrauti ir dirbti komandoje." 
+              desc: "Asmeninės įžvalgos apie tavo komandinio darbo stilių, potencialą bei ryšių kūrimą organizacijoje." 
             }
           ].map((item, idx) => (
             <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden">
@@ -292,13 +294,12 @@ export default function KarjerosPristatymas() {
         <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16">
           <div className="lg:w-1/2 relative z-10">
             <h2 className="text-3xl lg:text-5xl font-black mb-6 leading-tight">
-              Sužinoti kryptį — tik pradžia. <br/>
-              <span className="text-blue-400">Pasiekti ją padėsime mes.</span>
+              Savo profilio pažinimas - tik pradžia. <br/>
+              <span className="text-blue-400">Pasiekti tikslą padėsime mes.</span>
             </h2>
             
             <p className="text-blue-100/70 text-lg mb-8 leading-relaxed">
-              Testas parodys, kokių egzaminų tau reikia norimai specialybei. 
-              Tiksliukai.lt komanda padės jiems pasiruošti per individualias nuotolines pamokas.
+              Profesionali ataskaita parodys tavo stiprybes ir reikalingus egzaminus svajonių karjerai. Tiksliukai.lt komanda padės užpildyti žinių spragas per individualias nuotolines pamokas.
             </p>
 
             <ul className="space-y-4 mb-10">
@@ -328,7 +329,7 @@ export default function KarjerosPristatymas() {
                         </div>
                     </div>
                     <p className="text-slate-300 italic mb-6">
-                        „Mūsų tikslas- ne tik padėti išlaikyti egzaminus, bet ir įstoti į svajonių studijas, kurias atradote atlikę testą.“
+                        „Mūsų tikslas - ne tik padėti išlaikyti egzaminus, bet ir nukreipti tave ta linkme, kurioje tavo elgsenos profilis garantuos asmeninę ir profesinę sėkmę.“
                     </p>
                     <div className="flex items-center gap-1 text-yellow-400">
                         <Star fill="currentColor" size={16} />
@@ -347,23 +348,21 @@ export default function KarjerosPristatymas() {
       {/* --- FOOTER / FINAL CTA --- */}
       <section className="py-24 text-center container mx-auto px-6">
         <div className="bg-blue-50 rounded-[40px] py-16 px-6 border border-blue-100">
-          {/* Note: Kept the "more than 30" text as it acts as a value anchor, not necessarily the price itself */}
-          <h2 className="text-4xl font-black text-slate-900 mb-6">Tavo ateitis verta daugiau nei {PRODUCT_PRICE}€</h2>
+          <h2 className="text-4xl font-black text-slate-900 mb-6">Tavo potencialo atskleidimas vertas daugiau nei {PRODUCT_PRICE}€</h2>
           <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
-            Tai investicija, kuri atsipirks jau pirmą studijų dieną. Užpildyk testą dabar ir gauk rezultatus akimirksniu.
+            Tai gili asmeninė įžvalga, kuri padės formuoti tavo profesinį kelią nuo pat pirmos studijų dienos. Atlik testą dabar ir gauk savo ataskaitą.
           </p>
-          {/* 3. UPDATED FOOTER BUTTON */}
           <button 
             onClick={handleBuyClick}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-2xl font-extrabold text-xl transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1"
           >
-            Pradėti testą <ArrowRight />
+            Pradėti elgsenos testą <ArrowRight />
           </button>
         </div>
       </section>
 
       <footer className="py-12 border-t border-slate-100 text-center text-slate-400 text-sm">
-        <p>&copy; {new Date().getFullYear()} Tiksliukai.lt Karjeros Testas. Visos teisės saugomos.</p>
+        <p>&copy; {new Date().getFullYear()} Tiksliukai.lt Karjeros Tyrimas. Visos teisės saugomos.</p>
       </footer>
     </div>
   );
