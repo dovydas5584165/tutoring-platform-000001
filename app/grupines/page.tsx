@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ArrowLeft, Users, CheckCircle2, Globe2, MessageCircle, BookOpen, Languages } from "lucide-react";
+import { ArrowLeft, Users, CheckCircle2, Globe2, MessageCircle, BookOpen, Languages, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 // Importuojame jūsų Supabase klientą
@@ -12,13 +12,12 @@ import { supabase } from "../../lib/supabaseClient";
 
 export default function GrupinesPamokos() {
   const [email, setEmail] = useState("");
-  const [subject, setSubject] = useState(""); // Naujas state dalykui
+  const [subject, setSubject] = useState(""); 
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "validation_error">("idle");
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Patikriname, ar pasirinktas dalykas
     if (!subject) {
       setStatus("validation_error");
       return;
@@ -29,7 +28,6 @@ export default function GrupinesPamokos() {
     setStatus("loading");
 
     try {
-      // Siunčiame el. paštą ir pasirinktą dalyką į duomenų bazę
       const { error } = await supabase
         .from('group_registrations')
         .insert([{ email: email, subject: subject }]);
@@ -88,15 +86,15 @@ export default function GrupinesPamokos() {
             <Languages size={32} />
           </div>
           <h1 className="text-4xl sm:text-6xl font-extrabold text-[#3B65CE] mb-6">
-            Užsienio Kalbų Grupės
+            Grupinės Pamokos
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
-            Mokykitės naujų kalbų kartu su bendraamžiais, laužkite kalbėjimo barjerus ir siekite geriausių rezultatų. 
-            Grupinės pamokos – tai puikus būdas greičiau prabilti užsienio kalba.
+            Mokykitės kartu su bendraamžiais, dalinkitės žiniomis ir siekite geriausių rezultatų. 
+            Pasirinkite užsienio kalbų grupes arba kryptingą pasiruošimą mokyklos patikrinimams bei egzaminams.
           </p>
         </motion.div>
 
-        {/* GROUPS INFO CARDS (Language Courses) */}
+        {/* GROUPS INFO CARDS */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
           
           {/* Anglų kalba */}
@@ -178,6 +176,7 @@ export default function GrupinesPamokos() {
               <p className="text-sm font-bold text-emerald-600">Grupės renkamos</p>
             </div>
           </motion.div>
+
           {/* VBE grupė */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -230,7 +229,13 @@ export default function GrupinesPamokos() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">NMPP paruošimas</h2>
             <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
-              Sustipriname 4-os ir 8-os
+              Sustipriname 4-os ir 8-os klasės mokinių žinias prieš Nacionalinį Mokinių Pasiekimų Patikrinimą.
+            </p>
+            <div className="bg-gray-50 rounded-xl p-3 text-center">
+              <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
+              <p className="text-sm font-bold text-cyan-500">Grupės renkamos</p>
+            </div>
+          </motion.div>
 
         </div>
 
@@ -250,7 +255,7 @@ export default function GrupinesPamokos() {
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-5xl font-extrabold mb-6">Prisijunkite prie laukiančiųjų sąrašo</h2>
             <p className="text-blue-100 text-lg mb-10 max-w-2xl mx-auto">
-              Pasirinkite dominančią kalbą, įveskite el. paštą ir mes susisieksime, kai tik bus renkama jūsų grupė!
+              Pasirinkite dominančią grupę, įveskite el. paštą ir mes susisieksime, kai tik bus renkama jūsų grupė!
             </p>
 
             {status === "success" ? (
@@ -261,7 +266,7 @@ export default function GrupinesPamokos() {
               >
                 <CheckCircle2 size={64} className="text-yellow-400 mb-4" />
                 <h3 className="text-2xl font-bold mb-2">Sėkmingai užregistruota!</h3>
-                <p className="text-blue-100">Informaciją perduosime atitinkamos kalbos mokytojams. Laukite laiško!</p>
+                <p className="text-blue-100">Informaciją perduosime atitinkamos srities mokytojams. Laukite laiško!</p>
               </motion.div>
             ) : (
               <form onSubmit={handleRegistration} className="flex flex-col gap-4 max-w-2xl mx-auto">
@@ -276,11 +281,18 @@ export default function GrupinesPamokos() {
                     disabled={status === "loading"}
                     className="flex-1 px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70 bg-white cursor-pointer"
                   >
-                    <option value="" disabled>Pasirinkite kalbą...</option>
-                    <option value="Anglų kalba">Anglų kalba</option>
-                    <option value="Prancūzų kalba">Prancūzų kalba</option>
-                    <option value="Vokiečių kalba">Vokiečių kalba</option>
-                    <option value="Arabų kalba">Arabų kalba</option>
+                    <option value="" disabled>Pasirinkite grupę...</option>
+                    <optgroup label="Užsienio kalbos">
+                      <option value="Anglų kalba">Anglų kalba</option>
+                      <option value="Prancūzų kalba">Prancūzų kalba</option>
+                      <option value="Vokiečių kalba">Vokiečių kalba</option>
+                      <option value="Arabų kalba">Arabų kalba</option>
+                    </optgroup>
+                    <optgroup label="Egzaminai ir Patikrinimai">
+                      <option value="VBE grupė">VBE paruošimas</option>
+                      <option value="PUPP grupė">PUPP paruošimas</option>
+                      <option value="NMPP grupė">NMPP paruošimas</option>
+                    </optgroup>
                   </select>
 
                   {/* El. pašto įvestis */}
@@ -296,7 +308,7 @@ export default function GrupinesPamokos() {
                 </div>
 
                 {status === "validation_error" && (
-                  <p className="text-yellow-300 text-sm font-medium text-left ml-2">Prašome pasirinkti dominančią kalbą.</p>
+                  <p className="text-yellow-300 text-sm font-medium text-left ml-2">Prašome pasirinkti dominančią programą.</p>
                 )}
 
                 <Button
