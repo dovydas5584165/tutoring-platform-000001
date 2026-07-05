@@ -20,7 +20,12 @@ import {
   ChevronUp,
   BrainCircuit,
   Compass,
-  AlertTriangle
+  AlertTriangle,
+  Mail,
+  Gift,
+  CreditCard,
+  ClipboardCheck,
+  CalendarCheck
 } from 'lucide-react';
 
 // --- IMPORT CHECKOUT FORM (Up 2 levels) ---
@@ -31,6 +36,7 @@ const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
 
 // --- CONFIGURATION ---
 const PRODUCT_PRICE = 14;
+const CONTACT_EMAIL = 'info.tiksliukai@gmail.com';
 
 // --- MOBILE OPTIMIZED PAYMENT MODAL COMPONENT ---
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -117,7 +123,19 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                     <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
                     <span>Konkretus egzaminų (VBE) ir studijų planas tavo tikslui.</span>
                   </li>
+                  <li className="flex items-start gap-2">
+                    <Gift size={16} className="text-blue-600 shrink-0 mt-0.5"/> 
+                    <span className="font-semibold text-slate-700">Nemokama konsultacija su specialistu po testo rezultatų.</span>
+                  </li>
                 </ul>
+              </div>
+
+              <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-800 leading-relaxed">
+                <span className="font-bold">🎁 Bonusas:</span> atlikus testą parašyk mums į{' '}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold underline underline-offset-2">
+                  {CONTACT_EMAIL}
+                </a>{' '}
+                ir suderinsime nemokamos konsultacijos laiką.
               </div>
             </div>
 
@@ -202,9 +220,13 @@ export default function KarjerosPristatymas() {
               Nežinai, ką studijuoti? <br/> <span className="text-blue-600 underline decoration-blue-200 underline-offset-8">Nesirink iš lempos.</span>
             </h1>
             
-            <p className="text-xl text-slate-600 mb-10 leading-relaxed max-w-2xl mx-auto">
+            <p className="text-xl text-slate-600 mb-6 leading-relaxed max-w-2xl mx-auto">
               Daugiau nei 30% studentų meta studijas po pirmo kurso, nes pasirinko aklai. Išvenk šios klaidos. Atlik profesionalų asmenybės testą ir sužinok 10 profesijų, kurioms esi sutvertas.
             </p>
+
+            <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 border border-green-200 px-4 py-2 rounded-full text-sm font-bold mb-10">
+              <Gift size={16} /> Kiekvienam testo pirkėjui – nemokama konsultacija su specialistu
+            </div>
             
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
               <button 
@@ -215,7 +237,7 @@ export default function KarjerosPristatymas() {
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" />
               </button>
               
-              <Link href="#verte" className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-600 hover:bg-slate-50 text-slate-700 px-8 py-5 rounded-2xl font-bold text-lg transition-all">
+              <Link href="#kaip-veikia" className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-600 hover:bg-slate-50 text-slate-700 px-8 py-5 rounded-2xl font-bold text-lg transition-all">
                 Kaip tai veikia?
               </Link>
             </div>
@@ -224,6 +246,8 @@ export default function KarjerosPristatymas() {
               <span className="flex items-center gap-1"><ShieldCheck size={16} className="text-green-500"/> Saugus apmokėjimas</span>
               <span className="hidden sm:inline-block text-slate-300">•</span>
               <span className="flex items-center gap-1"><Zap size={16} className="text-yellow-500"/> Rezultatai per 15 minučių</span>
+              <span className="hidden sm:inline-block text-slate-300">•</span>
+              <span className="flex items-center gap-1"><Gift size={16} className="text-blue-500"/> Nemokama konsultacija po testo</span>
             </div>
 
           </div>
@@ -256,7 +280,8 @@ export default function KarjerosPristatymas() {
                   "Aiškų atsakymą, kas tau iš tikrųjų tinka.",
                   "Jokio spaudimo iš tėvų ar mokytojų - tik objektyvūs duomenys.",
                   "Ramybę dėl savo ateities pasirinkimų.",
-                  "Konkretų planą, ką daryti toliau (kokius VBE rinktis)."
+                  "Konkretų planą, ką daryti toliau (kokius VBE rinktis).",
+                  "Nemokamą konsultaciją su specialistu, kuris kartu su tavimi peržiūrės rezultatus."
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <CheckCircle2 className="text-blue-400 shrink-0 mt-1" size={20} />
@@ -309,6 +334,57 @@ export default function KarjerosPristatymas() {
               <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* --- HOW IT WORKS / FREE CONSULTATION --- */}
+      <section id="kaip-veikia" className="py-24 bg-white border-t border-slate-100">
+        <div className="container mx-auto px-6 max-w-5xl">
+          <div className="text-center max-w-2xl mx-auto mb-16">
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
+              <Gift size={16} /> Įskaičiuota į kainą
+            </div>
+            <h2 className="text-3xl lg:text-5xl font-extrabold mb-6 text-slate-900">Kaip tai veikia?</h2>
+            <p className="text-lg text-slate-500">
+              Kiekvienas, nusipirkęs testą, gauna ne tik ataskaitą, bet ir nemokamą asmeninę konsultaciją su mūsų specialistu.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8 relative">
+            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 relative">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-bold text-lg mb-6">1</div>
+              <CreditCard className="text-blue-600 mb-4" size={28} />
+              <h3 className="text-xl font-bold mb-3 text-slate-900">Nusiperki testą</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Vienkartinis {PRODUCT_PRICE} € mokėjimas, saugiai kortele. Prieiga prie testo atsidaro iškart po apmokėjimo.
+              </p>
+            </div>
+
+            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 relative">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-bold text-lg mb-6">2</div>
+              <ClipboardCheck className="text-blue-600 mb-4" size={28} />
+              <h3 className="text-xl font-bold mb-3 text-slate-900">Atlieki testą</h3>
+              <p className="text-slate-500 text-sm leading-relaxed">
+                Užpildai klausimyną savo tempu ir iškart gauni pilną asmenybės ir karjeros ataskaitą.
+              </p>
+            </div>
+
+            <div className="bg-blue-50 p-8 rounded-3xl border-2 border-blue-200 relative">
+              <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-bold text-lg mb-6">3</div>
+              <Mail className="text-blue-600 mb-4" size={28} />
+              <h3 className="text-xl font-bold mb-3 text-slate-900">Susisieki dėl konsultacijos</h3>
+              <p className="text-slate-600 text-sm leading-relaxed mb-4">
+                Parašyk mums į{' '}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="font-bold text-blue-700 underline underline-offset-2">
+                  {CONTACT_EMAIL}
+                </a>{' '}
+                nurodydamas savo vardą – mes priskirsime tau patogų nemokamos konsultacijos laiką.
+              </p>
+              <div className="flex items-center gap-2 text-xs font-bold text-blue-700 bg-white px-3 py-2 rounded-lg border border-blue-200">
+                <CalendarCheck size={14} /> Konsultacija nemokama, įskaičiuota į kainą
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -378,8 +454,13 @@ export default function KarjerosPristatymas() {
       <section className="py-24 text-center container mx-auto px-6">
         <div className="bg-gradient-to-b from-blue-50 to-white rounded-[40px] py-20 px-6 border border-blue-100 shadow-sm max-w-4xl mx-auto">
           <h2 className="text-4xl lg:text-5xl font-black text-slate-900 mb-6">Pradėk planuoti savo sėkmę šiandien</h2>
-          <p className="text-lg text-slate-600 mb-10 max-w-xl mx-auto">
+          <p className="text-lg text-slate-600 mb-6 max-w-xl mx-auto">
             Atsakyk į 50 klausimų ir gauk pilną savo asmenybės ataskaitą per kelias minutes. Tai protingiausi {PRODUCT_PRICE} €, kuriuos išleisi savo ateičiai.
+          </p>
+          <p className="text-sm text-blue-700 font-semibold mb-10 max-w-xl mx-auto flex items-center justify-center gap-2">
+            <Gift size={16} /> Nepamiršk: gavęs rezultatus, parašyk į{' '}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2">{CONTACT_EMAIL}</a>{' '}
+            ir gausi nemokamą konsultaciją.
           </p>
           <button 
             onClick={handleBuyClick}
@@ -387,7 +468,7 @@ export default function KarjerosPristatymas() {
           >
             Atlikti testą dabar <ArrowRight size={24}/>
           </button>
-          <p className="mt-6 text-sm text-slate-400">Jokių paslėptų mokesčių. Vienkartinis mokėjimas.</p>
+          <p className="mt-6 text-sm text-slate-400">Jokių paslėptų mokesčių. Vienkartinis mokėjimas, konsultacija nemokama.</p>
         </div>
       </section>
 
@@ -395,6 +476,7 @@ export default function KarjerosPristatymas() {
         <div className="container mx-auto px-6 text-slate-400 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
           <p>&copy; {new Date().getFullYear()} Tiksliukai.lt Karjeros Tyrimas. Visos teisės saugomos.</p>
           <div className="flex gap-6">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-blue-600 transition-colors">{CONTACT_EMAIL}</a>
             <Link href="#" className="hover:text-blue-600 transition-colors">Naudojimo taisyklės</Link>
             <Link href="#" className="hover:text-blue-600 transition-colors">Privatumo politika</Link>
           </div>
