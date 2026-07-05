@@ -9,7 +9,13 @@ import { usePathname } from "next/navigation";
 /* ─── Supabase ──────────────────────────────────────────────────────────────── */
 const supabaseUrl = "https://yabbhnnhnrainsakhuio.supabase.co";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "REPLACE_ME";
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+// FIX: Added cache: "no-store" to prevent Next.js from serving stale hourly wage data
+const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  global: {
+    fetch: (url, options) => fetch(url, { ...options, cache: "no-store" }),
+  },
+});
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
 interface StudentLine {
@@ -81,7 +87,9 @@ export default function InvoiceGenerator() {
         setVardas(data.vardas);
         setPavarde(data.pavarde);
         if (data.iv_nr) setIndividualNr(data.iv_nr.toString());
-        if (data.hourly_wage) {
+        
+        // FIX: Explicitly checking for null/undefined allows '0' to be set
+        if (data.hourly_wage !== null && data.hourly_wage !== undefined) {
           setPricePerLesson(data.hourly_wage.toString());
         }
       }
@@ -428,29 +436,36 @@ export default function InvoiceGenerator() {
                   <th style={{ border: "1px solid #ccc", padding: 8, textAlign: "right", width: 120 }}>Suma (€)</th>
                 </tr>
               </thead>
+              
+              {/* FIX: Dynamic body matching custom totalSum to effective unit prices */}
               <tbody>
-                {students.map((student) => {
-                  const qty = parseFloat(student.lessonCount) || 0;
-                  const price = parseFloat(pricePerLesson) || 0;
-                  const lineTotal = qty * price;
+                {(() => {
+                  const totalQty = students.reduce((sum, s) => sum + (parseFloat(s.lessonCount) || 0), 0);
+                  const parsedTotalSum = parseFloat(totalSum) || 0;
+                  const effectivePrice = totalQty > 0 ? parsedTotalSum / totalQty : (parseFloat(pricePerLesson) || 0);
 
-                  return (
-                    <tr key={student.id}>
-                      <td style={{ border: "1px solid #ccc", padding: 8 }}>
-                        Mokymo paslaugos ({student.name})
-                      </td>
-                      <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
-                        {qty}
-                      </td>
-                      <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
-                        {price.toFixed(2)}
-                      </td>
-                      <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
-                        {lineTotal.toFixed(2)}
-                      </td>
-                    </tr>
-                  );
-                })}
+                  return students.map((student) => {
+                    const qty = parseFloat(student.lessonCount) || 0;
+                    const lineTotal = qty * effectivePrice;
+
+                    return (
+                      <tr key={student.id}>
+                        <td style={{ border: "1px solid #ccc", padding: 8 }}>
+                          Mokymo paslaugos ({student.name})
+                        </td>
+                        <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                          {qty}
+                        </td>
+                        <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                          {effectivePrice.toFixed(2)}
+                        </td>
+                        <td style={{ border: "1px solid #ccc", padding: 8, textAlign: "right" }}>
+                          {lineTotal.toFixed(2)}
+                        </td>
+                      </tr>
+                    );
+                  });
+                })()}
 
                 {/* Total Row uses the totalSum State (which is editable) */}
                 <tr style={{ fontWeight: "bold", backgroundColor: "#f9f9f9" }}>
