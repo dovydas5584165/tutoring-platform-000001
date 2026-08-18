@@ -1,15 +1,4 @@
-Tikrai taip, atsiprašau už šį vertinį. „Santykiauja“ šiame kontekste skamba nenatūraliai. Lietuviškose analogijų užduotyse įprasta naudoti formuluotę „A yra B tas pats, kas C yra...“. Pakeičiau šį klausimą į: *„Knyga yra skaitytojui tas pats, kas maistas yra...“* (su atitinkamais atsakymų linksniais).
 
-Taip pat šioje versijoje, kaip ir prašei:
-
-1. **Pašalinti visi emodžiai** iš pradinio ekrano ir kitų vietų.
-2. **Atnaujintas viršutinis „TIKSLIUKAI.LT“ logotipas** – jam pritaikytas tas pats profesionalus „Georgia“ šriftas, o ikona panaikinta.
-3. **Sumažinti tušti tarpai** – klausimai ir atsakymai dabar yra sugrupuoti ekrano centre (panaikintas `mt-auto` ir kiti ištempimai), todėl akims nebereikės „šokinėti“ per tuščią erdvę.
-4. **Išmėtyti teisingi atsakymai** – loginės dalies užduotyse teisingas atsakymas dabar nėra visada pirmoje ar antroje vietoje, jie išdėstyti atsitiktine tvarka.
-
-Štai galutinis, pilnai sutvarkytas `page.tsx` failo kodas:
-
-```tsx
 "use client";
 
 import { useState, useEffect } from "react";
