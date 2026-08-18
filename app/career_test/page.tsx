@@ -7,7 +7,6 @@ import { Elements } from '@stripe/react-stripe-js';
 import { 
   Target, 
   GraduationCap, 
-  LineChart, 
   Users, 
   ArrowRight, 
   CheckCircle2, 
@@ -25,7 +24,8 @@ import {
   Gift,
   CreditCard,
   ClipboardCheck,
-  CalendarCheck
+  CalendarCheck,
+  Award
 } from 'lucide-react';
 
 // --- IMPORT CHECKOUT FORM (Up 2 levels) ---
@@ -67,82 +67,87 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
   const appearance = {
     theme: 'stripe' as const,
-    variables: { colorPrimary: '#2563eb', borderRadius: '12px', fontSizeBase: '16px' },
+    variables: { 
+      colorPrimary: '#0f172a', 
+      borderRadius: '8px', 
+      fontSizeBase: '15px',
+      fontFamily: 'ui-sans-serif, system-ui, sans-serif'
+    },
   };
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center sm:p-4">
       <div 
-        className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" 
+        className="absolute inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity" 
         onClick={onClose}
       />
       
-      <div className="relative bg-white w-full h-[95vh] md:h-auto md:max-h-[90vh] md:max-w-4xl rounded-t-3xl md:rounded-3xl shadow-2xl flex flex-col md:flex-row overflow-hidden transition-all transform">
+      <div className="relative bg-white w-full h-[95vh] md:h-auto md:max-h-[90vh] md:max-w-4xl rounded-t-2xl md:rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden transition-all transform border border-slate-200">
         
         <button 
           onClick={onClose}
-          className="md:hidden absolute top-4 right-4 z-20 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200"
+          className="md:hidden absolute top-4 right-4 z-20 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
         >
-          <X size={20} />
+          <X size={18} />
         </button>
 
         {/* --- LEFT SIDE (SUMMARY) --- */}
-        <div className="bg-slate-50 border-b md:border-b-0 md:border-r border-slate-200 md:w-2/5 flex-shrink-0">
+        <div className="bg-slate-900 text-white md:w-2/5 flex-shrink-0 border-b md:border-b-0 md:border-r border-slate-800">
           <div className="p-6 md:p-8 flex flex-col justify-between h-full">
             <div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2 md:mb-6 flex items-center gap-2">
-                <Lock className="w-5 h-5 text-blue-600" /> Tavo investicija
+              <h3 className="text-lg font-semibold tracking-wide text-slate-200 mb-2 md:mb-6 flex items-center gap-2">
+                <Lock className="w-4 h-4 text-emerald-400" /> Užsakymo suvestinė
               </h3>
               
               <div className="flex justify-between items-end mb-4 md:hidden">
-                 <span className="text-slate-500 font-medium text-sm">Mokėti:</span>
-                 <span className="text-3xl font-black text-slate-900">{PRODUCT_PRICE.toFixed(2)} €</span>
+                 <span className="text-slate-400 font-medium text-sm">Suma:</span>
+                 <span className="text-2xl font-semibold text-white">{PRODUCT_PRICE.toFixed(2)} €</span>
               </div>
 
               <button 
                 onClick={() => setShowDetails(!showDetails)}
-                className="flex items-center gap-1 text-blue-600 text-sm font-bold md:hidden mb-4"
+                className="flex items-center gap-1 text-slate-300 text-xs font-semibold uppercase tracking-wider md:hidden mb-4"
               >
-                {showDetails ? 'Slėpti informaciją' : 'Kas sudaro ataskaitą?'}
-                {showDetails ? <ChevronUp size={16}/> : <ChevronDown size={16}/>}
+                {showDetails ? 'Slėpti detales' : 'Ataskaitos sudėtis'}
+                {showDetails ? <ChevronUp size={14}/> : <ChevronDown size={14}/>}
               </button>
 
-              <div className={`${showDetails ? 'block' : 'hidden'} md:block bg-white p-4 rounded-xl border border-slate-200 shadow-sm transition-all`}>
-                <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">Patikima metodika</span>
-                <p className="font-bold text-slate-900 text-lg leading-tight mt-1">Karjeros ir asmenybės profilis 2026</p>
-                <ul className="mt-4 space-y-3 text-sm text-slate-500">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
+              <div className={`${showDetails ? 'block' : 'hidden'} md:block bg-slate-800/80 p-5 rounded-xl border border-slate-700/60 shadow-inner transition-all`}>
+                <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">Aukščiausio lygio diagnostika</span>
+                <p className="font-semibold text-white text-base leading-snug mt-1">Karjeros ir asmenybės profilis 2026</p>
+                <ul className="mt-4 space-y-3 text-xs text-slate-300 leading-relaxed">
+                  <li className="flex items-start gap-2.5">
+                    <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5"/> 
                     <span>Detali psichologinė ataskaita pagal 7 elgsenos dimensijas.</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
-                    <span>Top 10 profesijų, kuriose tu natūraliai dominuosi.</span>
+                  <li className="flex items-start gap-2.5">
+                    <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5"/> 
+                    <span>10 geriausiai suderinamų profesinių krypčių analitika.</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 size={16} className="text-green-500 shrink-0 mt-0.5"/> 
-                    <span>Konkretus egzaminų (VBE) ir studijų planas tavo tikslui.</span>
+                  <li className="flex items-start gap-2.5">
+                    <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5"/> 
+                    <span>Individualus VBE ir akademinių studijų planas.</span>
                   </li>
-                  <li className="flex items-start gap-2">
-                    <Gift size={16} className="text-blue-600 shrink-0 mt-0.5"/> 
-                    <span className="font-semibold text-slate-700">Nemokama konsultacija su specialistu po testo rezultatų.</span>
+                  <li className="flex items-start gap-2.5">
+                    <Award size={15} className="text-emerald-400 shrink-0 mt-0.5"/> 
+                    <span className="font-medium text-slate-200">Įskaičiuota asmeninė eksperto konsultacija.</span>
                   </li>
                 </ul>
               </div>
 
-              <div className="mt-4 bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-blue-800 leading-relaxed">
-                <span className="font-bold">🎁 Bonusas:</span> atlikus testą parašyk mums į{' '}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold underline underline-offset-2">
+              <div className="mt-5 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
+                <span className="font-semibold text-white">Konsultacija:</span> Po vertinimo susisiekite el. paštu{' '}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-emerald-400 underline underline-offset-2 hover:text-emerald-300">
                   {CONTACT_EMAIL}
                 </a>{' '}
-                ir suderinsime nemokamos konsultacijos laiką.
+                dėl individualaus susitikimo laiko suderinimo.
               </div>
             </div>
 
-            <div className="hidden md:block mt-6 pt-6 border-t border-slate-200">
+            <div className="hidden md:block mt-6 pt-6 border-t border-slate-800">
               <div className="flex justify-between items-end">
-                <span className="text-slate-500 font-medium">Iš viso:</span>
-                <span className="text-3xl font-black text-slate-900">{PRODUCT_PRICE.toFixed(2)} €</span>
+                <span className="text-slate-400 text-sm font-medium">Iš viso:</span>
+                <span className="text-3xl font-semibold text-white">{PRODUCT_PRICE.toFixed(2)} €</span>
               </div>
             </div>
           </div>
@@ -154,21 +159,21 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             onClick={onClose}
             className="hidden md:block absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors z-10"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
 
           <div className="overflow-y-auto p-6 md:p-8 h-full pb-20 md:pb-8">
-            <h2 className="text-2xl font-bold mb-2">Apmokėjimas</h2>
-            <p className="text-slate-500 text-sm mb-6">Saugus atsiskaitymas kortele. Rezultatus gausi iškart po testo.</p>
+            <h2 className="text-xl font-semibold text-slate-900 mb-1">Apmokėjimas</h2>
+            <p className="text-slate-500 text-xs mb-6">Saugus Atsiskaitymas. Prieiga suteikiama iškart po patvirtinimo.</p>
 
             {!clientSecret && !error && (
               <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-7 w-7 border-b-2 border-slate-900"></div>
               </div>
             )}
 
             {error && (
-              <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 mb-4 text-sm">
+              <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200 mb-4 text-xs">
                 {error}
               </div>
             )}
@@ -179,8 +184,8 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
               </Elements>
             )}
             
-            <div className="mt-8 flex items-center justify-center gap-2 text-[10px] text-slate-400 uppercase tracking-widest">
-              <ShieldCheck size={14} /> 100% Saugus SSL Apmokėjimas
+            <div className="mt-8 flex items-center justify-center gap-2 text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+              <ShieldCheck size={14} className="text-slate-500" /> 256-bit SSL Šifruotas Mokėjimas
             </div>
           </div>
         </div>
@@ -199,7 +204,7 @@ export default function KarjerosPristatymas() {
   };
 
   return (
-    <div className="bg-slate-50 text-slate-900 font-sans">
+    <div className="bg-slate-50 text-slate-900 font-sans antialiased">
       
       <PaymentModal 
         isOpen={isCheckoutOpen} 
@@ -207,85 +212,89 @@ export default function KarjerosPristatymas() {
       />
       
       {/* --- HERO SECTION --- */}
-      <section className="relative overflow-hidden bg-white py-20 lg:py-28 border-b border-slate-100">
+      <section className="relative overflow-hidden bg-white py-24 lg:py-32 border-b border-slate-200/80">
         <div className="container mx-auto px-6 relative z-10">
           
-          <div className="max-w-4xl mx-auto text-center flex flex-col items-center">
+          <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
             
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-8 shadow-sm">
-              <Zap size={16} className="text-blue-600" /> Sukurta specialiai moksleiviams ir abiturientams
+            <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 text-slate-800 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-8">
+              <Award size={14} className="text-slate-700" /> Moksleivių ir Abiturientų Karjeros Diagnostika
             </div>
             
-            <h1 className="text-5xl lg:text-7xl font-black tracking-tight text-slate-900 mb-8 leading-[1.1]">
-              Nežinai, ką studijuoti? <br/> <span className="text-blue-600 underline decoration-blue-200 underline-offset-8">Nesirink iš lempos.</span>
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.15]">
+              Sąmoningas studijų pasirinkimas. <br/>
+              <span className="text-slate-600 font-normal">Atsakingai suplanuota ateitis.</span>
             </h1>
             
-            <p className="text-xl text-slate-600 mb-6 leading-relaxed max-w-2xl mx-auto">
-              Daugiau nei 30% studentų meta studijas po pirmo kurso, nes pasirinko aklai. Išvenk šios klaidos. Atlik profesionalų asmenybės testą ir sužinok 10 profesijų, kurioms esi sutvertas.
+            <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto font-normal">
+              Daugiau nei 30% studentų pakeičia arba nutraukia studijas dėl skubotų sprendimų. Atlikite mokslu pagrįstą asmenybės bei elgsenos tyrimą ir išsiaiškinkite 10 geriausiai jūsų potencialą atitinkančių profesinių krypčių.
             </p>
 
-            <div className="inline-flex items-center gap-2 bg-green-50 text-green-700 border border-green-200 px-4 py-2 rounded-full text-sm font-bold mb-10">
-              <Gift size={16} /> Kiekvienam testo pirkėjui – nemokama konsultacija su specialistu
+            <div className="inline-flex items-center gap-2 bg-slate-900 text-slate-100 border border-slate-800 px-4 py-2 rounded-lg text-xs font-medium mb-10 shadow-sm">
+              <CheckCircle2 size={14} className="text-emerald-400" /> Įskaičiuota asmeninė ekspertinė konsultacija po vertinimo
             </div>
             
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
               <button 
                 onClick={handleBuyClick}
-                className="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-8 py-5 rounded-2xl font-bold text-lg transition-all shadow-xl shadow-blue-200 hover:-translate-y-1 group"
+                className="flex items-center justify-center gap-3 bg-slate-900 hover:bg-slate-800 text-white px-8 py-4 rounded-xl font-medium text-base transition-all shadow-lg hover:shadow-xl group"
               >
-                <span>Noriu sužinoti savo kelią ({PRODUCT_PRICE} €)</span> 
-                <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+                <span>Gauti analitinę ataskaitą ({PRODUCT_PRICE} €)</span> 
+                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={18} />
               </button>
               
-              <Link href="#kaip-veikia" className="flex items-center justify-center gap-2 bg-white border border-slate-200 hover:border-blue-600 hover:bg-slate-50 text-slate-700 px-8 py-5 rounded-2xl font-bold text-lg transition-all">
-                Kaip tai veikia?
+              <Link href="#kaip-veikia" className="flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-xl font-medium text-base transition-all">
+                Vertinimo metodika
               </Link>
             </div>
             
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-4 text-sm text-slate-500 font-medium">
-              <span className="flex items-center gap-1"><ShieldCheck size={16} className="text-green-500"/> Saugus apmokėjimas</span>
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-medium border-t border-slate-100 pt-8">
+              <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-slate-700"/> Saugus atsiskaitymas</span>
               <span className="hidden sm:inline-block text-slate-300">•</span>
-              <span className="flex items-center gap-1"><Zap size={16} className="text-yellow-500"/> Rezultatai per 15 minučių</span>
+              <span className="flex items-center gap-1.5"><Zap size={15} className="text-slate-700"/> Rezultatai per 15 minučių</span>
               <span className="hidden sm:inline-block text-slate-300">•</span>
-              <span className="flex items-center gap-1"><Gift size={16} className="text-blue-500"/> Nemokama konsultacija po testo</span>
+              <span className="flex items-center gap-1.5"><Gift size={15} className="text-slate-700"/> Įskaičiuotas eksperto aptarimas</span>
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* --- PROBLEM/SOLUTION SECTION (Student Focus) --- */}
-      <section className="py-20 bg-slate-900 text-white">
+      {/* --- PROBLEM/SOLUTION SECTION --- */}
+      <section className="py-24 bg-slate-950 text-white">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 text-red-400 font-bold mb-4 uppercase tracking-wider text-sm">
-                <AlertTriangle size={18} /> Realybė
+              <div className="inline-flex items-center gap-2 text-slate-400 font-semibold mb-4 uppercase tracking-widest text-xs">
+                <AlertTriangle size={15} className="text-amber-400" /> Pasirinkimo rizikos
               </div>
-              <h2 className="text-3xl lg:text-4xl font-extrabold mb-6">Metai netinkamose studijose kainuoja brangiai.</h2>
-              <p className="text-slate-300 text-lg leading-relaxed mb-6">
-                Vidutinė studijų kaina ir pragyvenimas per metus siekia ~3000-5000 €. Negana to - tai prarastas tavo laikas, stresas ir nusivylimas. 
+              <h2 className="text-3xl lg:text-4xl font-bold mb-6 tracking-tight leading-snug">
+                Klaidingas akademinis kelias reikalauja didelių išteklių.
+              </h2>
+              <p className="text-slate-400 text-base leading-relaxed mb-6">
+                Vidutinės vienų metų studijų bei pragyvenimo išlaidos siekia 3,000–5,000 €. Negana to, prarandamas brangus laikas, patiriamas akademinis stresas ir neapibrėžtumas dėl ateities.
               </p>
-              <p className="text-slate-300 text-lg leading-relaxed font-semibold">
-                Sutaupyk šiuos pinigus ir nervus investuodamas vos {PRODUCT_PRICE} € į mokslu pagrįstą savo elgsenos ir potencialo analizę.
+              <p className="text-slate-200 text-base leading-relaxed font-medium">
+                Sumažinkite neapibrėžtumą investuodami {PRODUCT_PRICE} € į psichologiniais tyrimais pagrįstą elgsenos bei profesinio potencialo analizę.
               </p>
             </div>
-            <div className="bg-slate-800 p-8 rounded-3xl border border-slate-700 shadow-2xl relative">
-              <div className="absolute -top-4 -right-4 bg-blue-500 text-white text-sm font-bold px-4 py-2 rounded-full shadow-lg transform rotate-3">
-                Geriausia investicija
+            
+            <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800 shadow-xl relative">
+              <div className="absolute -top-3 -right-3 bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold px-3 py-1 rounded-full shadow-md">
+                Diagnostinis paketas
               </div>
-              <h3 className="text-2xl font-bold mb-4 text-white">Ką gausi atlikęs testą?</h3>
+              <h3 className="text-xl font-semibold mb-6 text-white border-b border-slate-800 pb-4">Ką gausite atlikę vertinimą?</h3>
               <ul className="space-y-4">
                 {[
-                  "Aiškų atsakymą, kas tau iš tikrųjų tinka.",
-                  "Jokio spaudimo iš tėvų ar mokytojų - tik objektyvūs duomenys.",
-                  "Ramybę dėl savo ateities pasirinkimų.",
-                  "Konkretų planą, ką daryti toliau (kokius VBE rinktis).",
-                  "Nemokamą konsultaciją su specialistu, kuris kartu su tavimi peržiūrės rezultatus."
+                  "Objektyvią profesinių krypčių ir vidinio potencialo analizę.",
+                  "Nepriklausomus, duomenimis pagrįstus rezultatus be išorinio spaudimo.",
+                  "Aiškią struktūrą ir tikrumą dėl ateities sprendimų.",
+                  "Konkretų akademinį žemėlapį ir VBE pasirinkimo rekomendacijas.",
+                  "Individulų ataskaitos aptarimą su karjeros konsultantu."
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle2 className="text-blue-400 shrink-0 mt-1" size={20} />
-                    <span className="text-slate-200">{item}</span>
+                    <CheckCircle2 className="text-emerald-400 shrink-0 mt-1" size={18} />
+                    <span className="text-slate-300 text-sm leading-relaxed">{item}</span>
                   </li>
                 ))}
               </ul>
@@ -294,191 +303,199 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- FEATURE SECTION (Translated dimensions to student benefits) --- */}
+      {/* --- FEATURE SECTION --- */}
       <section id="verte" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl lg:text-5xl font-extrabold mb-6 text-slate-900">Tai ne eilinė mokyklos anketa.</h2>
-          <p className="text-lg text-slate-500">
-            Naudojame 7 dimensijų asmenybės vertinimo metodiką, kurią naudoja didžiausios įmonės atsirinkdamos darbuotojus. Dabar ji pritaikyta padėti tau išsirinkti studijas.
+          <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900 tracking-tight">
+            Mokslu pagrįsta 7 dimensijų metodika
+          </h2>
+          <p className="text-slate-600 text-base leading-relaxed">
+            Diagnostikai taikomas tarptautiniu mastu pripažintas vertinimo modelis, naudojamas organizacijų psichologijoje, pritaikytas akademiniam ir profesiniam nukreipimui.
           </p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { 
-              icon: <BrainCircuit className="text-blue-600" />, 
-              title: "Tavo supergalios", 
-              desc: "Išsiaiškinsime tavo stiprybes: ar esi lyderis, analitikas, kūrėjas, o gal komandos siela?" 
+              icon: <BrainCircuit className="text-slate-800" />, 
+              title: "Kompetencijų profilis", 
+              desc: "Atskleidžiamos esminės asmenybės savybės: analitiniai gebėjimai, lyderystė, struktūruotas mąstymas ar kūrybinis potencialas." 
             },
             { 
-              icon: <Target className="text-blue-600" />, 
-              title: "Top 10 profesijų", 
-              desc: "Jokių spėliojimų. Gausi konkretų 10 specialybių sąrašą, kuriose tavo asmenybė natūraliai atneš sėkmę." 
+              icon: <Target className="text-slate-800" />, 
+              title: "10 profesinių krypčių", 
+              desc: "Pateikiamas struktūruotas sąrašas specialybių, kuriose jūsų natūralūs elgsenos pavyzdžiai suteikia konkurencinį pranašumą." 
             },
             { 
-              icon: <Compass className="text-blue-600" />, 
-              title: "Egzaminų žemėlapis", 
-              desc: "Parodysime, kokių tiksliai valstybinių brandos egzaminų reikės norint įstoti į tavo idealiausias profesijas." 
+              icon: <Compass className="text-slate-800" />, 
+              title: "Akademinis planas", 
+              desc: "Tikslus valstybinių brandos egzaminų (VBE) ir akademinių reikalavimų suderinimas su pasirinktomis sritimis." 
             },
             { 
-              icon: <Users className="text-blue-600" />, 
-              title: "Mokymosi stilius", 
-              desc: "Sužinosi, kaip geriausiai įsimeni informaciją ir kaip valdyti stresą artėjant egzaminams." 
+              icon: <Users className="text-slate-800" />, 
+              title: "Darbo ir mokymosi stilius", 
+              desc: "Informacijos įsisavinimo specifikos, streso valdymo bei efektyvumo didinimo rekomendacijos." 
             }
           ].map((item, idx) => (
-            <div key={idx} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-blue-200 transition-all duration-300 relative overflow-hidden group">
-              <div className="w-14 h-14 bg-blue-50 group-hover:bg-blue-600 transition-colors rounded-2xl flex items-center justify-center mb-6">
-                {React.cloneElement(item.icon, { className: "group-hover:text-white transition-colors" })}
+            <div key={idx} className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-200">
+              <div className="w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center mb-6 border border-slate-200">
+                {item.icon}
               </div>
-              <h3 className="text-xl font-bold mb-3 text-slate-900">{item.title}</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">{item.desc}</p>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900">{item.title}</h3>
+              <p className="text-slate-600 text-xs leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* --- HOW IT WORKS / FREE CONSULTATION --- */}
-      <section id="kaip-veikia" className="py-24 bg-white border-t border-slate-100">
+      {/* --- HOW IT WORKS / CONSULTATION --- */}
+      <section id="kaip-veikia" className="py-24 bg-white border-t border-slate-200/80">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="text-center max-w-2xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
-              <Gift size={16} /> Įskaičiuota į kainą
+            <div className="inline-flex items-center gap-2 bg-slate-100 text-slate-800 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 border border-slate-200">
+              <Gift size={14} /> Kompleksinė paslauga
             </div>
-            <h2 className="text-3xl lg:text-5xl font-extrabold mb-6 text-slate-900">Kaip tai veikia?</h2>
-            <p className="text-lg text-slate-500">
-              Kiekvienas, nusipirkęs testą, gauna ne tik ataskaitą, bet ir nemokamą asmeninę konsultaciją su mūsų specialistu.
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900 tracking-tight">Procesas ir eiga</h2>
+            <p className="text-slate-600 text-base">
+              Kiekvienas užsakymas apima skaitmeninę diagnostikos ataskaitą ir asmeninę eksperto konsultaciją rezultatų aptarimui.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 relative">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-bold text-lg mb-6">1</div>
-              <CreditCard className="text-blue-600 mb-4" size={28} />
-              <h3 className="text-xl font-bold mb-3 text-slate-900">Nusiperki testą</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">
-                Vienkartinis {PRODUCT_PRICE} € mokėjimas, saugiai kortele. Prieiga prie testo atsidaro iškart po apmokėjimo.
+            <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+              <div className="w-10 h-10 bg-slate-900 text-white rounded-lg flex items-center justify-center font-semibold text-sm mb-6">01</div>
+              <CreditCard className="text-slate-800 mb-4" size={24} />
+              <h3 className="text-lg font-semibold mb-2 text-slate-900">Užsakymas</h3>
+              <p className="text-slate-600 text-xs leading-relaxed">
+                Vienkartinis {PRODUCT_PRICE} € mokėjimas per saugią Stripe sistemą. Prieiga prie vertinimo suteikiama iš karto.
               </p>
             </div>
 
-            <div className="bg-slate-50 p-8 rounded-3xl border border-slate-200 relative">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-bold text-lg mb-6">2</div>
-              <ClipboardCheck className="text-blue-600 mb-4" size={28} />
-              <h3 className="text-xl font-bold mb-3 text-slate-900">Atlieki testą</h3>
-              <p className="text-slate-500 text-sm leading-relaxed">
-                Užpildai klausimyną savo tempu ir iškart gauni pilną asmenybės ir karjeros ataskaitą.
+            <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+              <div className="w-10 h-10 bg-slate-900 text-white rounded-lg flex items-center justify-center font-semibold text-sm mb-6">02</div>
+              <ClipboardCheck className="text-slate-800 mb-4" size={24} />
+              <h3 className="text-lg font-semibold mb-2 text-slate-900">Diagnostika</h3>
+              <p className="text-slate-600 text-xs leading-relaxed">
+                Klausimyno užpildymas užtrunka apie 15 minučių. Generuojama išsami analitinė ataskaita.
               </p>
             </div>
 
-            <div className="bg-blue-50 p-8 rounded-3xl border-2 border-blue-200 relative">
-              <div className="w-12 h-12 bg-blue-600 text-white rounded-2xl flex items-center justify-center font-bold text-lg mb-6">3</div>
-              <Mail className="text-blue-600 mb-4" size={28} />
-              <h3 className="text-xl font-bold mb-3 text-slate-900">Susisieki dėl konsultacijos</h3>
-              <p className="text-slate-600 text-sm leading-relaxed mb-4">
-                Parašyk mums į{' '}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="font-bold text-blue-700 underline underline-offset-2">
+            <div className="bg-slate-900 text-white p-8 rounded-2xl border border-slate-800 shadow-md">
+              <div className="w-10 h-10 bg-emerald-500 text-slate-950 rounded-lg flex items-center justify-center font-bold text-sm mb-6">03</div>
+              <Mail className="text-emerald-400 mb-4" size={24} />
+              <h3 className="text-lg font-semibold mb-2 text-white">Eksperto konsultacija</h3>
+              <p className="text-slate-300 text-xs leading-relaxed mb-4">
+                Parašykite mums el. paštu{' '}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-emerald-400 font-medium underline underline-offset-2">
                   {CONTACT_EMAIL}
                 </a>{' '}
-                nurodydamas savo vardą – mes priskirsime tau patogų nemokamos konsultacijos laiką.
+                – suderinsime jums patogų konsultacijos laiką.
               </p>
-              <div className="flex items-center gap-2 text-xs font-bold text-blue-700 bg-white px-3 py-2 rounded-lg border border-blue-200">
-                <CalendarCheck size={14} /> Konsultacija nemokama, įskaičiuota į kainą
+              <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-400 bg-slate-800/80 px-3 py-2 rounded-lg border border-slate-700/60">
+                <CalendarCheck size={14} /> Nemokama konsultacija įskaičiuota
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* --- TIKSLIUKAI.LT INTEGRACIJA --- */}
-      <section className="bg-blue-600 py-24 text-white overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+      {/* --- TIKSLIUKAI.LT INTEGRATION --- */}
+      <section className="bg-slate-900 py-24 text-white overflow-hidden relative border-t border-slate-800">
         <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16 relative z-10">
           <div className="lg:w-1/2">
-            <div className="inline-flex items-center gap-2 bg-blue-800/50 text-blue-100 px-4 py-2 rounded-full text-sm font-bold mb-6 backdrop-blur-sm border border-blue-500">
-              <GraduationCap size={16} /> Nuo testo iki įstojimo
+            <div className="inline-flex items-center gap-2 bg-slate-800 text-slate-300 px-3.5 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-6 border border-slate-700">
+              <GraduationCap size={15} /> Akademinis Palaikymas
             </div>
-            <h2 className="text-3xl lg:text-5xl font-black mb-6 leading-tight">
-              Padėsime ne tik sužinoti, <br/>
-              <span className="text-blue-200">bet ir įstoti.</span>
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 tracking-tight leading-tight">
+              Atsakingas pasirengimas <br/>
+              <span className="text-slate-400 font-normal">studijų tikslams pasiekti.</span>
             </h2>
             
-            <p className="text-blue-100 text-lg mb-8 leading-relaxed">
-              Kai žinosi, kokią kryptį pasirinkti ir kokius egzaminus laikyti, „Tiksliukai.lt“ komanda bus tavo užnugaris. Mes jungiame geriausius korepetitorius, kurie padės užpildyti spragas ir pasiruošti VBE aukščiausiu balu.
+            <p className="text-slate-300 text-base mb-8 leading-relaxed font-normal">
+              Atskleidus tinkamiausią karjeros kryptį ir reikalingus egzaminus, „Tiksliukai.lt“ komanda padeda užtikrinti aukščiausius akademinius rezultatus. Jungiame patyrusius mentorius ir korepetitorius kryptingam VBE pasirengimui.
             </p>
             
-            <a href="https://tiksliukai.lt" target="_blank" className="inline-block bg-white hover:bg-slate-100 text-blue-700 px-10 py-4 rounded-2xl font-bold text-lg transition-transform hover:scale-105 shadow-xl">
-              Ieškoti korepetitoriaus
+            <a 
+              href="https://tiksliukai.lt" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center bg-white hover:bg-slate-100 text-slate-900 px-8 py-4 rounded-xl font-medium text-base transition-all shadow-lg"
+            >
+              Susipažinti su Tiksliukai.lt
             </a>
           </div>
           
           <div className="lg:w-1/2 flex justify-center w-full">
-              <div className="bg-white text-slate-900 p-8 rounded-3xl max-w-md w-full shadow-2xl transform rotate-1 hover:rotate-0 transition-transform">
-                  <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-100">
-                      <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
-                          T
-                      </div>
-                      <div>
-                          <h4 className="font-bold text-lg leading-tight">Tiksliukai.lt mokytojai</h4>
-                          <p className="text-slate-500 text-sm">Pasiruošimas VBE ir mokyklos kursui</p>
-                      </div>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-700">Matematika</span>
-                      <span className="text-green-500 font-bold text-sm bg-green-50 px-2 py-1 rounded-md">100 balų sistema</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-700">Fizika</span>
-                      <span className="text-blue-500 font-bold text-sm bg-blue-50 px-2 py-1 rounded-md">Patyrę dėstytojai</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="font-semibold text-slate-700">IT</span>
-                      <span className="text-purple-500 font-bold text-sm bg-purple-50 px-2 py-1 rounded-md">Programavimo pagrindai</span>
-                    </div>
-                  </div>
-                  <div className="mt-8 pt-6 border-t border-slate-100 flex items-center justify-between">
-                      <div className="flex items-center gap-1 text-yellow-400">
-                          <Star fill="currentColor" size={16} />
-                          <Star fill="currentColor" size={16} />
-                          <Star fill="currentColor" size={16} />
-                          <Star fill="currentColor" size={16} />
-                          <Star fill="currentColor" size={16} />
-                      </div>
-                      <span className="text-slate-400 text-sm font-medium">500+ laimingų mokinių</span>
-                  </div>
+            <div className="bg-slate-950 text-white p-8 rounded-2xl max-w-md w-full border border-slate-800 shadow-2xl">
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-800">
+                <div className="w-10 h-10 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold text-lg">
+                  T
+                </div>
+                <div>
+                  <h4 className="font-semibold text-base leading-tight">Tiksliukai.lt Akademija</h4>
+                  <p className="text-slate-400 text-xs">Tikslinis VBE ir dalykinis pasirengimas</p>
+                </div>
               </div>
+              <div className="space-y-4 text-sm">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-800/50">
+                  <span className="font-medium text-slate-300">Matematika</span>
+                  <span className="text-slate-400 text-xs font-mono">VBE Standartas</span>
+                </div>
+                <div className="flex items-center justify-between pb-2 border-b border-slate-800/50">
+                  <span className="font-medium text-slate-300">Fizika</span>
+                  <span className="text-slate-400 text-xs font-mono">Ekspertiniai Mentoriai</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-slate-300">Informatika</span>
+                  <span className="text-slate-400 text-xs font-mono">Programavimas</span>
+                </div>
+              </div>
+              <div className="mt-8 pt-6 border-t border-slate-800 flex items-center justify-between">
+                <div className="flex items-center gap-1 text-amber-400">
+                  <Star fill="currentColor" size={14} />
+                  <Star fill="currentColor" size={14} />
+                  <Star fill="currentColor" size={14} />
+                  <Star fill="currentColor" size={14} />
+                  <Star fill="currentColor" size={14} />
+                </div>
+                <span className="text-slate-400 text-xs font-medium">Aukšti VBE įvertinimai</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* --- FOOTER / FINAL CTA --- */}
       <section className="py-24 text-center container mx-auto px-6">
-        <div className="bg-gradient-to-b from-blue-50 to-white rounded-[40px] py-20 px-6 border border-blue-100 shadow-sm max-w-4xl mx-auto">
-          <h2 className="text-4xl lg:text-5xl font-black text-slate-900 mb-6">Pradėk planuoti savo sėkmę šiandien</h2>
-          <p className="text-lg text-slate-600 mb-6 max-w-xl mx-auto">
-            Atsakyk į 50 klausimų ir gauk pilną savo asmenybės ataskaitą per kelias minutes. Tai protingiausi {PRODUCT_PRICE} €, kuriuos išleisi savo ateičiai.
+        <div className="bg-white rounded-3xl py-16 px-6 border border-slate-200/80 shadow-sm max-w-4xl mx-auto">
+          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
+            Pradėkite strateginį planavimą šiandien
+          </h2>
+          <p className="text-base text-slate-600 mb-6 max-w-xl mx-auto leading-relaxed">
+            Atsakykite į klausimyno teiginius ir gaukite asmeninę analitinę ataskaitą per kelias minutes. Tai pamatuota investicija į aiškią ateities viziją.
           </p>
-          <p className="text-sm text-blue-700 font-semibold mb-10 max-w-xl mx-auto flex items-center justify-center gap-2">
-            <Gift size={16} /> Nepamiršk: gavęs rezultatus, parašyk į{' '}
-            <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2">{CONTACT_EMAIL}</a>{' '}
-            ir gausi nemokamą konsultaciją.
+          <p className="text-xs text-slate-500 font-medium mb-10 max-w-xl mx-auto flex items-center justify-center gap-1.5">
+            <Gift size={14} className="text-slate-700" /> Atlikę vertinimą, susisiekite el. paštu{' '}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-slate-900 underline underline-offset-2">{CONTACT_EMAIL}</a>{' '}
+            dėl konsultacijos.
           </p>
           <button 
             onClick={handleBuyClick}
-            className="inline-flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-12 py-5 rounded-2xl font-extrabold text-xl transition-all shadow-2xl shadow-blue-300 hover:-translate-y-2 animate-pulse hover:animate-none"
+            className="inline-flex items-center gap-3 bg-slate-900 hover:bg-slate-800 text-white px-10 py-4 rounded-xl font-medium text-lg transition-all shadow-lg hover:shadow-xl"
           >
-            Atlikti testą dabar <ArrowRight size={24}/>
+            Atlikti vertinimą dabar <ArrowRight size={20}/>
           </button>
-          <p className="mt-6 text-sm text-slate-400">Jokių paslėptų mokesčių. Vienkartinis mokėjimas, konsultacija nemokama.</p>
+          <p className="mt-4 text-xs text-slate-400">Vienkartinis mokėjimas ({PRODUCT_PRICE} €). Jokių papildomų mokesčių.</p>
         </div>
       </section>
 
-      <footer className="py-8 border-t border-slate-200 text-center bg-white">
-        <div className="container mx-auto px-6 text-slate-400 text-sm flex flex-col md:flex-row justify-between items-center gap-4">
+      <footer className="py-8 border-t border-slate-200 bg-white">
+        <div className="container mx-auto px-6 text-slate-500 text-xs flex flex-col md:flex-row justify-between items-center gap-4">
           <p>&copy; {new Date().getFullYear()} Tiksliukai.lt Karjeros Tyrimas. Visos teisės saugomos.</p>
           <div className="flex gap-6">
-            <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-blue-600 transition-colors">{CONTACT_EMAIL}</a>
-            <Link href="#" className="hover:text-blue-600 transition-colors">Naudojimo taisyklės</Link>
-            <Link href="#" className="hover:text-blue-600 transition-colors">Privatumo politika</Link>
+            <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-slate-900 transition-colors">{CONTACT_EMAIL}</a>
+            <Link href="#" className="hover:text-slate-900 transition-colors">Naudojimo taisyklės</Link>
+            <Link href="#" className="hover:text-slate-900 transition-colors">Privatumo politika</Link>
           </div>
         </div>
       </footer>
