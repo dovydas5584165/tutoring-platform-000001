@@ -9,7 +9,11 @@ import {
   Compass,
   ArrowRight,
   ArrowLeft,
+  BookOpen,
   Building2,
+  Briefcase,
+  GraduationCap,
+  Star,
   X,
   Info,
   Download,
@@ -18,7 +22,7 @@ import {
   Radar as RadarIcon,
   HelpCircle,
   Clock,
-  CheckSquare
+  CheckSquare,
 } from "lucide-react";
 import {
   RadarChart,
@@ -304,7 +308,7 @@ const DYNAMIC_QUESTIONS = [
   { type: "likert", q: "Mėgstu automatizuoti pasikartojančius darbus ir ieškoti efektyviausio sprendimo būdo.", t: "A" },
   { type: "likert", q: "Galiu lengvai suprasti, kaip jaučiasi kitas žmogus, net jei jis to nesako žodžiais.", t: "B" },
   { type: "likert", q: "Man be galo svarbu, kad tai, ką sukuriu, atrodytų estetiškai ir turėtų vizualinę vertę.", t: "C" },
-  { type: "likert", q: "Nebijau rizikuoti ir išeiti iš komforto zonos, jei matau galimybę pasiekti sėkmę.", t: "D" },
+  { type: "likert", q: "Nebijau rizikuoti ir išeiti iš komforto zonas, jei matau galimybę pasiekti sėkmę.", t: "D" },
   { type: "likert", q: "Mėgstu klasifikuoti informaciją, palaikyti griežtą tvarką ir visada tikrinu faktus.", t: "E" },
 ];
 
@@ -358,6 +362,12 @@ function getAptitudeBand(pct) {
   if (pct >= 75) return { label: "Aukštas", color: "#166534", text: "Stiprūs analitiniai gebėjimai. Puikiai tvarkotės su logika ir skaičiais." };
   if (pct >= 45) return { label: "Vidutinis", color: "#92400e", text: "Vidutiniai analitiniai gebėjimai. Dalis užduočių įveikta sėkmingai, tačiau loginėms grandinėms gali reikėti daugiau praktikos." };
   return { label: "Pradinis", color: "#7f1d1d", text: "Šįkart užduotys pasirodė sudėtingesnės. Tai puiki proga pasipraktikuoti loginio mąstymo ir matematikos sferoje." };
+}
+
+function buildTraitNarrative(result) {
+  const pos = result.positives.join(", ");
+  const neg = result.negatives.join(", ");
+  return `Atsakymai į savęs pažinimo klausimyną atskleidžia, kad ryškiausios savybės yra: ${pos}. Šios stiprybės paaiškina, kodėl šis profilis natūraliai dera su kryptimi „${result.title}“. Kartu vertėtų sąmoningai stebėti sritis, kurios ateityje gali tapti iššūkiu: ${neg}. Tai nėra trūkumai – tai tiesiog kryptys, kurias ugdant galima dar labiau atskleisti savo potencialą.`;
 }
 
 // ============================================================================
@@ -465,8 +475,15 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
           <div className="text-sm text-slate-600 text-right leading-relaxed">
             <p><span className="font-semibold text-slate-800">Respondentas:</span> {respondentName || "Nenurodyta"}</p>
             <p><span className="font-semibold text-slate-800">Vertinimo data:</span> {dateStr}</p>
+            <p><span className="font-semibold text-slate-800">Norminė grupė:</span> Mokiniai, 9–12 kl.</p>
           </div>
         </div>
+        <p className="text-sm text-slate-500 leading-relaxed max-w-3xl border-l-4 border-slate-200 pl-4">
+          Ši ataskaita parengta pagal atsakymus, kuriuos respondentas pateikė savęs pažinimo klausimyne, bei trumpos analitinių
+          gebėjimų užduoties rezultatus. Rezultatai atspindi tai, kaip pats mokinys šiuo metu vertina savo pomėgius ir stiprybes –
+          jie yra prielaidos, o ne galutinis sprendimas apie tinkamą karjeros kelią. Kadangi interesai ir gebėjimai keičiasi laikui
+          bėgant, ataskaitos aktualumas paprastai trunka apie 12 mėnesių, po to rekomenduojama pakartoti testą.
+        </p>
       </div>
 
       <div className="p-6 md:p-12 space-y-2">
@@ -480,7 +497,38 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
           </div>
         </ReportSection>
 
+        <ReportSection icon={<Star className="w-5 h-5 text-slate-700" />} title="Asmenybės bruožai">
+          <p className="text-slate-700 text-base leading-relaxed mb-6">{buildTraitNarrative(result)}</p>
+          <div className="grid md:grid-cols-2 gap-6">
+            <div className="bg-emerald-50/60 p-5 rounded-2xl border border-emerald-100">
+              <h4 className="text-emerald-800 font-bold mb-3 text-sm uppercase tracking-wide">Stipriosios savybės</h4>
+              <div className="flex flex-wrap gap-2">
+                {result.positives.map((item, i) => (
+                  <span key={i} className="px-3 py-1.5 bg-white text-emerald-900 text-sm font-semibold rounded-lg border border-emerald-200">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <div className="bg-rose-50/60 p-5 rounded-2xl border border-rose-100">
+              <h4 className="text-rose-800 font-bold mb-3 text-sm uppercase tracking-wide">Augimo zonos</h4>
+              <div className="flex flex-wrap gap-2">
+                {result.negatives.map((item, i) => (
+                  <span key={i} className="px-3 py-1.5 bg-white text-rose-900 text-sm font-semibold rounded-lg border border-rose-200">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
+        </ReportSection>
+
         <ReportSection icon={<RadarIcon className="w-5 h-5 text-slate-700" />} title="Asmenybės profilis (visos penkios kryptys)">
+          <p className="text-slate-700 text-sm leading-relaxed mb-4">
+            Nors testas nustato vieną dominuojantį profilį, kiekvienas žmogus atsakymuose atspindi visų penkių krypčių
+            elementus skirtingu laipsniu. Toliau pateikta diagrama parodo, kiek kiekviena kryptis buvo išreikšta atsakymuose –
+            ryškiausia (didžiausia) kryptis atitinka ataskaitoje aprašytą karjeros tipą.
+          </p>
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4" style={{ height: 360 }}>
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData} outerRadius="70%">
@@ -492,6 +540,23 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
               </RadarChart>
             </ResponsiveContainer>
           </div>
+          <div className="mt-4 grid grid-cols-2 sm:grid-cols-5 gap-3">
+            {radarData.map((d) => (
+              <div
+                key={d.key}
+                className={`text-center p-2.5 rounded-xl border ${d.key === resultKey ? "bg-slate-800 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-600"}`}
+              >
+                <div className="text-xs font-semibold leading-tight">{d.subject}</div>
+                <div className={`text-lg font-extrabold ${d.key === resultKey ? "text-white" : "text-slate-800"}`}>
+                  {d.score}/{d.fullMark}
+                </div>
+              </div>
+            ))}
+          </div>
+        </ReportSection>
+
+        <ReportSection icon={<Briefcase className="w-5 h-5 text-slate-700" />} title="Bendravimo stilius">
+          <p className="text-slate-700 text-base leading-relaxed">{result.communication}</p>
         </ReportSection>
 
         <ReportSection icon={<Calculator className="w-5 h-5 text-slate-700" />} title="Analitiniai gebėjimai">
@@ -503,6 +568,51 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
             </div>
             <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden mb-4">
               <div className="h-full rounded-full" style={{ width: `${overallPct}%`, backgroundColor: band.color }} />
+            </div>
+
+            {aptitude.byCategoryPct && Object.keys(CAT_LABELS).map((cat) => {
+              const pct = aptitude.byCategoryPct[cat] || 0;
+              return (
+                <div key={cat}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm text-slate-600">{CAT_LABELS[cat]}</span>
+                    <span className="text-sm font-semibold text-slate-700">{pct}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-slate-700 rounded-full" style={{ width: `${pct}%` }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </ReportSection>
+
+        <ReportSection icon={<GraduationCap className="w-5 h-5 text-slate-700" />} title="Studijų kryptys ir egzaminai">
+          <div className="grid md:grid-cols-3 gap-6">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
+              <h5 className="font-bold text-slate-800 mb-2 flex items-center gap-2 text-sm uppercase tracking-wide">
+                <BookOpen className="w-4 h-4" /> Rekomenduojami egzaminai
+              </h5>
+              <p className="text-slate-700 text-sm leading-relaxed">{result.exams}</p>
+            </div>
+            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
+              <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Universitetai Lietuvoje</h5>
+              <ul className="space-y-2">
+                {result.uniLt.map((uni, i) => (
+                  <li key={i} className="flex justify-between items-center text-sm">
+                    <span className="text-slate-700">{uni.name}</span>
+                    <span className="text-xs font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded ml-2 whitespace-nowrap">{uni.score}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
+              <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Universitetai Europoje</h5>
+              <ul className="space-y-2">
+                {result.uniEu.split(",").map((uni, i) => (
+                  <li key={i} className="text-sm text-slate-700">{uni.trim()}</li>
+                ))}
+              </ul>
             </div>
           </div>
         </ReportSection>
@@ -655,10 +765,23 @@ export default function CareerQuiz() {
 
   const getAptitudeSummary = () => {
     let correctTotal = 0;
+    const catTotal = { numerine: 0, logine: 0, verbaline: 0 };
+    const catCorrect = { numerine: 0, logine: 0, verbaline: 0 };
+
     APTITUDE_QUESTIONS.forEach((q, i) => {
-      if (aptAnswers[i] === q.correct) correctTotal += 1;
+      catTotal[q.cat] = (catTotal[q.cat] || 0) + 1;
+      if (aptAnswers[i] === q.correct) {
+        correctTotal += 1;
+        catCorrect[q.cat] = (catCorrect[q.cat] || 0) + 1;
+      }
     });
-    return { correctTotal };
+
+    const byCategoryPct = {};
+    Object.keys(catTotal).forEach((cat) => {
+      byCategoryPct[cat] = Math.round((catCorrect[cat] / catTotal[cat]) * 100);
+    });
+
+    return { correctTotal, byCategoryPct };
   };
 
   const totalQuestions = DYNAMIC_QUESTIONS.length + APTITUDE_QUESTIONS.length;
