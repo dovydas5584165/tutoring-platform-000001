@@ -374,20 +374,12 @@ export default function ScheduleLanding() {
                 img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/E0Tsj4D9OTOfOSOhS6zfFxwscH4sVtb8INL9xPp4.jpg",
               },
               {
-                name: "Darija Stanislavovaitė",
-                subject: "IT",
-                experience: "1 metai",
+                name: "Katia,
+                subject: "French",
+                experience: "3 metai",
                 description:
-                  "Draugiška mokytoja, kuri moko per praktinius pavyzdžius. Darija yra VGTU studentė ir informatikos korepetitorė.",
+                  "Currently pursuing a Master’s degree in Didactics of French as a Foreign Language (FLE) and holding a Bachelor’s degree in Language Sciences and French Literature, I offer tailored French lessons for all learning levels. Backed by a full year of classroom teaching experience alongside hands-on work with international university students and adult learners, my teaching focus is built on communicative and practical methods. Through custom-designed, interactive learning materials, I provide personalized instruction aimed at building your speaking confidence, improving reading and writing skills, and achieving your language goals at your own pace",
                 img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/da.jpg",
-              },
-              {
-                name: "Nomeda Sabienė",
-                subject: "Chemija, biologija, fizika",
-                experience: "15 metų",
-                description:
-                  "Esu aplinkos chemijos ir ekologijos mokslų daktarė, gamtos mokslus suprantu kaip vientisą nedalomą/holistinę visumą. Galiu paaiškinti įvairius chemijos, fizikos, biologijos klausimus iš visų šių mokslų pozicijų. Ilgametė pedagoginė patirtis leidžia suteikti pagrindus sunkiau besimokantiems, ruošti moksleivius olimpiadoms ir VBE. Mano moto: kartu lengviau! ",
-                img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/20200624_203645-1.jpg",
               },
               {
                 name: "Kajus Tutor",
@@ -402,7 +394,7 @@ export default function ScheduleLanding() {
                 subject: "Matematika, IT",
                 experience: "2 metai",
                 description:
-                  "Esu kiekybinės ekonomikos studentas ir šiuo metu studijuoju Prancūzijoje.",
+                  "Esu kiekybinės ekonomikos alumnas ir studijavau Prancūzijoje šiuo metu dirbu rizikų analitiku.",
                 img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/1701519636194.jpeg",
               }
               
