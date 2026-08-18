@@ -873,5 +873,3 @@ export default function CareerQuiz() {
     </main>
   );
 }
-
-```
