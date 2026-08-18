@@ -374,7 +374,7 @@ export default function ScheduleLanding() {
                 img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/E0Tsj4D9OTOfOSOhS6zfFxwscH4sVtb8INL9xPp4.jpg",
               },
               {
-                name: "Katia,
+                name: "Katia",
                 subject: "French",
                 experience: "3 metai",
                 description:
