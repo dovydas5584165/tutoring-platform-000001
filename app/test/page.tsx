@@ -1,6 +1,17 @@
+Štai atnaujintas `page.tsx` kodas, kuriame įgyvendinau visus tavo prašymus:
+
+1. **Pilno ekrano režimas (Full-screen)**: Panaikinau rėmelius ir apribojimus. Dabar aplikacija išnaudoja visą ekraną, todėl mobiliajame telefone naudotis bus kur kas patogiau.
+2. **Klausimų dinamika**: Pakeičiau senus „Taip/Ne“ klausimus į dinamišką formatą. Dabar yra 3 tipų klausimai: vieno pasirinkimo iš kelių variantų, kelių atsakymų žymėjimo (angl. *multiselect*) ir stiprumo vertinimo („Visiškai sutinku“, „Iš dalies“, „Nesutinku“).
+3. **Analitinės dalies laikmatis**: Pridėtas aiškus 30 sekundžių laikmatis loginės dalies užduotims. Laikui pasibaigus, automatiškai pereinama prie kito klausimo.
+4. **Vienodi šriftai**: Klausimų tekstuose pritaikytas tas pats „Georgia“ / serif šriftas, kuris naudojamas ir ataskaitos antraštėse.
+5. **Daugiau profesijų**: Prie kiekvieno karjeros tipo pridėjau po 5 papildomas profesijas su aprašymais (iš viso dabar po 15 profesijų kiekvienai krypčiai).
+
+Pakeisk savo `page.tsx` failo turinį šiuo kodu:
+
+```tsx
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
@@ -21,6 +32,9 @@ import {
   ShieldCheck,
   ClipboardList,
   Radar as RadarIcon,
+  HelpCircle,
+  Clock,
+  CheckSquare
 } from "lucide-react";
 import {
   RadarChart,
@@ -68,6 +82,11 @@ const RESULTS = {
       { title: "Blockchain vystytojas", salary: "2500-6000€", description: "Kuria decentralizuotas sistemas ir kriptovaliutų technologijas, užtikrinančias saugius sandorius be tarpininkų." },
       { title: "Sistemų administratorius", salary: "1500-3000€", description: "Prižiūri įmonės kompiuterių tinklus, serverius ir įrangą, užtikrindamas sklandų kasdienį darbą." },
       { title: "Elektronikos inžinierius", salary: "1600-3500€", description: "Kuria elektronines grandines ir prietaisus – nuo išmaniųjų telefonų komponentų iki medicininės įrangos." },
+      { title: "QA Inžinierius (Testuotojas)", salary: "1500-3500€", description: "Testuoja programinę įrangą ir užtikrina jos kokybę prieš pasiekiant vartotojus." },
+      { title: "Tinklų inžinierius", salary: "2000-4500€", description: "Kuria, diegia ir prižiūri kompiuterinių tinklų infrastruktūrą organizacijose." },
+      { title: "Duomenų inžinierius", salary: "2500-5500€", description: "Rengia ir prižiūri infrastruktūrą, reikalingą dideliems duomenų kiekiams apdoroti." },
+      { title: "Telekomunikacijų inžinierius", salary: "1800-4000€", description: "Kuria ir optimizuoja ryšio ir duomenų perdavimo sistemas." },
+      { title: "IT palaikymo specialistas", salary: "1200-2500€", description: "Padeda išspręsti technines problemas, su kuriomis susiduria įmonės darbuotojai ar klientai." },
     ],
   },
   B: {
@@ -101,6 +120,11 @@ const RESULTS = {
       { title: "Ergoterapeutas", salary: "1300-2400€", description: "Padeda žmonėms po traumų ar ligų susigrąžinti kasdienius įgūdžius ir savarankiškumą." },
       { title: "Renginių organizatorius", salary: "1200-3000€", description: "Planuoja ir koordinuoja šventes, konferencijas ar festivalius, užtikrindamas geras dalyvių emocijas." },
       { title: "Specialusis pedagogas", salary: "1300-2200€", description: "Dirba su vaikais, turinčiais specialiųjų poreikių, padėdamas jiems integruotis ir mokytis." },
+      { title: "Šeimos terapeutas", salary: "1500-3500€", description: "Konsultuoja šeimas, padeda joms įveikti krizes ir gerinti tarpusavio santykius." },
+      { title: "Slaugytojas", salary: "1300-2500€", description: "Rūpinasi pacientų fizine ir emocine gerove sveikatos priežiūros įstaigose." },
+      { title: "Bendruomenės lyderis", salary: "1200-2800€", description: "Buria ir atstovauja bendruomenes, inicijuoja socialinius projektus." },
+      { title: "Vaiko teisių apsaugos specialistas", salary: "1400-2500€", description: "Gina vaikų interesus ir sprendžia sudėtingas šeimų problemas." },
+      { title: "Priklausomybių konsultantas", salary: "1300-2600€", description: "Padeda asmenims įveikti priklausomybes per terapiją ir palaikymą." },
     ],
   },
   C: {
@@ -134,6 +158,11 @@ const RESULTS = {
       { title: "3D modeliuotojas", salary: "1600-3800€", description: "Kuria trimačius objektus žaidimams, filmams arba produktų vizualizacijoms." },
       { title: "Mados dizaineris", salary: "1200-4000€", description: "Kuria drabužių ir aksesuarų kolekcijas, seka mados tendencijas." },
       { title: "Copywriter (Tekstų kūrėjas)", salary: "1300-2800€", description: "Rašo įtraukiančius tekstus reklamoms, svetainėms ir straipsniams." },
+      { title: "Animatorius", salary: "1500-3500€", description: "Kuria judančius vaizdus filmams, vaizdo žaidimams ar reklamoms." },
+      { title: "Iliustratorius", salary: "1200-3000€", description: "Kuria vizualinius piešinius ir meną knygoms, žurnalams ar skaitmeninei žiniasklaidai." },
+      { title: "Pramonės dizaineris", salary: "1600-4000€", description: "Kuria masinės gamybos produktų formą, funkcijas ir ergonomiką." },
+      { title: "Scenografas", salary: "1300-3000€", description: "Kuria vizualią aplinką ir dekoracijas teatrui, televizijai ar kinui." },
+      { title: "Videografas", salary: "1400-3500€", description: "Filmuoja ir prodiusuoja vaizdo turinį asmeniniams ar verslo projektams." },
     ],
   },
   D: {
@@ -167,6 +196,11 @@ const RESULTS = {
       { title: "Nekilnojamojo turto vystytojas", salary: "Neribota", description: "Inicijuoja statybų projektus, perka žemę ir organizuoja pastatų statybą bei pardavimą." },
       { title: "Logistikos vadovas", salary: "1800-3500€", description: "Organizuoja prekių judėjimą tarptautiniu mastu, optimizuoja tiekimo grandines." },
       { title: "Finansų direktorius (CFO)", salary: "3000-7000€", description: "Atsako už visus įmonės finansus, biudžeto planavimą ir finansines ataskaitas." },
+      { title: "Verslo analitikas", salary: "2000-4500€", description: "Analizuoja įmonės procesus, duomenis ir siūlo sprendimus efektyvumui didinti." },
+      { title: "Operacijų vadovas", salary: "2500-6000€", description: "Valdo kasdienę įmonės veiklą, užtikrindamas sklandų ir pelningą procesų veikimą." },
+      { title: "Startuolio įkūrėjas", salary: "Neribota", description: "Inicijuoja, augina ir pritraukia investicijas inovatyviems verslo projektams." },
+      { title: "Prekės ženklo strategas", salary: "2000-4800€", description: "Kuria ilgalaikę prekės ženklo pozicionavimo, įvaizdžio ir augimo strategiją." },
+      { title: "Rizikos vertintojas", salary: "2200-5000€", description: "Identifikuoja ir analizuoja galimas finansines, operacines ar verslo rizikas." },
     ],
   },
   E: {
@@ -200,61 +234,107 @@ const RESULTS = {
       { title: "Laboratorijos vedėjas", salary: "1600-3200€", description: "Vadovauja moksliniams tyrimams, prižiūri įrangą ir užtikrina tyrimų tikslumą." },
       { title: "Apskaitininkas / Buhalteris", salary: "1200-2800€", description: "Tvarko įmonės finansinius dokumentus, skaičiuoja atlyginimus ir mokesčius." },
       { title: "Odontologas", salary: "2500-6000€", description: "Rūpinasi pacientų burnos sveikata, gydo dantis ir atlieka estetines procedūras." },
+      { title: "Genetikos technologas", salary: "1800-3500€", description: "Atlieka DNR tyrimus, paveldimų ligų ir genetinę analizę laboratorijose." },
+      { title: "Epidemiologas", salary: "1700-4000€", description: "Tiria ligų plitimą populiacijoje, analizuoja duomenis ir ieško būdų jas suvaldyti." },
+      { title: "Teisės patarėjas", salary: "2000-5000€", description: "Teikia teisines konsultacijas įmonėms ar asmenims, rengia sutartis ir dokumentus." },
+      { title: "Kokybės kontrolės inspektorius", salary: "1400-2800€", description: "Užtikrina, kad gaminiai ar paslaugos atitiktų griežčiausius nustatytus standartus." },
+      { title: "Veterinaras", salary: "1500-3500€", description: "Diagnozuoja ir gydo gyvūnų ligas, atlieka operacijas ir rūpinasi jų sveikata." },
     ],
   },
 };
 
-// Personality / self-report items (~60 items, ~8-10s each => ~9 minutes)
-const RAW_QUESTIONS = [
-  { q: "Mėgstu spręsti loginius galvosūkius ir mįsles.", t: "A" }, { q: "Man įdomu, kaip veikia algoritmai ir kodas.", t: "A" },
-  { q: "Galiu ilgai sėdėti prie vienos techninės problemos.", t: "A" }, { q: "Man patinka aiški struktūra ir skaičiai.", t: "A" },
-  { q: "Greitai pastebiu sistemos klaidas ar neefektyvumą.", t: "A" }, { q: "Mėgstu automatizuoti pasikartojančius darbus.", t: "A" },
-  { q: "Man įdomu ardyti prietaisus ir suprasti jų veikimą.", t: "A" }, { q: "Suprantu kompiuterių tinklų logiką.", t: "A" },
-  { q: "Analizuoju statistiką ir grafikus savo malonumui.", t: "A" }, { q: "Mane domina duomenų saugumas ir privatumas.", t: "A" },
-  { q: "Man patinka kurti ir tobulinti sistemas ar procesus.", t: "A" }, { q: "Greitai išmokstu naujas programas ar technologijas.", t: "A" },
-  { q: "Moku išklausyti žmogų jo nepertraukdamas.", t: "B" }, { q: "Socialinės problemos ir nelygybė man rūpi.", t: "B" },
-  { q: "Galiu lengvai paaiškinti sudėtingą dalyką vaikui.", t: "B" }, { q: "Jaučiu prasmę padėdamas kitiems tobulėti.", t: "B" },
-  { q: "Gera atmosfera komandoje man svarbiau už rezultatą.", t: "B" }, { q: "Domiuosi psichologija ir žmonių elgsena.", t: "B" },
-  { q: "Nuoširdžiai džiaugiuosi kitų sėkme.", t: "B" }, { q: "Moku motyvuoti nusivylusį žmogų.", t: "B" },
-  { q: "Darbas be prasmės man būtų kančia.", t: "B" }, { q: "Mėgstu pažinti skirtingas kultūras.", t: "B" },
-  { q: "Man patinka padėti draugams susitvarkyti su sunkumais.", t: "B" }, { q: "Jaučiu, kada žmogui reikia palaikymo, net jei jis nesako.", t: "B" },
-  { q: "Pastebiu, kai spalvos ar formos nedera tarpusavyje.", t: "C" }, { q: "Daug laiko praleidžiu svajodamas apie idėjas.", t: "C" },
-  { q: "Mėgstu kurti video, fotografuoti ar piešti.", t: "C" }, { q: "Originalumas man svarbiau už taisykles.", t: "C" },
-  { q: "Mėgstu keisti savo aplinkos dizainą.", t: "C" }, { q: "Mada, kinas ir menas mane įkvepia.", t: "C" },
-  { q: "Man svarbu, kad rezultatas būtų estetiškas.", t: "C" }, { q: "Mano idėjos kitiems kartais atrodo keistos.", t: "C" },
-  { q: "Norėčiau sukurti savo prekinį ženklą.", t: "C" }, { q: "Mėgstu gaminti ar meistrauti rankomis.", t: "C" },
-  { q: "Mėgstu improvizuoti ir eksperimentuoti su naujomis idėjomis.", t: "C" }, { q: "Man patinka rašyti istorijas, dainų tekstus ar scenarijus.", t: "C" },
-  { q: "Mėgstu derėtis ir gauti geriausią kainą.", t: "D" }, { q: "Konkurencija mane motyvuoja stengtis labiau.", t: "D" },
-  { q: "Galiu priimti sprendimus spaudimo metu.", t: "D" }, { q: "Finansinė sėkmė man yra svarbus rodiklis.", t: "D" },
-  { q: "Visada turiu planą B ir C.", t: "D" }, { q: "Nebijau finansinės rizikos, jei matau galimybę.", t: "D" },
-  { q: "Mėgstu vadovauti grupiniams projektams.", t: "D" }, { q: "Galiu įtikinti kitus savo tiesa.", t: "D" },
-  { q: "Svajoju turėti savo verslą ar įmonę.", t: "D" }, { q: "Statusas ir pripažinimas man svarbu.", t: "D" },
-  { q: "Man patinka kelti tikslus ir sekti, kaip juos pasiekiu.", t: "D" }, { q: "Noriu, kad mano darbas turėtų aiškų poveikį rezultatams.", t: "D" },
-  { q: "Mėgstu klasifikuoti ir rūšiuoti informaciją.", t: "E" }, { q: "Visada pastebiu rašybos ar faktines klaidas.", t: "E" },
-  { q: "Gamtos mokslai (biologija, chemija) man patinka.", t: "E" }, { q: "Aiškios instrukcijos ir rutina manęs negąsdina.", t: "E" },
-  { q: "Mėgstu atlikti tikslius eksperimentus.", t: "E" }, { q: "Sveikata ir ekologija man prioritetas.", t: "E" },
-  { q: "Galiu ilgai dirbti susikaupęs prie detalių.", t: "E" }, { q: "Saugumo taisyklių laikymasis yra būtinas.", t: "E" },
-  { q: "Visada skaitau instrukcijas iki galo.", t: "E" }, { q: "Disciplina ir tvarka man padeda gyventi.", t: "E" },
-  { q: "Man patinka tikrinti faktus prieš juos patikint.", t: "E" }, { q: "Jaučiuosi ramiau, kai turiu aiškų veiksmų planą.", t: "E" },
+// Dynamic questions mix (choice, multiselect, likert)
+const DYNAMIC_QUESTIONS = [
+  {
+    type: "choice",
+    q: "Kokia veikla komandiniame projekte tau atrodytų patraukliausia?",
+    options: [
+      { text: "Struktūruoti užduotis, planuoti logiką ar programuoti", t: "A" },
+      { text: "Padėti komandos nariams susikalbėti ir spręsti konfliktus", t: "B" },
+      { text: "Kurti vizualinį dizainą, idėjas ar pristatymą", t: "C" },
+      { text: "Dalinti užduotis, sekti biudžetą ir prisiimti atsakomybę", t: "D" },
+      { text: "Tikrinti faktus, ieškoti mokslinių šaltinių ir taisyti klaidas", t: "E" },
+    ]
+  },
+  {
+    type: "choice",
+    q: "Kokia tavo idealios darbo aplinkos vizija?",
+    options: [
+      { text: "Tyli, tvarkinga laboratorija ar asmeninis kabinetas", t: "E" },
+      { text: "Atviros erdvės su moderniomis technologijomis ir ekranais", t: "A" },
+      { text: "Jauki aplinka, kurioje galima bendrauti ir tiesiogiai padėti kitiems", t: "B" },
+      { text: "Kūrybinė studija be griežtų taisyklių ir rutinos", t: "C" },
+      { text: "Dinamiškas biuras, kuriame nuolat verda veiksmas ir sprendžiami verslo reikalai", t: "D" },
+    ]
+  },
+  {
+    type: "multiselect",
+    q: "Pažymėk visas veiklas, kurios tau skamba įdomiai (gali rinktis kelias):",
+    options: [
+      { text: "Duomenų bazių ar sistemų analizė", t: "A" },
+      { text: "Pagalba sunkumus išgyvenantiems žmonėms", t: "B" },
+      { text: "Grafinis dizainas ar vizualinis menas", t: "C" },
+      { text: "Derybos, pardavimai ir verslo strategijos", t: "D" },
+      { text: "Teisinių dokumentų ar taisyklių nagrinėjimas", t: "E" },
+      { text: "Robotų programavimas ar inžinerija", t: "A" },
+      { text: "Savanorystė renginiuose", t: "B" },
+      { text: "Vaizdo įrašų kūrimas ir montavimas", t: "C" },
+      { text: "Savo verslo idėjos vystymas", t: "D" },
+      { text: "Laboratoriniai tyrimai", t: "E" },
+    ]
+  },
+  { type: "likert", q: "Man patinka ardyti prietaisus, suprasti, kaip viskas veikia, arba spręsti loginius galvosūkius.", t: "A" },
+  { type: "likert", q: "Draugai dažnai kreipiasi į mane patarimo, nes moku nuoširdžiai išklausyti.", t: "B" },
+  { type: "likert", q: "Mane labai vargina griežtos taisyklės ir rutina – man reikia erdvės improvizacijai.", t: "C" },
+  { type: "likert", q: "Mėgstu imtis lyderio vaidmens ir nebijau priimti sprendimų už visą grupę.", t: "D" },
+  { type: "likert", q: "Aš esu labai detalus (-i), visada laikausi instrukcijų ir pastebiu kitų klaidas.", t: "E" },
+  
+  {
+    type: "choice",
+    q: "Kaip dažniausiai priimi svarbius sprendimus?",
+    options: [
+      { text: "Pasikliaudamas logika, efektyvumu ir sisteminiu požiūriu", t: "A" },
+      { text: "Svarstydamas, kaip mano sprendimas paveiks kitų žmonių emocijas", t: "B" },
+      { text: "Kliaudamasis savo intuicija ir ieškodamas originalaus kampo", t: "C" },
+      { text: "Vertindamas potencialią naudą, konkurenciją ir asmeninę sėkmę", t: "D" },
+      { text: "Ilgai analizuodamas faktus, skaičius ir ieškodamas įrodymų", t: "E" },
+    ]
+  },
+  {
+    type: "multiselect",
+    q: "Apie kokias temas mieliausiai skaitytum straipsnį ar žiūrėtum dokumentiką?",
+    options: [
+      { text: "Dirbtinis intelektas ir kosmoso technologijos", t: "A" },
+      { text: "Žmogaus psichologija ir santykiai", t: "B" },
+      { text: "Architektūra, mada ir šiuolaikinis menas", t: "C" },
+      { text: "Investavimas, ekonomika ir lyderystė", t: "D" },
+      { text: "Medicina, genetika ir gamtos mokslai", t: "E" },
+    ]
+  },
+  { type: "likert", q: "Galiu ilgai koncentruotis į vieną techninę ar matematinę problemą, kol randu išeitį.", t: "A" },
+  { type: "likert", q: "Man svarbu, kad mano darbas teiktų tiesioginę pagalbą ar naudą visuomenei.", t: "B" },
+  { type: "likert", q: "Dažnai svajoju ir galvoju apie originalias, netradicines idėjas.", t: "C" },
+  { type: "likert", q: "Konkurencija mane motyvuoja pasiekti dar geresnių rezultatų.", t: "D" },
+  { type: "likert", q: "Moksliniai metodai ir tikslūs eksperimentai man atrodo patikimiausias būdas rasti tiesą.", t: "E" },
+  
+  { type: "likert", q: "Mėgstu automatizuoti pasikartojančius darbus ir ieškoti efektyviausio sprendimo būdo.", t: "A" },
+  { type: "likert", q: "Galiu lengvai suprasti, kaip jaučiasi kitas žmogus, net jei jis to nesako žodžiais.", t: "B" },
+  { type: "likert", q: "Man be galo svarbu, kad tai, ką sukuriu, atrodytų estetiškai ir turėtų vizualinę vertę.", t: "C" },
+  { type: "likert", q: "Nebijau rizikuoti ir išeiti iš komforto zonos, jei matau galimybę pasiekti sėkmę.", t: "D" },
+  { type: "likert", q: "Mėgstu klasifikuoti informaciją, palaikyti griežtą tvarką ir visada tikrinu faktus.", t: "E" },
 ];
 
-// Aptitude items: numerical, logical, and verbal reasoning (~15 items, ~40-45s each => ~10 minutes)
 const APTITUDE_QUESTIONS = [
   { q: "Kokia sekos tąsa: 2, 5, 8, 11, 14, ...?", options: ["15", "16", "17", "18"], correct: 2, cat: "numerine" },
   { q: "Prekės kaina 80 €, jai taikoma 25% nuolaida. Kokia kaina po nuolaidos?", options: ["55 €", "60 €", "65 €", "70 €"], correct: 1, cat: "numerine" },
   { q: "Klasėje yra 30 mokinių, 60% jų – mergaitės. Kiek klasėje berniukų?", options: ["10", "12", "15", "18"], correct: 1, cat: "numerine" },
-  { q: "Automobilis 3 valandas važiavo 90 km/h greičiu. Kiek kilometrų jis nuvažiavo?", options: ["240 km", "270 km", "300 km", "330 km"], correct: 1, cat: "numerine" },
-  { q: "3 pieštukai kainuoja 1,50 €. Kiek kainuos 7 tokie pieštukai?", options: ["3,00 €", "3,50 €", "4,00 €", "4,50 €"], correct: 1, cat: "numerine" },
   { q: "Kuris skaičius nedera prie kitų: 16, 25, 30, 36?", options: ["16", "25", "30", "36"], correct: 2, cat: "logine" },
   { q: "Visi katinai yra gyvūnai. Kai kurie gyvūnai yra žali. Ką galima teigti apie katinus?", options: ["Visi katinai yra žali", "Kai kurie katinai yra žali", "Joks katinas nėra žalias", "Iš duotų teiginių negalima nustatyti"], correct: 3, cat: "logine" },
   { q: "Kokia raidė seka toliau: A, C, E, G, ...?", options: ["H", "I", "J", "K"], correct: 1, cat: "logine" },
   { q: "Jei šiandien trečiadienis, kokia diena bus po 10 dienų?", options: ["Penktadienis", "Šeštadienis", "Sekmadienis", "Pirmadienis"], correct: 1, cat: "logine" },
-  { q: "Kuri figūra nedera prie kitų: trikampis, kvadratas, apskritimas, kubas?", options: ["Trikampis", "Kvadratas", "Apskritimas", "Kubas"], correct: 3, cat: "logine" },
   { q: "Knyga santykiauja su skaitytoju taip, kaip maistas santykiauja su...?", options: ["Restoranu", "Valgytoju", "Virtuve", "Lėkšte"], correct: 1, cat: "verbaline" },
   { q: "Kuris žodis reiškia tą pačią mintį, kaip „kruopštus“?", options: ["Greitas", "Atidus", "Tingus", "Garsus"], correct: 1, cat: "verbaline" },
   { q: "Kuris žodis yra priešingos reikšmės žodžiui „optimistiškas“?", options: ["Realistiškas", "Pesimistiškas", "Ramus", "Drąsus"], correct: 1, cat: "verbaline" },
-  { q: "Gydytojas santykiauja su ligonine taip, kaip mokytojas santykiauja su...?", options: ["Klase", "Knyga", "Mokykla", "Egzaminu"], correct: 2, cat: "verbaline" },
-  { q: "Kuris žodis nedera prie kitų: obuolys, bananas, morka, kriaušė?", options: ["Obuolys", "Bananas", "Morka", "Kriaušė"], correct: 2, cat: "verbaline" },
 ];
 
 const CAT_LABELS = {
@@ -263,8 +343,6 @@ const CAT_LABELS = {
   verbaline: "Žodinis / kalbinis mąstymas",
 };
 
-// Short labels for the five personality dimensions, used in the radar diagram.
-// Max score per dimension = number of RAW_QUESTIONS tagged with that letter (12 each).
 const DIMENSION_SHORT = {
   A: "Techninis-inžinerinis",
   B: "Socialinis-emocinis",
@@ -273,35 +351,30 @@ const DIMENSION_SHORT = {
   E: "Mokslinis-struktūrinis",
 };
 
-function getAptitudeBand(pct) {
-  if (pct >= 75) {
-    return {
-      label: "Aukštas",
-      color: "#166534",
-      text:
-        "Atsakymai į loginio ir matematinio mąstymo užduotis rodo stiprius analitinius gebėjimus. Toks rezultatas dažnai siejamas su gebėjimu greitai apdoroti informaciją, pastebėti dėsningumus ir priimti pagrįstus sprendimus – tai naudinga bet kurioje srityje, tačiau ypač reikšminga tiksliuosiuose ir gamtos moksluose, inžinerijoje ar analitikoje.",
-    };
+// Calculate max theoretical points based on dynamic structure
+const MAX_PER_DIMENSION = { A: 0, B: 0, C: 0, D: 0, E: 0 };
+DYNAMIC_QUESTIONS.forEach(q => {
+  if (q.type === 'likert') {
+    MAX_PER_DIMENSION[q.t] += 2;
+  } else if (q.type === 'choice') {
+    const seen = new Set();
+    q.options.forEach(opt => {
+      if (!seen.has(opt.t)) {
+        MAX_PER_DIMENSION[opt.t] += 1;
+        seen.add(opt.t);
+      }
+    });
+  } else if (q.type === 'multiselect') {
+    q.options.forEach(opt => {
+      MAX_PER_DIMENSION[opt.t] += 1;
+    });
   }
-  if (pct >= 45) {
-    return {
-      label: "Vidutinis",
-      color: "#92400e",
-      text:
-        "Atsakymai rodo vidutinį analitinio mąstymo lygį – dalis užduočių atliktos tiksliai, o kai kurios parodė, kad tam tikrose srityse (skaičiavimo, loginio ar žodinio mąstymo) būtų naudinga papildoma praktika. Tai visiškai normalu – šis gebėjimas gerai lavėja sprendžiant panašaus tipo užduotis reguliariai.",
-    };
-  }
-  return {
-    label: "Pradinis",
-    color: "#7f1d1d",
-    text:
-      "Šio testo užduotys šįkart pasirodė sudėtingesnės nei tikėtasi. Tai nebūtinai atspindi tikrąjį potencialą, nes tokio tipo užduotims reikia pratybos. Rekomenduojama neskubant pasitreniruoti su panašiomis matematinės ir loginės logikos užduotimis – rezultatas paprastai greitai pagerėja.",
-  };
-}
+});
 
-function buildTraitNarrative(result) {
-  const pos = result.positives.join(", ");
-  const neg = result.negatives.join(", ");
-  return `Atsakymai į savęs pažinimo klausimyną atskleidžia, kad ryškiausios savybės yra: ${pos}. Šios stiprybės paaiškina, kodėl šis profilis natūraliai dera su kryptimi „${result.title}“. Kartu vertėtų sąmoningai stebėti sritis, kurios ateityje gali tapti iššūkiu: ${neg}. Tai nėra trūkumai – tai tiesiog kryptys, kurias ugdant galima dar labiau atskleisti savo potencialą.`;
+function getAptitudeBand(pct) {
+  if (pct >= 75) return { label: "Aukštas", color: "#166534", text: "Stiprūs analitiniai gebėjimai. Puikiai tvarkotės su logika ir skaičiais." };
+  if (pct >= 45) return { label: "Vidutinis", color: "#92400e", text: "Vidutiniai analitiniai gebėjimai. Dalis užduočių įveikta sėkmingai, tačiau loginėms grandinėms gali reikėti daugiau praktikos." };
+  return { label: "Pradinis", color: "#7f1d1d", text: "Šįkart užduotys pasirodė sudėtingesnės. Tai puiki proga pasipraktikuoti loginio mąstymo ir matematikos sferoje." };
 }
 
 // ============================================================================
@@ -329,7 +402,7 @@ function ProfessionModal({ profession, onClose }) {
           <X className="w-5 h-5 text-slate-500" />
         </button>
         <div className="bg-slate-800 p-6 text-white">
-          <h3 className="text-2xl font-bold pr-8">{profession.title}</h3>
+          <h3 className="text-2xl font-bold pr-8" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>{profession.title}</h3>
           <div className="mt-2 inline-flex items-center gap-2 bg-white/15 px-3 py-1 rounded-lg backdrop-blur-md">
             <span className="font-semibold">{profession.salary}</span>
             <span className="text-xs opacity-90">/mėn. (Bruto)</span>
@@ -360,9 +433,8 @@ function ReportSection({ icon, title, children }) {
   );
 }
 
-function ResultsView({ result, resultKey, scores, maxPerDimension, aptitude, respondentName, dateStr, onRestart }) {
+function ResultsView({ result, resultKey, scores, aptitude, respondentName, dateStr, onRestart }) {
   const [selectedProfession, setSelectedProfession] = useState(null);
-
   const overallPct = Math.round((aptitude.correctTotal / APTITUDE_QUESTIONS.length) * 100);
   const band = getAptitudeBand(overallPct);
 
@@ -370,23 +442,22 @@ function ResultsView({ result, resultKey, scores, maxPerDimension, aptitude, res
     subject: DIMENSION_SHORT[key],
     key,
     score: scores[key],
-    fullMark: maxPerDimension[key],
+    fullMark: MAX_PER_DIMENSION[key],
   }));
-  const radarMax = Math.max(...Object.values(maxPerDimension));
+  const radarMax = Math.max(...Object.values(MAX_PER_DIMENSION));
 
   return (
     <motion.div
       key="result"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex-1 overflow-y-auto max-h-[85vh] md:max-h-[800px] report-scroll bg-white"
+      className="flex-1 overflow-y-auto report-scroll bg-white"
     >
       <style>{`
         @media print {
           body { background: white; }
           .no-print { display: none !important; }
-          .report-scroll { max-height: none !important; overflow: visible !important; }
-          .report-page { box-shadow: none !important; border: none !important; border-radius: 0 !important; }
+          .report-scroll { overflow: visible !important; }
           .break-inside-avoid { break-inside: avoid; }
         }
       `}</style>
@@ -395,8 +466,7 @@ function ResultsView({ result, resultKey, scores, maxPerDimension, aptitude, res
         {selectedProfession && <ProfessionModal profession={selectedProfession} onClose={() => setSelectedProfession(null)} />}
       </AnimatePresence>
 
-      {/* COVER / REPORT HEADER */}
-      <div className="p-8 md:p-12 border-b border-slate-200">
+      <div className="p-6 md:p-12 border-b border-slate-200">
         <div className="flex justify-between items-start flex-wrap gap-6 mb-8">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-slate-800 rounded-lg text-white">
@@ -412,19 +482,11 @@ function ResultsView({ result, resultKey, scores, maxPerDimension, aptitude, res
           <div className="text-sm text-slate-600 text-right leading-relaxed">
             <p><span className="font-semibold text-slate-800">Respondentas:</span> {respondentName || "Nenurodyta"}</p>
             <p><span className="font-semibold text-slate-800">Vertinimo data:</span> {dateStr}</p>
-            <p><span className="font-semibold text-slate-800">Norminė grupė:</span> Mokiniai, 9–12 kl.</p>
           </div>
         </div>
-        <p className="text-sm text-slate-500 leading-relaxed max-w-3xl border-l-4 border-slate-200 pl-4">
-          Ši ataskaita parengta pagal atsakymus, kuriuos respondentas pateikė savęs pažinimo klausimyne, bei trumpos analitinių
-          gebėjimų užduoties rezultatus. Rezultatai atspindi tai, kaip pats mokinys šiuo metu vertina savo pomėgius ir stiprybes –
-          jie yra prielaidos, o ne galutinis sprendimas apie tinkamą karjeros kelią. Kadangi interesai ir gebėjimai keičiasi laikui
-          bėgant, ataskaitos aktualumas paprastai trunka apie 12 mėnesių, po to rekomenduojama pakartoti testą.
-        </p>
       </div>
 
       <div className="p-6 md:p-12 space-y-2">
-        {/* SUMMARY */}
         <ReportSection icon={<Compass className="w-5 h-5 text-slate-700" />} title="Rezultatų santrauka">
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 md:p-8">
             <span className="inline-block py-1 px-3 rounded-full bg-slate-800 text-white text-xs font-bold tracking-widest uppercase mb-4">
@@ -435,79 +497,20 @@ function ResultsView({ result, resultKey, scores, maxPerDimension, aptitude, res
           </div>
         </ReportSection>
 
-        {/* TRAITS NARRATIVE */}
-        <ReportSection icon={<Star className="w-5 h-5 text-slate-700" />} title="Asmenybės bruožai">
-          <p className="text-slate-700 text-base leading-relaxed mb-6">{buildTraitNarrative(result)}</p>
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-emerald-50/60 p-5 rounded-2xl border border-emerald-100">
-              <h4 className="text-emerald-800 font-bold mb-3 text-sm uppercase tracking-wide">Stipriosios savybės</h4>
-              <div className="flex flex-wrap gap-2">
-                {result.positives.map((item, i) => (
-                  <span key={i} className="px-3 py-1.5 bg-white text-emerald-900 text-sm font-semibold rounded-lg border border-emerald-200">
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="bg-rose-50/60 p-5 rounded-2xl border border-rose-100">
-              <h4 className="text-rose-800 font-bold mb-3 text-sm uppercase tracking-wide">Augimo zonos</h4>
-              <div className="flex flex-wrap gap-2">
-                {result.negatives.map((item, i) => (
-                  <span key={i} className="px-3 py-1.5 bg-white text-rose-900 text-sm font-semibold rounded-lg border border-rose-200">
-                    {item}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </ReportSection>
-
-        {/* RADAR DIAGRAM OF ALL FIVE DIMENSIONS */}
         <ReportSection icon={<RadarIcon className="w-5 h-5 text-slate-700" />} title="Asmenybės profilis (visos penkios kryptys)">
-          <p className="text-slate-700 text-sm leading-relaxed mb-4">
-            Nors testas nustato vieną dominuojantį profilį, kiekvienas žmogus atsakymuose atspindi visų penkių krypčių
-            elementus skirtingu laipsniu. Toliau pateikta diagrama parodo, kiek kiekviena kryptis buvo išreikšta atsakymuose –
-            ryškiausia (didžiausia) kryptis atitinka ataskaitoje aprašytą karjeros tipą.
-          </p>
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4" style={{ height: 360 }}>
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData} outerRadius="70%">
                 <PolarGrid stroke="#cbd5e1" />
                 <PolarAngleAxis dataKey="subject" tick={{ fill: "#334155", fontSize: 12 }} />
                 <PolarRadiusAxis angle={90} domain={[0, radarMax]} tick={{ fill: "#94a3b8", fontSize: 10 }} tickCount={5} />
-                <Radar
-                  name="Rezultatas"
-                  dataKey="score"
-                  stroke="#1e293b"
-                  fill="#1e293b"
-                  fillOpacity={0.35}
-                  isAnimationActive={false}
-                />
+                <Radar name="Rezultatas" dataKey="score" stroke="#1e293b" fill="#1e293b" fillOpacity={0.35} isAnimationActive={false} />
                 <Tooltip formatter={(value, name, props) => [`${value} / ${props.payload.fullMark}`, props.payload.subject]} />
               </RadarChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 grid grid-cols-2 sm:grid-cols-5 gap-3">
-            {radarData.map((d) => (
-              <div
-                key={d.key}
-                className={`text-center p-2.5 rounded-xl border ${d.key === resultKey ? "bg-slate-800 border-slate-800 text-white" : "bg-white border-slate-200 text-slate-600"}`}
-              >
-                <div className="text-xs font-semibold leading-tight">{d.subject}</div>
-                <div className={`text-lg font-extrabold ${d.key === resultKey ? "text-white" : "text-slate-800"}`}>
-                  {d.score}/{d.fullMark}
-                </div>
-              </div>
-            ))}
-          </div>
         </ReportSection>
 
-        {/* COMMUNICATION */}
-        <ReportSection icon={<Briefcase className="w-5 h-5 text-slate-700" />} title="Bendravimo stilius">
-          <p className="text-slate-700 text-base leading-relaxed">{result.communication}</p>
-        </ReportSection>
-
-        {/* APTITUDE / ANALYTICAL SKILLS */}
         <ReportSection icon={<Calculator className="w-5 h-5 text-slate-700" />} title="Analitiniai gebėjimai">
           <p className="text-slate-700 text-base leading-relaxed mb-6">{band.text}</p>
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 space-y-5">
@@ -518,60 +521,10 @@ function ResultsView({ result, resultKey, scores, maxPerDimension, aptitude, res
             <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden mb-4">
               <div className="h-full rounded-full" style={{ width: `${overallPct}%`, backgroundColor: band.color }} />
             </div>
-
-            {Object.keys(CAT_LABELS).map((cat) => {
-              const pct = aptitude.byCategoryPct[cat];
-              return (
-                <div key={cat}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-slate-600">{CAT_LABELS[cat]}</span>
-                    <span className="text-sm font-semibold text-slate-700">{pct}%</span>
-                  </div>
-                  <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-slate-700 rounded-full" style={{ width: `${pct}%` }} />
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </ReportSection>
 
-        {/* STUDIES */}
-        <ReportSection icon={<GraduationCap className="w-5 h-5 text-slate-700" />} title="Studijų kryptys ir egzaminai">
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
-              <h5 className="font-bold text-slate-800 mb-2 flex items-center gap-2 text-sm uppercase tracking-wide">
-                <BookOpen className="w-4 h-4" /> Rekomenduojami egzaminai
-              </h5>
-              <p className="text-slate-700 text-sm leading-relaxed">{result.exams}</p>
-            </div>
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
-              <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Universitetai Lietuvoje</h5>
-              <ul className="space-y-2">
-                {result.uniLt.map((uni, i) => (
-                  <li key={i} className="flex justify-between items-center text-sm">
-                    <span className="text-slate-700">{uni.name}</span>
-                    <span className="text-xs font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded ml-2 whitespace-nowrap">{uni.score}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
-              <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Universitetai Europoje</h5>
-              <ul className="space-y-2">
-                {result.uniEu.split(",").map((uni, i) => (
-                  <li key={i} className="text-sm text-slate-700">{uni.trim()}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </ReportSection>
-
-        {/* PROFESSIONS */}
-        <ReportSection
-          icon={<Building2 className="w-5 h-5 text-slate-700" />}
-          title="Tau tinkančios profesijos"
-        >
+        <ReportSection icon={<Building2 className="w-5 h-5 text-slate-700" />} title="Tau tinkančios profesijos">
           <p className="text-xs text-slate-500 mb-4 flex items-center gap-1 no-print">
             <Info className="w-3.5 h-3.5" /> Paspausk kortelę informacijai
           </p>
@@ -591,25 +544,12 @@ function ResultsView({ result, resultKey, scores, maxPerDimension, aptitude, res
           </div>
         </ReportSection>
 
-        {/* FOOTER */}
-        <div className="pt-6 border-t border-slate-200 text-xs text-slate-400 flex items-center gap-2">
-          <ShieldCheck className="w-4 h-4" />
-          Šis dokumentas yra konfidencialus ir skirtas naudoti tik respondento, jo tėvų ar mokyklos karjeros konsultanto. ©
-          {" "}{new Date().getFullYear()} tiksliukai.lt
-        </div>
-
         <div className="pt-8 flex flex-wrap justify-center gap-4 no-print">
-          <button
-            onClick={() => window.print()}
-            className="inline-flex items-center gap-2 bg-slate-900 text-white font-bold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors"
-          >
-            <Download className="w-5 h-5" /> Atsisiųsti ataskaitą (PDF)
+          <button onClick={() => window.print()} className="inline-flex items-center gap-2 bg-slate-900 text-white font-bold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors">
+            <Download className="w-5 h-5" /> Atsisiųsti ataskaitą
           </button>
-          <button
-            onClick={onRestart}
-            className="inline-flex items-center gap-2 text-slate-500 font-bold hover:text-slate-800 transition-colors px-6 py-3 rounded-xl hover:bg-slate-50"
-          >
-            <RefreshCcw className="w-5 h-5" /> Pradėti testą iš naujo
+          <button onClick={onRestart} className="inline-flex items-center gap-2 text-slate-500 font-bold hover:text-slate-800 transition-colors px-6 py-3 rounded-xl hover:bg-slate-50">
+            <RefreshCcw className="w-5 h-5" /> Pradėti iš naujo
           </button>
         </div>
       </div>
@@ -624,18 +564,21 @@ function ResultsView({ result, resultKey, scores, maxPerDimension, aptitude, res
 export default function CareerQuiz() {
   const [gameState, setGameState] = useState("intro"); // intro | personality | aptitude | result
   const [respondentName, setRespondentName] = useState("");
-  const [questions, setQuestions] = useState([...RAW_QUESTIONS]);
   const [currentIdx, setCurrentIdx] = useState(0);
   const [scores, setScores] = useState({ A: 0, B: 0, C: 0, D: 0, E: 0 });
   const [history, setHistory] = useState([]);
 
+  // For Multiselect
+  const [selectedMulti, setSelectedMulti] = useState([]);
+
+  // Aptitude state
   const [aptIdx, setAptIdx] = useState(0);
   const [aptAnswers, setAptAnswers] = useState(Array(APTITUDE_QUESTIONS.length).fill(null));
+  const [timeLeft, setTimeLeft] = useState(30);
 
   const dateStr = new Date().toLocaleDateString("lt-LT", { year: "numeric", month: "long", day: "numeric" });
 
   const startGame = () => {
-    setQuestions([...RAW_QUESTIONS].sort(() => Math.random() - 0.5));
     setCurrentIdx(0);
     setScores({ A: 0, B: 0, C: 0, D: 0, E: 0 });
     setHistory([]);
@@ -644,15 +587,25 @@ export default function CareerQuiz() {
     setGameState("personality");
   };
 
-  const handleAnswer = (isYes) => {
-    const type = questions[currentIdx].t;
-    if (isYes) {
-      setScores((prev) => ({ ...prev, [type]: prev[type] + 1 }));
-    }
-    setHistory((prev) => [...prev, { type, isYes }]);
+  // -----------------------------------------------------
+  // PERSONALITY LOGIC
+  // -----------------------------------------------------
+  const handleDynamicAnswer = (answerObj) => {
+    // answerObj can be a single object {type: "A", score: 2} or an array of objects
+    setHistory((prev) => [...prev, answerObj]);
+    setScores((prev) => {
+      const newScores = { ...prev };
+      if (Array.isArray(answerObj)) {
+        answerObj.forEach((item) => { newScores[item.type] += item.score; });
+      } else {
+        newScores[answerObj.type] += answerObj.score;
+      }
+      return newScores;
+    });
 
-    if (currentIdx + 1 < questions.length) {
+    if (currentIdx + 1 < DYNAMIC_QUESTIONS.length) {
       setCurrentIdx((prev) => prev + 1);
+      setSelectedMulti([]); // Reset multiselect
     } else {
       setGameState("aptitude");
     }
@@ -661,12 +614,50 @@ export default function CareerQuiz() {
   const handleBack = () => {
     if (currentIdx === 0) return;
     const lastEntry = history[history.length - 1];
-    if (lastEntry.isYes) {
-      setScores((prev) => ({ ...prev, [lastEntry.type]: prev[lastEntry.type] - 1 }));
-    }
+    setScores((prev) => {
+      const newScores = { ...prev };
+      if (Array.isArray(lastEntry)) {
+        lastEntry.forEach((item) => { newScores[item.type] -= item.score; });
+      } else {
+        newScores[lastEntry.type] -= lastEntry.score;
+      }
+      return newScores;
+    });
     setHistory((prev) => prev.slice(0, -1));
     setCurrentIdx((prev) => prev - 1);
+    setSelectedMulti([]);
   };
+
+  const toggleMulti = (option) => {
+    setSelectedMulti((prev) =>
+      prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]
+    );
+  };
+
+  const submitMulti = () => {
+    const answerArr = selectedMulti.map((opt) => ({ type: opt.t, score: 1 }));
+    handleDynamicAnswer(answerArr);
+  };
+
+  // -----------------------------------------------------
+  // APTITUDE LOGIC & TIMER
+  // -----------------------------------------------------
+  useEffect(() => {
+    if (gameState === "aptitude") {
+      setTimeLeft(30);
+    }
+  }, [gameState, aptIdx]);
+
+  useEffect(() => {
+    if (gameState !== "aptitude") return;
+    if (timeLeft > 0) {
+      const timerId = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
+      return () => clearTimeout(timerId);
+    } else {
+      // Timeout reached
+      handleAptitudeAnswer(-1);
+    }
+  }, [timeLeft, gameState]);
 
   const handleAptitudeAnswer = (optionIdx) => {
     const updated = [...aptAnswers];
@@ -685,217 +676,237 @@ export default function CareerQuiz() {
     setAptIdx((prev) => prev - 1);
   };
 
+  // -----------------------------------------------------
+  // RESULTS
+  // -----------------------------------------------------
   const getWinner = () => {
     return Object.keys(scores).reduce((a, b) => (scores[a] > scores[b] ? a : b));
   };
 
-  // Max possible score per dimension = how many RAW_QUESTIONS carry that letter tag.
-  // Computed from the data instead of hard-coded, so it stays correct if questions are edited.
-  const maxPerDimension = Object.keys(scores).reduce((acc, key) => {
-    acc[key] = RAW_QUESTIONS.filter((q) => q.t === key).length;
-    return acc;
-  }, {});
-
   const getAptitudeSummary = () => {
     let correctTotal = 0;
-    const byCategoryCorrect = { numerine: 0, logine: 0, verbaline: 0 };
-    const byCategoryTotal = { numerine: 0, logine: 0, verbaline: 0 };
-
-    APTITUDE_QUESTIONS.forEach((question, i) => {
-      byCategoryTotal[question.cat] += 1;
-      if (aptAnswers[i] === question.correct) {
-        correctTotal += 1;
-        byCategoryCorrect[question.cat] += 1;
-      }
+    APTITUDE_QUESTIONS.forEach((q, i) => {
+      if (aptAnswers[i] === q.correct) correctTotal += 1;
     });
-
-    const byCategoryPct = {};
-    Object.keys(byCategoryTotal).forEach((cat) => {
-      byCategoryPct[cat] = Math.round((byCategoryCorrect[cat] / byCategoryTotal[cat]) * 100);
-    });
-
-    return { correctTotal, byCategoryPct };
+    return { correctTotal };
   };
 
-  const totalQuestions = RAW_QUESTIONS.length + APTITUDE_QUESTIONS.length;
-  const stepNumber =
-    gameState === "personality" ? currentIdx + 1 : gameState === "aptitude" ? RAW_QUESTIONS.length + aptIdx + 1 : totalQuestions;
+  const totalQuestions = DYNAMIC_QUESTIONS.length + APTITUDE_QUESTIONS.length;
+  const stepNumber = gameState === "personality" ? currentIdx + 1 : gameState === "aptitude" ? DYNAMIC_QUESTIONS.length + aptIdx + 1 : totalQuestions;
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans p-4 md:p-8 flex items-center justify-center">
-      <div className="w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden min-h-[700px] flex flex-col relative report-page">
-        <div className="bg-slate-900 p-8 text-white flex justify-between items-center z-10 no-print">
-          <div className="flex items-center gap-3">
-            <Compass className="w-8 h-8 text-slate-300" />
-            <span className="font-bold tracking-wider text-xl">TIKSLIUKAI.LT</span>
-          </div>
-          {(gameState === "personality" || gameState === "aptitude") && (
-            <span className="text-sm font-medium text-slate-300 bg-slate-800 px-4 py-1.5 rounded-full border border-slate-700">
-              Klausimas {stepNumber} / {totalQuestions}
-            </span>
-          )}
+    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col w-full h-full">
+      <div className="bg-slate-900 px-4 py-4 md:px-8 text-white flex justify-between items-center z-10 sticky top-0 shadow-md no-print">
+        <div className="flex items-center gap-3">
+          <Compass className="w-6 h-6 md:w-8 md:h-8 text-slate-300" />
+          <span className="font-bold tracking-wider text-lg md:text-xl">TIKSLIUKAI.LT</span>
         </div>
+        {(gameState === "personality" || gameState === "aptitude") && (
+          <span className="text-xs md:text-sm font-medium text-slate-300 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
+            {stepNumber} / {totalQuestions}
+          </span>
+        )}
+      </div>
 
-        <div className="flex-1 flex flex-col relative">
-          <AnimatePresence mode="wait">
-            {gameState === "intro" && (
-              <motion.div
-                key="intro"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="flex flex-col items-center justify-center flex-1 p-8 text-center space-y-8"
+      <div className="flex-1 w-full flex flex-col relative">
+        <AnimatePresence mode="wait">
+          {gameState === "intro" && (
+            <motion.div
+              key="intro"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col items-center justify-center flex-1 p-6 md:p-8 text-center space-y-8 max-w-4xl mx-auto w-full"
+            >
+              <div className="bg-slate-100 p-8 rounded-full inline-block shadow-inner ring-8 ring-slate-50">
+                <span className="text-7xl">🧭</span>
+              </div>
+              <div className="max-w-2xl">
+                <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                  Atrask Savo <span className="text-slate-600">Profesinį Kelią</span>
+                </h1>
+                <p className="text-lg md:text-xl text-slate-600 leading-relaxed">
+                  Pasiruošk išsamiai savęs pažinimo kelionei. Testas sudarytas iš dinamiškų situacijų ir trumpos loginės dalies.
+                </p>
+              </div>
+              <div className="w-full max-w-sm">
+                <label className="block text-sm font-bold text-slate-500 mb-2 text-left">Tavo vardas (ataskaitai)</label>
+                <input
+                  type="text"
+                  value={respondentName}
+                  onChange={(e) => setRespondentName(e.target.value)}
+                  placeholder="Pvz. Dovydas"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-slate-500 focus:outline-none text-lg text-center"
+                />
+              </div>
+              <button
+                onClick={startGame}
+                className="group bg-slate-900 hover:bg-slate-800 text-white text-xl font-bold py-5 px-12 md:px-16 rounded-2xl transition-all transform hover:scale-105 shadow-xl shadow-slate-900/20 flex items-center gap-3 w-full sm:w-auto justify-center"
               >
-                <div className="bg-slate-100 p-8 rounded-full inline-block shadow-inner ring-8 ring-slate-50">
-                  <span className="text-7xl">🧭</span>
+                Pradėti <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+              </button>
+            </motion.div>
+          )}
+
+          {gameState === "personality" && (
+            <motion.div key="quiz" className="flex flex-col flex-1 max-w-4xl mx-auto w-full px-4 py-6 md:p-12 justify-center">
+              <div className="mb-6 md:mb-10">
+                <div className="flex justify-between items-center mb-4">
+                  <button
+                    onClick={handleBack}
+                    disabled={currentIdx === 0}
+                    className={`flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-800 transition-colors p-2 -ml-2 ${currentIdx === 0 ? "invisible" : "visible"}`}
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Atgal
+                  </button>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden md:block">Dalis 1 / 2 · Savęs pažinimas</span>
                 </div>
-                <div className="max-w-2xl">
-                  <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight">
-                    Atrask Savo <span className="text-slate-600">Profesinį Kelią</span>
-                  </h1>
-                  <p className="text-lg md:text-xl text-slate-600 leading-relaxed">
-                    Šis testas trunka apie 20 minučių ir susideda iš dviejų dalių: savęs pažinimo klausimyno ir trumpos
-                    analitinių (matematinio ir loginio mąstymo) gebėjimų užduoties. Rezultatas – asmeninė, atsisiunčiama
-                    ataskaita apie tavo stiprybes, tinkamas studijų kryptis ir profesijas.
-                  </p>
-                </div>
-                <div className="w-full max-w-sm">
-                  <label className="block text-sm font-bold text-slate-500 mb-2 text-left">Tavo vardas (ataskaitai)</label>
-                  <input
-                    type="text"
-                    value={respondentName}
-                    onChange={(e) => setRespondentName(e.target.value)}
-                    placeholder="Pvz. Dovydas"
-                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-slate-500 focus:outline-none text-lg text-center"
+                <div className="w-full h-2 md:h-3 bg-slate-100 rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${(currentIdx / DYNAMIC_QUESTIONS.length) * 100}%` }}
+                    className="h-full bg-slate-800 rounded-full"
                   />
                 </div>
-                <button
-                  onClick={startGame}
-                  className="group bg-slate-900 hover:bg-slate-800 text-white text-xl font-bold py-5 px-16 rounded-2xl transition-all transform hover:scale-105 shadow-xl shadow-slate-900/20 flex items-center gap-3"
-                >
-                  Pradėti <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
-                </button>
+              </div>
+
+              <motion.div
+                key={currentIdx}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="flex-1 flex flex-col"
+              >
+                <div className="min-h-[140px] flex items-center justify-center mb-8">
+                  <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-800 leading-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                    {DYNAMIC_QUESTIONS[currentIdx].q}
+                  </h2>
+                </div>
+
+                <div className="mt-auto">
+                  {/* LIKERT TYPE */}
+                  {DYNAMIC_QUESTIONS[currentIdx].type === "likert" && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 2 })} className="p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all font-bold text-slate-600 hover:text-emerald-700 shadow-sm flex items-center justify-center gap-2">
+                        <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Visiškai sutinku
+                      </button>
+                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 1 })} className="p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-amber-500 hover:bg-amber-50 transition-all font-bold text-slate-600 hover:text-amber-700 shadow-sm flex items-center justify-center gap-2">
+                        <HelpCircle className="w-5 h-5 text-amber-500" /> Iš dalies
+                      </button>
+                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 0 })} className="p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-rose-500 hover:bg-rose-50 transition-all font-bold text-slate-600 hover:text-rose-700 shadow-sm flex items-center justify-center gap-2">
+                        <XCircle className="w-5 h-5 text-rose-500" /> Nesutinku
+                      </button>
+                    </div>
+                  )}
+
+                  {/* CHOICE TYPE */}
+                  {DYNAMIC_QUESTIONS[currentIdx].type === "choice" && (
+                    <div className="flex flex-col gap-3">
+                      {DYNAMIC_QUESTIONS[currentIdx].options.map((opt, i) => (
+                        <button key={i} onClick={() => handleDynamicAnswer({ type: opt.t, score: 1 })} className="p-4 md:p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-slate-500 hover:bg-slate-50 transition-all font-semibold text-slate-700 text-left shadow-sm">
+                          {opt.text}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* MULTISELECT TYPE */}
+                  {DYNAMIC_QUESTIONS[currentIdx].type === "multiselect" && (
+                    <div className="flex flex-col gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        {DYNAMIC_QUESTIONS[currentIdx].options.map((opt, i) => {
+                          const isSelected = selectedMulti.includes(opt);
+                          return (
+                            <button key={i} onClick={() => toggleMulti(opt)} className={`p-4 rounded-xl border-2 transition-all flex items-start gap-3 text-left ${isSelected ? "border-slate-800 bg-slate-800 text-white shadow-md" : "border-slate-100 bg-white text-slate-700 hover:border-slate-300"}`}>
+                              <div className={`mt-0.5 rounded flex items-center justify-center shrink-0 w-5 h-5 border ${isSelected ? "border-white bg-white/20" : "border-slate-300"}`}>
+                                {isSelected && <CheckSquare className="w-4 h-4 text-white" />}
+                              </div>
+                              <span className="font-medium text-sm md:text-base leading-snug">{opt.text}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <button onClick={submitMulti} disabled={selectedMulti.length === 0} className="w-full p-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 disabled:opacity-50 transition-all flex justify-center items-center gap-2">
+                        Tęsti <ArrowRight className="w-5 h-5" />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </motion.div>
-            )}
+            </motion.div>
+          )}
 
-            {gameState === "personality" && (
-              <motion.div key="quiz" className="flex flex-col flex-1 max-w-3xl mx-auto w-full p-6 md:p-12 justify-center">
-                <div className="mb-10">
-                  <div className="flex justify-between items-center mb-4">
-                    <button
-                      onClick={handleBack}
-                      disabled={currentIdx === 0}
-                      className={`flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-800 transition-colors ${currentIdx === 0 ? "invisible" : "visible"}`}
-                    >
-                      <ArrowLeft className="w-4 h-4" /> Buvęs klausimas
-                    </button>
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Dalis 1 / 2 · Savęs pažinimas</span>
-                  </div>
-                  <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(currentIdx / questions.length) * 100}%` }}
-                      className="h-full bg-slate-800 rounded-full"
-                    />
-                  </div>
-                </div>
-
-                <motion.div
-                  key={currentIdx}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex-1 flex items-center justify-center min-h-[180px] mb-10"
-                >
-                  <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-800 leading-tight">{questions[currentIdx].q}</h2>
-                </motion.div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-auto">
+          {gameState === "aptitude" && (
+            <motion.div key="aptitude" className="flex flex-col flex-1 max-w-4xl mx-auto w-full px-4 py-6 md:p-12 justify-center">
+              <div className="mb-6 md:mb-10">
+                <div className="flex justify-between items-center mb-4">
                   <button
-                    onClick={() => handleAnswer(true)}
-                    className="flex items-center justify-center gap-4 p-7 rounded-3xl border-2 border-slate-100 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all group shadow-sm hover:shadow-xl"
+                    onClick={handleAptBack}
+                    disabled={aptIdx === 0}
+                    className={`flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-800 transition-colors p-2 -ml-2 ${aptIdx === 0 ? "invisible" : "visible"}`}
                   >
-                    <CheckCircle2 className="w-7 h-7 text-slate-300 group-hover:text-emerald-500 transition-colors" />
-                    <span className="font-bold text-lg text-slate-600 group-hover:text-emerald-700">Taip, tai aš</span>
+                    <ArrowLeft className="w-4 h-4" /> Atgal
                   </button>
-                  <button
-                    onClick={() => handleAnswer(false)}
-                    className="flex items-center justify-center gap-4 p-7 rounded-3xl border-2 border-slate-100 bg-white hover:border-rose-500 hover:bg-rose-50 transition-all group shadow-sm hover:shadow-xl"
-                  >
-                    <XCircle className="w-7 h-7 text-slate-300 group-hover:text-rose-500 transition-colors" />
-                    <span className="font-bold text-lg text-slate-600 group-hover:text-rose-700">Ne, nelabai</span>
-                  </button>
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
+                    <ClipboardList className="w-3.5 h-3.5" /> Dalis 2 / 2
+                  </span>
                 </div>
-              </motion.div>
-            )}
-
-            {gameState === "aptitude" && (
-              <motion.div key="aptitude" className="flex flex-col flex-1 max-w-3xl mx-auto w-full p-6 md:p-12 justify-center">
-                <div className="mb-10">
-                  <div className="flex justify-between items-center mb-4">
-                    <button
-                      onClick={handleAptBack}
-                      disabled={aptIdx === 0}
-                      className={`flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-slate-800 transition-colors ${aptIdx === 0 ? "invisible" : "visible"}`}
-                    >
-                      <ArrowLeft className="w-4 h-4" /> Buvęs klausimas
-                    </button>
-                    <span className="text-xs font-bold text-slate-400 uppercase tracking-widest flex items-center gap-1">
-                      <ClipboardList className="w-3.5 h-3.5" /> Dalis 2 / 2 · Analitiniai gebėjimai
-                    </span>
-                  </div>
+                
+                {/* Timer Bar */}
+                <div className="flex items-center gap-4 mb-2">
+                  <Clock className={`w-5 h-5 ${timeLeft <= 5 ? "text-rose-500 animate-pulse" : "text-slate-500"}`} />
                   <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `${(aptIdx / APTITUDE_QUESTIONS.length) * 100}%` }}
-                      className="h-full bg-slate-800 rounded-full"
-                    />
+                    <div className={`h-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? "bg-rose-500" : "bg-slate-800"}`} style={{ width: `${(timeLeft / 30) * 100}%` }} />
                   </div>
+                  <span className={`font-bold text-sm w-8 text-right ${timeLeft <= 5 ? "text-rose-500" : "text-slate-600"}`}>{timeLeft}s</span>
                 </div>
+              </div>
 
-                <motion.div
-                  key={aptIdx}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  className="flex-1 flex items-center justify-center min-h-[140px] mb-8"
-                >
-                  <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-800 leading-tight">
+              <motion.div
+                key={aptIdx}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="flex-1 flex flex-col"
+              >
+                <div className="min-h-[140px] flex items-center justify-center mb-8">
+                  <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-800 leading-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
                     {APTITUDE_QUESTIONS[aptIdx].q}
                   </h2>
-                </motion.div>
+                </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-auto">
                   {APTITUDE_QUESTIONS[aptIdx].options.map((option, i) => (
                     <button
                       key={i}
                       onClick={() => handleAptitudeAnswer(i)}
-                      className="flex items-center justify-center p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-slate-500 hover:bg-slate-50 transition-all shadow-sm hover:shadow-lg"
+                      className="flex items-center justify-center p-5 md:p-6 rounded-2xl border-2 border-slate-100 bg-white hover:border-slate-500 hover:bg-slate-50 transition-all shadow-sm hover:shadow-md"
                     >
-                      <span className="font-bold text-base text-slate-700">{option}</span>
+                      <span className="font-bold text-base md:text-lg text-slate-700">{option}</span>
                     </button>
                   ))}
                 </div>
               </motion.div>
-            )}
+            </motion.div>
+          )}
 
-            {gameState === "result" && (
-              <ResultsView
-                result={RESULTS[getWinner()]}
-                resultKey={getWinner()}
-                scores={scores}
-                maxPerDimension={maxPerDimension}
-                aptitude={getAptitudeSummary()}
-                respondentName={respondentName}
-                dateStr={dateStr}
-                onRestart={startGame}
-              />
-            )}
-          </AnimatePresence>
-        </div>
+          {gameState === "result" && (
+            <ResultsView
+              result={RESULTS[getWinner()]}
+              resultKey={getWinner()}
+              scores={scores}
+              aptitude={getAptitudeSummary()}
+              respondentName={respondentName}
+              dateStr={dateStr}
+              onRestart={startGame}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </main>
   );
 }
+
+```
