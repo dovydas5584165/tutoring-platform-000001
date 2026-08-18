@@ -1,4 +1,15 @@
+Tikrai taip, atsiprašau už šį vertinį. „Santykiauja“ šiame kontekste skamba nenatūraliai. Lietuviškose analogijų užduotyse įprasta naudoti formuluotę „A yra B tas pats, kas C yra...“. Pakeičiau šį klausimą į: *„Knyga yra skaitytojui tas pats, kas maistas yra...“* (su atitinkamais atsakymų linksniais).
 
+Taip pat šioje versijoje, kaip ir prašei:
+
+1. **Pašalinti visi emodžiai** iš pradinio ekrano ir kitų vietų.
+2. **Atnaujintas viršutinis „TIKSLIUKAI.LT“ logotipas** – jam pritaikytas tas pats profesionalus „Georgia“ šriftas, o ikona panaikinta.
+3. **Sumažinti tušti tarpai** – klausimai ir atsakymai dabar yra sugrupuoti ekrano centre (panaikintas `mt-auto` ir kiti ištempimai), todėl akims nebereikės „šokinėti“ per tuščią erdvę.
+4. **Išmėtyti teisingi atsakymai** – loginės dalies užduotyse teisingas atsakymas dabar nėra visada pirmoje ar antroje vietoje, jie išdėstyti atsitiktine tvarka.
+
+Štai galutinis, pilnai sutvarkytas `page.tsx` failo kodas:
+
+```tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -10,16 +21,11 @@ import {
   Compass,
   ArrowRight,
   ArrowLeft,
-  BookOpen,
   Building2,
-  Briefcase,
-  GraduationCap,
-  Star,
   X,
   Info,
   Download,
   Calculator,
-  ShieldCheck,
   ClipboardList,
   Radar as RadarIcon,
   HelpCircle,
@@ -233,7 +239,7 @@ const RESULTS = {
   },
 };
 
-// Dynamic questions mix (choice, multiselect, likert)
+// Dynamic questions mix
 const DYNAMIC_QUESTIONS = [
   {
     type: "choice",
@@ -315,16 +321,16 @@ const DYNAMIC_QUESTIONS = [
 ];
 
 const APTITUDE_QUESTIONS = [
-  { q: "Kokia sekos tąsa: 2, 5, 8, 11, 14, ...?", options: ["15", "16", "17", "18"], correct: 2, cat: "numerine" },
-  { q: "Prekės kaina 80 €, jai taikoma 25% nuolaida. Kokia kaina po nuolaidos?", options: ["55 €", "60 €", "65 €", "70 €"], correct: 1, cat: "numerine" },
-  { q: "Klasėje yra 30 mokinių, 60% jų – mergaitės. Kiek klasėje berniukų?", options: ["10", "12", "15", "18"], correct: 1, cat: "numerine" },
-  { q: "Kuris skaičius nedera prie kitų: 16, 25, 30, 36?", options: ["16", "25", "30", "36"], correct: 2, cat: "logine" },
-  { q: "Visi katinai yra gyvūnai. Kai kurie gyvūnai yra žali. Ką galima teigti apie katinus?", options: ["Visi katinai yra žali", "Kai kurie katinai yra žali", "Joks katinas nėra žalias", "Iš duotų teiginių negalima nustatyti"], correct: 3, cat: "logine" },
-  { q: "Kokia raidė seka toliau: A, C, E, G, ...?", options: ["H", "I", "J", "K"], correct: 1, cat: "logine" },
-  { q: "Jei šiandien trečiadienis, kokia diena bus po 10 dienų?", options: ["Penktadienis", "Šeštadienis", "Sekmadienis", "Pirmadienis"], correct: 1, cat: "logine" },
-  { q: "Knyga santykiauja su skaitytoju taip, kaip maistas santykiauja su...?", options: ["Restoranu", "Valgytoju", "Virtuve", "Lėkšte"], correct: 1, cat: "verbaline" },
-  { q: "Kuris žodis reiškia tą pačią mintį, kaip „kruopštus“?", options: ["Greitas", "Atidus", "Tingus", "Garsus"], correct: 1, cat: "verbaline" },
-  { q: "Kuris žodis yra priešingos reikšmės žodžiui „optimistiškas“?", options: ["Realistiškas", "Pesimistiškas", "Ramus", "Drąsus"], correct: 1, cat: "verbaline" },
+  { q: "Kokia sekos tąsa: 2, 5, 8, 11, 14, ...?", options: ["15", "17", "16", "18"], correct: 1, cat: "numerine" },
+  { q: "Prekės kaina 80 €, jai taikoma 25% nuolaida. Kokia kaina po nuolaidos?", options: ["65 €", "70 €", "55 €", "60 €"], correct: 3, cat: "numerine" },
+  { q: "Klasėje yra 30 mokinių, 60% jų – mergaitės. Kiek klasėje berniukų?", options: ["12", "15", "18", "10"], correct: 0, cat: "numerine" },
+  { q: "Kuris skaičius nedera prie kitų: 16, 25, 30, 36?", options: ["16", "36", "30", "25"], correct: 2, cat: "logine" },
+  { q: "Visi katinai yra gyvūnai. Kai kurie gyvūnai yra žali. Ką galima teigti apie katinus?", options: ["Visi katinai yra žali", "Joks katinas nėra žalias", "Iš duotų teiginių negalima nustatyti", "Kai kurie katinai yra žali"], correct: 2, cat: "logine" },
+  { q: "Kokia raidė seka toliau: A, C, E, G, ...?", options: ["H", "J", "K", "I"], correct: 3, cat: "logine" },
+  { q: "Jei šiandien trečiadienis, kokia diena bus po 10 dienų?", options: ["Penktadienis", "Šeštadienis", "Pirmadienis", "Sekmadienis"], correct: 1, cat: "logine" },
+  { q: "Knyga yra skaitytojui tas pats, kas maistas yra...", options: ["Lėkštei", "Valgytojui", "Restoranui", "Virtuvei"], correct: 1, cat: "verbaline" },
+  { q: "Kuris žodis reiškia tą pačią mintį, kaip „kruopštus“?", options: ["Garsus", "Greitas", "Atidus", "Tingus"], correct: 2, cat: "verbaline" },
+  { q: "Kuris žodis yra priešingos reikšmės žodžiui „optimistiškas“?", options: ["Pesimistiškas", "Realistiškas", "Ramus", "Drąsus"], correct: 0, cat: "verbaline" },
 ];
 
 const CAT_LABELS = {
@@ -341,7 +347,6 @@ const DIMENSION_SHORT = {
   E: "Mokslinis-struktūrinis",
 };
 
-// Calculate max theoretical points based on dynamic structure
 const MAX_PER_DIMENSION = { A: 0, B: 0, C: 0, D: 0, E: 0 };
 DYNAMIC_QUESTIONS.forEach(q => {
   if (q.type === 'likert') {
@@ -552,16 +557,14 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
 // ============================================================================
 
 export default function CareerQuiz() {
-  const [gameState, setGameState] = useState("intro"); // intro | personality | aptitude | result
+  const [gameState, setGameState] = useState("intro"); 
   const [respondentName, setRespondentName] = useState("");
   const [currentIdx, setCurrentIdx] = useState(0);
   const [scores, setScores] = useState({ A: 0, B: 0, C: 0, D: 0, E: 0 });
   const [history, setHistory] = useState([]);
 
-  // For Multiselect
   const [selectedMulti, setSelectedMulti] = useState([]);
 
-  // Aptitude state
   const [aptIdx, setAptIdx] = useState(0);
   const [aptAnswers, setAptAnswers] = useState(Array(APTITUDE_QUESTIONS.length).fill(null));
   const [timeLeft, setTimeLeft] = useState(30);
@@ -577,11 +580,7 @@ export default function CareerQuiz() {
     setGameState("personality");
   };
 
-  // -----------------------------------------------------
-  // PERSONALITY LOGIC
-  // -----------------------------------------------------
   const handleDynamicAnswer = (answerObj) => {
-    // answerObj can be a single object {type: "A", score: 2} or an array of objects
     setHistory((prev) => [...prev, answerObj]);
     setScores((prev) => {
       const newScores = { ...prev };
@@ -595,7 +594,7 @@ export default function CareerQuiz() {
 
     if (currentIdx + 1 < DYNAMIC_QUESTIONS.length) {
       setCurrentIdx((prev) => prev + 1);
-      setSelectedMulti([]); // Reset multiselect
+      setSelectedMulti([]);
     } else {
       setGameState("aptitude");
     }
@@ -629,9 +628,6 @@ export default function CareerQuiz() {
     handleDynamicAnswer(answerArr);
   };
 
-  // -----------------------------------------------------
-  // APTITUDE LOGIC & TIMER
-  // -----------------------------------------------------
   useEffect(() => {
     if (gameState === "aptitude") {
       setTimeLeft(30);
@@ -644,7 +640,6 @@ export default function CareerQuiz() {
       const timerId = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
       return () => clearTimeout(timerId);
     } else {
-      // Timeout reached
       handleAptitudeAnswer(-1);
     }
   }, [timeLeft, gameState]);
@@ -666,9 +661,6 @@ export default function CareerQuiz() {
     setAptIdx((prev) => prev - 1);
   };
 
-  // -----------------------------------------------------
-  // RESULTS
-  // -----------------------------------------------------
   const getWinner = () => {
     return Object.keys(scores).reduce((a, b) => (scores[a] > scores[b] ? a : b));
   };
@@ -687,9 +679,10 @@ export default function CareerQuiz() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col w-full h-full">
       <div className="bg-slate-900 px-4 py-4 md:px-8 text-white flex justify-between items-center z-10 sticky top-0 shadow-md no-print">
-        <div className="flex items-center gap-3">
-          <Compass className="w-6 h-6 md:w-8 md:h-8 text-slate-300" />
-          <span className="font-bold tracking-wider text-lg md:text-xl">TIKSLIUKAI.LT</span>
+        <div className="flex items-center">
+          <span className="font-bold tracking-widest text-lg md:text-xl" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+            TIKSLIUKAI.LT
+          </span>
         </div>
         {(gameState === "personality" || gameState === "aptitude") && (
           <span className="text-xs md:text-sm font-medium text-slate-300 bg-slate-800 px-3 py-1.5 rounded-full border border-slate-700">
@@ -706,11 +699,8 @@ export default function CareerQuiz() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
-              className="flex flex-col items-center justify-center flex-1 p-6 md:p-8 text-center space-y-8 max-w-4xl mx-auto w-full"
+              className="flex flex-col items-center justify-center flex-1 p-6 md:p-8 text-center space-y-10 max-w-4xl mx-auto w-full"
             >
-              <div className="bg-slate-100 p-8 rounded-full inline-block shadow-inner ring-8 ring-slate-50">
-                <span className="text-7xl">🧭</span>
-              </div>
               <div className="max-w-2xl">
                 <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight leading-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
                   Atrask Savo <span className="text-slate-600">Profesinį Kelią</span>
@@ -726,7 +716,7 @@ export default function CareerQuiz() {
                   value={respondentName}
                   onChange={(e) => setRespondentName(e.target.value)}
                   placeholder="Pvz. Dovydas"
-                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-slate-500 focus:outline-none text-lg text-center"
+                  className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-slate-500 focus:outline-none text-lg text-center bg-white"
                 />
               </div>
               <button
@@ -739,8 +729,8 @@ export default function CareerQuiz() {
           )}
 
           {gameState === "personality" && (
-            <motion.div key="quiz" className="flex flex-col flex-1 max-w-4xl mx-auto w-full px-4 py-6 md:p-12 justify-center">
-              <div className="mb-6 md:mb-10">
+            <motion.div key="quiz" className="flex flex-col flex-1 max-w-4xl mx-auto w-full px-4 py-6 md:p-12 justify-start">
+              <div className="mb-6 md:mb-10 w-full">
                 <div className="flex justify-between items-center mb-4">
                   <button
                     onClick={handleBack}
@@ -751,7 +741,7 @@ export default function CareerQuiz() {
                   </button>
                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest hidden md:block">Dalis 1 / 2 · Savęs pažinimas</span>
                 </div>
-                <div className="w-full h-2 md:h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div className="w-full h-2 md:h-3 bg-slate-200 rounded-full overflow-hidden">
                   <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: `${(currentIdx / DYNAMIC_QUESTIONS.length) * 100}%` }}
@@ -766,25 +756,23 @@ export default function CareerQuiz() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex-1 flex flex-col"
+                className="flex-1 flex flex-col justify-center gap-8 md:gap-12 pb-12"
               >
-                <div className="min-h-[140px] flex items-center justify-center mb-8">
-                  <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-800 leading-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-                    {DYNAMIC_QUESTIONS[currentIdx].q}
-                  </h2>
-                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-800 leading-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                  {DYNAMIC_QUESTIONS[currentIdx].q}
+                </h2>
 
-                <div className="mt-auto">
+                <div className="w-full max-w-2xl mx-auto">
                   {/* LIKERT TYPE */}
                   {DYNAMIC_QUESTIONS[currentIdx].type === "likert" && (
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 2 })} className="p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all font-bold text-slate-600 hover:text-emerald-700 shadow-sm flex items-center justify-center gap-2">
+                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 2 })} className="p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-emerald-500 hover:bg-emerald-50 transition-all font-bold text-slate-600 hover:text-emerald-700 shadow-sm flex items-center justify-center gap-2">
                         <CheckCircle2 className="w-5 h-5 text-emerald-500" /> Visiškai sutinku
                       </button>
-                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 1 })} className="p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-amber-500 hover:bg-amber-50 transition-all font-bold text-slate-600 hover:text-amber-700 shadow-sm flex items-center justify-center gap-2">
+                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 1 })} className="p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-amber-500 hover:bg-amber-50 transition-all font-bold text-slate-600 hover:text-amber-700 shadow-sm flex items-center justify-center gap-2">
                         <HelpCircle className="w-5 h-5 text-amber-500" /> Iš dalies
                       </button>
-                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 0 })} className="p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-rose-500 hover:bg-rose-50 transition-all font-bold text-slate-600 hover:text-rose-700 shadow-sm flex items-center justify-center gap-2">
+                      <button onClick={() => handleDynamicAnswer({ type: DYNAMIC_QUESTIONS[currentIdx].t, score: 0 })} className="p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-rose-500 hover:bg-rose-50 transition-all font-bold text-slate-600 hover:text-rose-700 shadow-sm flex items-center justify-center gap-2">
                         <XCircle className="w-5 h-5 text-rose-500" /> Nesutinku
                       </button>
                     </div>
@@ -794,7 +782,7 @@ export default function CareerQuiz() {
                   {DYNAMIC_QUESTIONS[currentIdx].type === "choice" && (
                     <div className="flex flex-col gap-3">
                       {DYNAMIC_QUESTIONS[currentIdx].options.map((opt, i) => (
-                        <button key={i} onClick={() => handleDynamicAnswer({ type: opt.t, score: 1 })} className="p-4 md:p-5 rounded-2xl border-2 border-slate-100 bg-white hover:border-slate-500 hover:bg-slate-50 transition-all font-semibold text-slate-700 text-left shadow-sm">
+                        <button key={i} onClick={() => handleDynamicAnswer({ type: opt.t, score: 1 })} className="p-4 md:p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-500 hover:bg-slate-50 transition-all font-semibold text-slate-700 text-left shadow-sm">
                           {opt.text}
                         </button>
                       ))}
@@ -804,11 +792,11 @@ export default function CareerQuiz() {
                   {/* MULTISELECT TYPE */}
                   {DYNAMIC_QUESTIONS[currentIdx].type === "multiselect" && (
                     <div className="flex flex-col gap-3">
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
                         {DYNAMIC_QUESTIONS[currentIdx].options.map((opt, i) => {
                           const isSelected = selectedMulti.includes(opt);
                           return (
-                            <button key={i} onClick={() => toggleMulti(opt)} className={`p-4 rounded-xl border-2 transition-all flex items-start gap-3 text-left ${isSelected ? "border-slate-800 bg-slate-800 text-white shadow-md" : "border-slate-100 bg-white text-slate-700 hover:border-slate-300"}`}>
+                            <button key={i} onClick={() => toggleMulti(opt)} className={`p-4 rounded-xl border-2 transition-all flex items-start gap-3 text-left ${isSelected ? "border-slate-800 bg-slate-800 text-white shadow-md" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"}`}>
                               <div className={`mt-0.5 rounded flex items-center justify-center shrink-0 w-5 h-5 border ${isSelected ? "border-white bg-white/20" : "border-slate-300"}`}>
                                 {isSelected && <CheckSquare className="w-4 h-4 text-white" />}
                               </div>
@@ -818,7 +806,7 @@ export default function CareerQuiz() {
                         })}
                       </div>
                       <button onClick={submitMulti} disabled={selectedMulti.length === 0} className="w-full p-4 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 disabled:opacity-50 transition-all flex justify-center items-center gap-2">
-                        Tęsti <ArrowRight className="w-5 h-5" />
+                        Patvirtinti ir tęsti <ArrowRight className="w-5 h-5" />
                       </button>
                     </div>
                   )}
@@ -828,8 +816,8 @@ export default function CareerQuiz() {
           )}
 
           {gameState === "aptitude" && (
-            <motion.div key="aptitude" className="flex flex-col flex-1 max-w-4xl mx-auto w-full px-4 py-6 md:p-12 justify-center">
-              <div className="mb-6 md:mb-10">
+            <motion.div key="aptitude" className="flex flex-col flex-1 max-w-4xl mx-auto w-full px-4 py-6 md:p-12 justify-start">
+              <div className="mb-6 md:mb-10 w-full">
                 <div className="flex justify-between items-center mb-4">
                   <button
                     onClick={handleAptBack}
@@ -846,7 +834,7 @@ export default function CareerQuiz() {
                 {/* Timer Bar */}
                 <div className="flex items-center gap-4 mb-2">
                   <Clock className={`w-5 h-5 ${timeLeft <= 5 ? "text-rose-500 animate-pulse" : "text-slate-500"}`} />
-                  <div className="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                  <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
                     <div className={`h-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? "bg-rose-500" : "bg-slate-800"}`} style={{ width: `${(timeLeft / 30) * 100}%` }} />
                   </div>
                   <span className={`font-bold text-sm w-8 text-right ${timeLeft <= 5 ? "text-rose-500" : "text-slate-600"}`}>{timeLeft}s</span>
@@ -859,20 +847,18 @@ export default function CareerQuiz() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
-                className="flex-1 flex flex-col"
+                className="flex-1 flex flex-col justify-center gap-8 md:gap-12 pb-12"
               >
-                <div className="min-h-[140px] flex items-center justify-center mb-8">
-                  <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-800 leading-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-                    {APTITUDE_QUESTIONS[aptIdx].q}
-                  </h2>
-                </div>
+                <h2 className="text-2xl md:text-3xl font-bold text-center text-slate-800 leading-tight" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                  {APTITUDE_QUESTIONS[aptIdx].q}
+                </h2>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-auto">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-2xl mx-auto">
                   {APTITUDE_QUESTIONS[aptIdx].options.map((option, i) => (
                     <button
                       key={i}
                       onClick={() => handleAptitudeAnswer(i)}
-                      className="flex items-center justify-center p-5 md:p-6 rounded-2xl border-2 border-slate-100 bg-white hover:border-slate-500 hover:bg-slate-50 transition-all shadow-sm hover:shadow-md"
+                      className="flex items-center justify-center p-5 md:p-6 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-500 hover:bg-slate-50 transition-all shadow-sm hover:shadow-md"
                     >
                       <span className="font-bold text-base md:text-lg text-slate-700">{option}</span>
                     </button>
@@ -898,3 +884,5 @@ export default function CareerQuiz() {
     </main>
   );
 }
+
+```
