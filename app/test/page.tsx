@@ -1,13 +1,3 @@
-Štai atnaujintas `page.tsx` kodas, kuriame įgyvendinau visus tavo prašymus:
-
-1. **Pilno ekrano režimas (Full-screen)**: Panaikinau rėmelius ir apribojimus. Dabar aplikacija išnaudoja visą ekraną, todėl mobiliajame telefone naudotis bus kur kas patogiau.
-2. **Klausimų dinamika**: Pakeičiau senus „Taip/Ne“ klausimus į dinamišką formatą. Dabar yra 3 tipų klausimai: vieno pasirinkimo iš kelių variantų, kelių atsakymų žymėjimo (angl. *multiselect*) ir stiprumo vertinimo („Visiškai sutinku“, „Iš dalies“, „Nesutinku“).
-3. **Analitinės dalies laikmatis**: Pridėtas aiškus 30 sekundžių laikmatis loginės dalies užduotims. Laikui pasibaigus, automatiškai pereinama prie kito klausimo.
-4. **Vienodi šriftai**: Klausimų tekstuose pritaikytas tas pats „Georgia“ / serif šriftas, kuris naudojamas ir ataskaitos antraštėse.
-5. **Daugiau profesijų**: Prie kiekvieno karjeros tipo pridėjau po 5 papildomas profesijas su aprašymais (iš viso dabar po 15 profesijų kiekvienai krypčiai).
-
-Pakeisk savo `page.tsx` failo turinį šiuo kodu:
-
 ```tsx
 "use client";
 
