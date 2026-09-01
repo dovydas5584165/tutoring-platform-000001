@@ -1,6 +1,4 @@
-Atnaujinta kodo versija `page-3.tsx` su sutrumpintu 20 sekundžių laikmačiu kiekvienam analitinių gebėjimų klausimui:
 
-```tsx name=page-3.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -1069,4 +1067,3 @@ export default function CareerQuiz() {
   );
 }
 
-```
