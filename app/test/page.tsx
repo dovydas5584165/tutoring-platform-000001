@@ -1,3 +1,6 @@
+Atnaujinta kodo versija `page-3.tsx` su sutrumpintu 20 sekundžių laikmačiu kiekvienam analitinių gebėjimų klausimui:
+
+```tsx name=page-3.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -735,7 +738,7 @@ export default function CareerQuiz() {
 
   const [aptIdx, setAptIdx] = useState(0);
   const [aptAnswers, setAptAnswers] = useState(Array(APTITUDE_QUESTIONS.length).fill(null));
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(20);
 
   const dateStr = new Date().toLocaleDateString("lt-LT", { year: "numeric", month: "long", day: "numeric" });
 
@@ -798,7 +801,7 @@ export default function CareerQuiz() {
 
   useEffect(() => {
     if (gameState === "aptitude") {
-      setTimeLeft(30);
+      setTimeLeft(20);
     }
   }, [gameState, aptIdx]);
 
@@ -1016,7 +1019,7 @@ export default function CareerQuiz() {
                 <div className="flex items-center gap-4 mb-2">
                   <Clock className={`w-5 h-5 ${timeLeft <= 5 ? "text-rose-500 animate-pulse" : "text-slate-500"}`} />
                   <div className="w-full h-3 bg-slate-200 rounded-full overflow-hidden">
-                    <div className={`h-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? "bg-rose-500" : "bg-slate-800"}`} style={{ width: `${(timeLeft / 30) * 100}%` }} />
+                    <div className={`h-full transition-all duration-1000 ease-linear ${timeLeft <= 5 ? "bg-rose-500" : "bg-slate-800"}`} style={{ width: `${(timeLeft / 20) * 100}%` }} />
                   </div>
                   <span className={`font-bold text-sm w-8 text-right ${timeLeft <= 5 ? "text-rose-500" : "text-slate-600"}`}>{timeLeft}s</span>
                 </div>
@@ -1065,3 +1068,5 @@ export default function CareerQuiz() {
     </main>
   );
 }
+
+```
