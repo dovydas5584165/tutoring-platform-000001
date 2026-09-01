@@ -23,6 +23,8 @@ import {
   HelpCircle,
   Clock,
   CheckSquare,
+  Users,
+  ShieldCheck,
 } from "lucide-react";
 import {
   RadarChart,
@@ -38,6 +40,16 @@ import {
 // DATA & TYPES
 // ============================================================================
 
+const LAMA_BPO_GENERAL_INFO = {
+  mandatoryNotice: "Stojant į Lietuvos aukštąsias mokyklas (VF ir VNF su stipendija) PRIVALOMA būti išlaikius Matematikos VBE (išskyrus menų studijas) ir Lietuvių k. ir literatūros VBE bei 3-ią pasirinktą VBE.",
+  minCriteria: [
+    "Ne mažiau 3 valstybiniai brandos egzaminai (VBE): Lietuvių k., Matematika + 1 pasirinktinis VBE.",
+    "Minimali VBE išlaikymo ribinė reikšmė: pasiekta pagrindinio pasiekimų lygio riba (≥16 balų).",
+    "5 geriausių dalykų metinių įvertinimų vidurkis: ne mažesnis nei 7 (universitetuose) arba 6 (kolegijose).",
+    "Minimalus konkursinis balas (KB): paprastai ≥ 5.4 universitetuose ir ≥ 4.3 kolegijose (tikslina kiekviena aukštoji mokykla).",
+  ]
+};
+
 const RESULTS = {
   A: {
     title: "Sistemų Architektas (Inžinerinis-Techninis)",
@@ -47,7 +59,7 @@ const RESULTS = {
     negatives: ["Socialinis nuovargis", "Per didelis kritiškumas", "Perfekcionizmas"],
     communication:
       "Draugai tave vertina už tavo objektyvumą. Tu nemėgsti tuščių kalbų, kalbi faktais ir vertini intelektualų ryšį.",
-    exams: "Matematika (valstybinis), Fizika, Informacinės Technologijos, Anglų kalba.",
+    exams: "Matematika (VBE - Privalomas), Fizika / Informacinės Technologijos (VBE), Lietuvių k. (VBE), Anglų k. (VBE).",
     uniLt: [
       { name: "KTU Informatikos fak.", score: "KB: >8.2" },
       { name: "VU Matematikos ir informatikos fak.", score: "KB: >8.8" },
@@ -85,7 +97,7 @@ const RESULTS = {
     negatives: ["Sunkumas brėžti ribas", "Emocinis jautrumas kitiems", "Kritikos baimė"],
     communication:
       "Esi draugų būrio patarėjas. Moki išklausyti, suprasti be žodžių ir visada rasti tinkamą paguodos ar palaikymo frazę.",
-    exams: "Lietuvių kalba, Anglų kalba, Biologija (psichologijai) arba Istorija.",
+    exams: "Matematika (VBE - Privalomas), Lietuvių k. (VBE), Anglų k. (VBE), Biologija arba Istorija.",
     uniLt: [
       { name: "VU Psichologijos fak.", score: "KB: >9.0" },
       { name: "LSMU (Sveikatos psichologija)", score: "KB: >8.5" },
@@ -123,7 +135,7 @@ const RESULTS = {
     negatives: ["Chaotiškumas", "Rutinos netoleravimas", "Nepastovumas"],
     communication:
       "Esi charizmatiškas. Draugai tave vertina už kitokį požiūrį į gyvenimą, estetiką ir gebėjimą nustebinti.",
-    exams: "Lietuvių kalba, Anglų kalba, Dailės/Architektūros stojamieji, Istorija.",
+    exams: "Lietuvių kalba (VBE), Anglų kalba (VBE), Dailės / Architektūros stojamasis egzaminas. (Matematikos VBE privalomas stojant į valstybės finansuojamas vietas, išskyrus grynųjų menų studijas).",
     uniLt: [
       { name: "Vilniaus Dailės Akademija (VDA)", score: "KB: Portfelis + Egz." },
       { name: "LMTA (Muzikos ir teatro)", score: "KB: Stojamasis" },
@@ -161,7 +173,7 @@ const RESULTS = {
     negatives: ["Nekantrumas", "Poilsio ignoravimas", "Polinkis dominuoti"],
     communication:
       "Esi organizatorius. Kalbi užtikrintai, argumentuotai, motyvuoji kitus veikti. Mėgsti laimėti diskusijas.",
-    exams: "Matematika (valstybinis), Anglų kalba, Geografija arba Istorija.",
+    exams: "Matematika (VBE - Privalomas), Anglų kalba (VBE), Lietuvių k. (VBE), Geografija arba Istorija.",
     uniLt: [
       { name: "ISM Vadybos ir ekonomikos univ.", score: "KB: >7.0" },
       { name: "VU Verslo mokykla", score: "KB: >7.5" },
@@ -199,7 +211,7 @@ const RESULTS = {
     negatives: ["Baimė keisti planus", "Perfekcionizmas detalėse", "Sunkus prisitaikymas"],
     communication:
       "Komunikuoji ramiai, logiškai. Nemėgsti pagražinimų, vertini punktualumą ir konkretumą. Tavo žodis yra šventas.",
-    exams: "Biologija, Chemija, Matematika, Lietuvių kalba.",
+    exams: "Matematika (VBE - Privalomas), Biologija / Chemija (VBE), Lietuvių k. (VBE).",
     uniLt: [
       { name: "LSMU (Medicina)", score: "KB: >9.5" },
       { name: "VU Medicinos fak.", score: "KB: >9.2" },
@@ -207,9 +219,9 @@ const RESULTS = {
     ],
     uniEu: "Heidelbergo universitetas (Vokietija), Karolinska Institutet (Švedija), Sorbona (Prancūzija)",
     famousPeople: [
-      { name: "Marie Curie", role: "Mokslininkė" },
-      { name: "Angela Merkel", role: "Politikė, fizikė" },
-      { name: "Dr. House (Personažas)", role: "Diagnostikas" },
+      { name: "Marie Curie", role: "Mokslininkė, Nobelio premijos laurentė" },
+      { name: "Angela Merkel", role: "Politikė, kvantinės chemijos daktarė" },
+      { name: "Dr. House (Personažas)", role: "Medicininės diagnostikos genijus" },
     ],
     professions: [
       { title: "Gydytojas / Chirurgas", salary: "2500-7000€", description: "Diagnozuoja ligas, atlieka operacijas ir skiria gydymą. Reikalauja ilgų studijų ir atsakomybės." },
@@ -231,7 +243,7 @@ const RESULTS = {
   },
 };
 
-// Dynamic questions mix
+// Dynamic questions mix including Work Values
 const DYNAMIC_QUESTIONS = [
   {
     type: "choice",
@@ -242,6 +254,17 @@ const DYNAMIC_QUESTIONS = [
       { text: "Kurti vizualinį dizainą, idėjas ar pristatymą", t: "C" },
       { text: "Dalinti užduotis, sekti biudžetą ir prisiimti atsakomybę", t: "D" },
       { text: "Tikrinti faktus, ieškoti mokslinių šaltinių ir taisyti klaidas", t: "E" },
+    ]
+  },
+  {
+    type: "choice",
+    q: "Kuri darbo vertybė tau yra pati svarbiausia ieškant svajonių karjeros?",
+    options: [
+      { text: "Aukštas atlyginimas, finansinis nepriklausomumas ir lyderystė", t: "D" },
+      { text: "Saviraiška, kūrybinė laisvė ir galimybė kurti kažką unikalaus", t: "C" },
+      { text: "Darbo stabilumas, saugumas ir aiškios taisyklės", t: "E" },
+      { text: "Prasmė, pagalba kitiems ir teigiamas poveikis visuomenei", t: "B" },
+      { text: "Inovacijos, technologiniai iššūkiai ir nuolatinis tobulėjimas", t: "A" },
     ]
   },
   {
@@ -279,6 +302,17 @@ const DYNAMIC_QUESTIONS = [
   
   {
     type: "choice",
+    q: "Kas tave labiausiai motyvuoja pasiekti geriausių rezultatų darbe?",
+    options: [
+      { text: "Finansinis atlygis ir karjeros galimybės (Aukštas atlyginimas)", t: "D" },
+      { text: "Jausmas, kad mano darbas keičia kitų žmonių gyvenimus", t: "B" },
+      { text: "Galimybė realizuoti savo kurybines vizijas be apribojimų", t: "C" },
+      { text: "Ramybė, profesinis saugumas ir nuspėjamumas", t: "E" },
+      { text: "Galimybė spręsti sudėtingiausias technines problemas", t: "A" },
+    ]
+  },
+  {
+    type: "choice",
     q: "Kaip dažniausiai priimi svarbius sprendimus?",
     options: [
       { text: "Pasikliaudamas logika, efektyvumu ir sisteminiu požiūriu", t: "A" },
@@ -308,7 +342,7 @@ const DYNAMIC_QUESTIONS = [
   { type: "likert", q: "Mėgstu automatizuoti pasikartojančius darbus ir ieškoti efektyviausio sprendimo būdo.", t: "A" },
   { type: "likert", q: "Galiu lengvai suprasti, kaip jaučiasi kitas žmogus, net jei jis to nesako žodžiais.", t: "B" },
   { type: "likert", q: "Man be galo svarbu, kad tai, ką sukuriu, atrodytų estetiškai ir turėtų vizualinę vertę.", t: "C" },
-  { type: "likert", q: "Nebijau rizikuoti ir išeiti iš komforto zonas, jei matau galimybę pasiekti sėkmę.", t: "D" },
+  { type: "likert", q: "Nebijau rizikuoti ir išeiti iš komforto zonos, jei matau galimybę pasiekti sėkmę.", t: "D" },
   { type: "likert", q: "Mėgstu klasifikuoti informaciją, palaikyti griežtą tvarką ir visada tikrinu faktus.", t: "E" },
 ];
 
@@ -523,6 +557,22 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
           </div>
         </ReportSection>
 
+        <ReportSection icon={<Users className="w-5 h-5 text-slate-700" />} title="Žymios asmenybės (Šio tipo atstovai)">
+          <p className="text-slate-700 text-sm leading-relaxed mb-4">
+            Žemiau pateikiami žinomi lyderiai, mokslininkai ar kūrėjai, kurių veiklos stilius ir pasiekimai atspindi šį asmenybės tipą:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {result.famousPeople.map((person, i) => (
+              <div key={i} className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
+                <div>
+                  <h5 className="font-bold text-slate-900 text-base">{person.name}</h5>
+                  <p className="text-xs text-slate-500 font-medium mt-1">{person.role}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </ReportSection>
+
         <ReportSection icon={<RadarIcon className="w-5 h-5 text-slate-700" />} title="Asmenybės profilis (visos penkios kryptys)">
           <p className="text-slate-700 text-sm leading-relaxed mb-4">
             Nors testas nustato vieną dominuojantį profilį, kiekvienas žmogus atsakymuose atspindi visų penkių krypčių
@@ -587,11 +637,31 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
           </div>
         </ReportSection>
 
-        <ReportSection icon={<GraduationCap className="w-5 h-5 text-slate-700" />} title="Studijų kryptys ir egzaminai">
+        <ReportSection icon={<GraduationCap className="w-5 h-5 text-slate-700" />} title="Studijų kryptys, Egzaminai ir LAMA BPO kriterijai">
+          {/* LAMA BPO Rule Box */}
+          <div className="bg-amber-50/70 border border-amber-200 rounded-xl p-5 mb-6">
+            <div className="flex items-start gap-3">
+              <ShieldCheck className="w-5 h-5 text-amber-700 mt-0.5 shrink-0" />
+              <div>
+                <h5 className="font-bold text-amber-900 text-sm uppercase tracking-wide mb-1">
+                  LAMA BPO bendrieji stojimo reikalavimai
+                </h5>
+                <p className="text-amber-800 text-xs font-semibold mb-3">
+                  {LAMA_BPO_GENERAL_INFO.mandatoryNotice}
+                </p>
+                <ul className="list-disc list-inside space-y-1 text-xs text-amber-800">
+                  {LAMA_BPO_GENERAL_INFO.minCriteria.map((crit, idx) => (
+                    <li key={idx}>{crit}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
               <h5 className="font-bold text-slate-800 mb-2 flex items-center gap-2 text-sm uppercase tracking-wide">
-                <BookOpen className="w-4 h-4" /> Rekomenduojami egzaminai
+                <BookOpen className="w-4 h-4" /> Šios krypties VBE
               </h5>
               <p className="text-slate-700 text-sm leading-relaxed">{result.exams}</p>
             </div>
