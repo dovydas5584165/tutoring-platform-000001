@@ -206,8 +206,16 @@ export default function KarjerosPristatymas() {
             </h1>
             
             <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto font-normal">
-              Daugiau nei 30% studentų pakeičia arba nutraukia studijas dėl skubotų sprendimų. Atlikite mokslu pagrįstą asmenybės bei elgsenos tyrimą ir išsiaiškinkite 10 geriausiai jūsų potencialą atitinkančių profesinių krypčių.
+              Daugiau nei 30% studentų pakeičia arba nutraukia studijas dėl skubotų sprendimų. Atlikite mokslu pagrįstą asmenybės bei elgsenos tyrimą ir išsiaiškinkite 10+ geriausiai jūsų potencialą atitinkančių profesinių krypčių.
             </p>
+
+            <div className="w-full max-w-2xl mb-10 rounded-2xl overflow-hidden border border-slate-200">
+              <img 
+                src="/images/hero-students.jpg" 
+                alt="Moksleiviai renkasi studijų kryptį" 
+                className="w-full h-56 sm:h-72 object-cover"
+              />
+            </div>
 
             <div className="text-sm font-medium mb-10" style={{ color: BRAND_BLUE }}>
               Įskaičiuota asmeninė ekspertinė konsultacija po vertinimo
@@ -219,7 +227,7 @@ export default function KarjerosPristatymas() {
                 className="flex items-center justify-center gap-3 text-white px-8 py-4 rounded-xl font-medium text-base transition-all hover:opacity-90"
                 style={{ backgroundColor: BRAND_BLUE }}
               >
-                Gauti analitinę ataskaitą ({PRODUCT_PRICE} €)
+                Karjeros testas ({PRODUCT_PRICE} €)
               </button>
               
               <Link href="#kaip-veikia" className="flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-xl font-medium text-base transition-all">
@@ -230,7 +238,7 @@ export default function KarjerosPristatymas() {
             <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-medium border-t border-slate-100 pt-8">
               <span>Saugus atsiskaitymas</span>
               <span className="hidden sm:inline-block text-slate-300">•</span>
-              <span>Rezultatai per 15 minučių</span>
+              <span>Rezultatai per 30 minučių</span>
               <span className="hidden sm:inline-block text-slate-300">•</span>
               <span>Įskaičiuotas eksperto aptarimas</span>
             </div>
@@ -285,7 +293,7 @@ export default function KarjerosPristatymas() {
       <section id="verte" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900 tracking-tight">
-            Mokslu pagrįsta 7 dimensijų metodika
+            Mokslu pagrįsta ir specialistų patvirtinta metodika
           </h2>
           <p className="text-slate-600 text-base leading-relaxed">
             Diagnostikai taikomas tarptautiniu mastu pripažintas vertinimo modelis, naudojamas organizacijų psichologijoje, pritaikytas akademiniam ir profesiniam nukreipimui.
@@ -334,23 +342,31 @@ export default function KarjerosPristatymas() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
+              <img src="/images/step-1-order.jpg" alt="Užsakymo apmokėjimas" className="w-full h-36 object-cover" />
+              <div className="p-8">
               <div className="w-10 h-10 text-white rounded-lg flex items-center justify-center font-semibold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>01</div>
               <h3 className="text-lg font-semibold mb-2 text-slate-900">Užsakymas</h3>
               <p className="text-slate-600 text-xs leading-relaxed">
                 Vienkartinis {PRODUCT_PRICE} € mokėjimas per saugią Stripe sistemą. Prieiga prie vertinimo suteikiama iš karto.
               </p>
+              </div>
             </div>
 
-            <div className="bg-slate-50 p-8 rounded-2xl border border-slate-200">
+            <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
+              <img src="/images/step-2-diagnostics.jpg" alt="Klausimyno pildymas" className="w-full h-36 object-cover" />
+              <div className="p-8">
               <div className="w-10 h-10 text-white rounded-lg flex items-center justify-center font-semibold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>02</div>
               <h3 className="text-lg font-semibold mb-2 text-slate-900">Diagnostika</h3>
               <p className="text-slate-600 text-xs leading-relaxed">
-                Klausimyno užpildymas užtrunka apie 15 minučių. Generuojama išsami analitinė ataskaita.
+                Klausimyno užpildymas užtrunka apie 30 minučių. Generuojama išsami analitinė ataskaita.
               </p>
+              </div>
             </div>
 
-            <div className="bg-slate-900 text-white p-8 rounded-2xl border border-slate-800">
+            <div className="bg-slate-900 text-white rounded-2xl border border-slate-800 overflow-hidden">
+              <img src="/images/step-3-consultation.jpg" alt="Eksperto konsultacija" className="w-full h-36 object-cover" />
+              <div className="p-8">
               <div className="w-10 h-10 text-slate-950 rounded-lg flex items-center justify-center font-bold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>03</div>
               <h3 className="text-lg font-semibold mb-2 text-white">Eksperto konsultacija</h3>
               <p className="text-slate-300 text-xs leading-relaxed mb-4">
@@ -361,7 +377,8 @@ export default function KarjerosPristatymas() {
                 – suderinsime jums patogų konsultacijos laiką.
               </p>
               <div className="text-[11px] font-medium bg-slate-800/80 px-3 py-2 rounded-lg border border-slate-700/60" style={{ color: BRAND_BLUE }}>
-                Nemokama konsultacija įskaičiuota
+                Konsultacija įskaičiuota
+              </div>
               </div>
             </div>
           </div>
@@ -395,7 +412,9 @@ export default function KarjerosPristatymas() {
           </div>
           
           <div className="lg:w-1/2 flex justify-center w-full">
-            <div className="bg-slate-950 text-white p-8 rounded-2xl max-w-md w-full border border-slate-800">
+            <div className="bg-slate-950 text-white rounded-2xl max-w-md w-full border border-slate-800 overflow-hidden">
+              <img src="/images/academy-tutoring.jpg" alt="Tiksliukai.lt korepetavimas" className="w-full h-40 object-cover" />
+              <div className="p-8">
               <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-800">
                 <div className="w-10 h-10 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold text-lg">
                   T
@@ -408,19 +427,20 @@ export default function KarjerosPristatymas() {
               <div className="space-y-4 text-sm">
                 <div className="flex items-center justify-between pb-2 border-b border-slate-800/50">
                   <span className="font-medium text-slate-300">Matematika</span>
-                  <span className="text-slate-400 text-xs font-mono">VBE Standartas</span>
+                  <span className="text-slate-400 text-xs font-mono">VBE Standartinis</span>
                 </div>
                 <div className="flex items-center justify-between pb-2 border-b border-slate-800/50">
                   <span className="font-medium text-slate-300">Fizika</span>
-                  <span className="text-slate-400 text-xs font-mono">Ekspertiniai Mentoriai</span>
+      
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-slate-300">Informatika</span>
-                  <span className="text-slate-400 text-xs font-mono">Programavimas</span>
+                  <span className="text-slate-400 text-xs font-mono">C++, Python, Office</span>
                 </div>
               </div>
               <div className="mt-8 pt-6 border-t border-slate-800">
                 <span className="text-slate-400 text-xs font-medium">Aukšti VBE įvertinimai</span>
+              </div>
               </div>
             </div>
           </div>
