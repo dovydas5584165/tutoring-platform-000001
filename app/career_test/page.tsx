@@ -25,20 +25,22 @@ import {
   CreditCard,
   ClipboardCheck,
   CalendarCheck,
-  Award
+  Award,
+  MessageSquare,
+  Briefcase
 } from 'lucide-react';
 
-// --- IMPORT CHECKOUT FORM (Up 2 levels) ---
+// IMPORT CHECKOUT FORM (Up 2 levels)
 import CheckoutForm from '../../components/CheckoutForm'; 
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
-// --- CONFIGURATION ---
+// CONFIGURATION
 const PRODUCT_PRICE = 14;
 const CONTACT_EMAIL = 'info.tiksliukai@gmail.com';
 
-// --- MOBILE OPTIMIZED PAYMENT MODAL COMPONENT ---
+// MOBILE OPTIMIZED PAYMENT MODAL COMPONENT
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
@@ -71,12 +73,12 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
       colorPrimary: '#0f172a', 
       borderRadius: '8px', 
       fontSizeBase: '15px',
-      fontFamily: 'ui-sans-serif, system-ui, sans-serif'
+      fontFamily: "'Aileron', 'Garet', ui-sans-serif, system-ui, sans-serif"
     },
   };
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center sm:p-4">
+    <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center sm:p-4" style={{ fontFamily: "'Aileron', 'Garet', sans-serif" }}>
       <div 
         className="absolute inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity" 
         onClick={onClose}
@@ -91,7 +93,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           <X size={18} />
         </button>
 
-        {/* --- LEFT SIDE (SUMMARY) --- */}
+        {/* LEFT SIDE (SUMMARY) */}
         <div className="bg-slate-900 text-white md:w-2/5 flex-shrink-0 border-b md:border-b-0 md:border-r border-slate-800">
           <div className="p-6 md:p-8 flex flex-col justify-between h-full">
             <div>
@@ -114,23 +116,23 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
               <div className={`${showDetails ? 'block' : 'hidden'} md:block bg-slate-800/80 p-5 rounded-xl border border-slate-700/60 shadow-inner transition-all`}>
                 <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-widest">Aukščiausio lygio diagnostika</span>
-                <p className="font-semibold text-white text-base leading-snug mt-1">Karjeros ir asmenybės profilis 2026</p>
+                <p className="font-semibold text-white text-base leading-snug mt-1">Karjeros testas: Individualizuota asmenybės analizė, tinkančių profesijų sąrašas ir ateities studijų planas.</p>
                 <ul className="mt-4 space-y-3 text-xs text-slate-300 leading-relaxed">
                   <li className="flex items-start gap-2.5">
                     <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5"/> 
-                    <span>Detali psichologinė ataskaita pagal 7 elgsenos dimensijas.</span>
+                    <span>Profesionalus profilis: Gausite detalų psichologinį savo stiprybių ir silpnybių aprašymą.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5"/> 
-                    <span>10 geriausiai suderinamų profesinių krypčių analitika.</span>
+                    <span>Karjeros planas: 10+ konkrečių profesijų, kurios labiausiai atitinka tavo duomenis.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <CheckCircle2 size={15} className="text-emerald-400 shrink-0 mt-0.5"/> 
-                    <span>Individualus VBE ir akademinių studijų planas.</span>
+                    <span>Studijų žemėlapis: Rekomendacijos, kur stoti Lietuvoje ir Europoje bei kokių egzaminų reikės.</span>
                   </li>
                   <li className="flex items-start gap-2.5">
                     <Award size={15} className="text-emerald-400 shrink-0 mt-0.5"/> 
-                    <span className="font-medium text-slate-200">Įskaičiuota asmeninė eksperto konsultacija.</span>
+                    <span className="font-medium text-slate-200">Komunikacijos gidas: Patarimai, kaip tavo asmenybės tipui geriausia bendrauti ir dirbti komandoje.</span>
                   </li>
                 </ul>
               </div>
@@ -153,7 +155,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           </div>
         </div>
 
-        {/* --- RIGHT SIDE (STRIPE FORM) --- */}
+        {/* RIGHT SIDE (STRIPE FORM) */}
         <div className="flex-1 bg-white flex flex-col h-full overflow-hidden">
           <button 
             onClick={onClose}
@@ -194,7 +196,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   );
 }
 
-// --- MAIN LANDING PAGE COMPONENT ---
+// MAIN LANDING PAGE COMPONENT
 export default function KarjerosPristatymas() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
@@ -204,26 +206,26 @@ export default function KarjerosPristatymas() {
   };
 
   return (
-    <div className="bg-slate-50 text-slate-900 font-sans antialiased">
+    <div className="bg-slate-50 text-slate-900 antialiased" style={{ fontFamily: "'Aileron', 'Garet', sans-serif" }}>
       
       <PaymentModal 
         isOpen={isCheckoutOpen} 
         onClose={() => setIsCheckoutOpen(false)} 
       />
       
-      {/* --- HERO SECTION --- */}
+      {/* HERO SECTION */}
       <section className="relative overflow-hidden bg-white py-24 lg:py-32 border-b border-slate-200/80">
         <div className="container mx-auto px-6 relative z-10">
           
           <div className="max-w-3xl mx-auto text-center flex flex-col items-center">
             
             <div className="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 text-slate-800 px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wider mb-8">
-              <Award size={14} className="text-slate-700" /> Moksleivių ir Abiturientų Karjeros Diagnostika
+              <Award size={14} className="text-slate-700" /> Karjeros testas
             </div>
             
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.15]">
-              Sąmoningas studijų pasirinkimas. <br/>
-              <span className="text-slate-600 font-normal">Atsakingai suplanuota ateitis.</span>
+              Individualizuota asmenybės analizė, <br/>
+              <span className="text-slate-600 font-normal">tinkančių profesijų sąrašas ir ateities studijų planas.</span>
             </h1>
             
             <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto font-normal">
@@ -260,7 +262,7 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- PROBLEM/SOLUTION SECTION --- */}
+      {/* PROBLEM/SOLUTION SECTION */}
       <section className="py-24 bg-slate-950 text-white">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -272,7 +274,7 @@ export default function KarjerosPristatymas() {
                 Klaidingas akademinis kelias reikalauja didelių išteklių.
               </h2>
               <p className="text-slate-400 text-base leading-relaxed mb-6">
-                Vidutinės vienų metų studijų bei pragyvenimo išlaidos siekia 3,000–5,000 €. Negana to, prarandamas brangus laikas, patiriamas akademinis stresas ir neapibrėžtumas dėl ateities.
+                Vidutinės vienų metų studijų bei pragyvenimo išlaidos siekia 3,000-5,000 €. Negana to, prarandamas brangus laikas, patiriamas akademinis stresas ir neapibrėžtumas dėl ateities.
               </p>
               <p className="text-slate-200 text-base leading-relaxed font-medium">
                 Sumažinkite neapibrėžtumą investuodami {PRODUCT_PRICE} € į psichologiniais tyrimais pagrįstą elgsenos bei profesinio potencialo analizę.
@@ -286,11 +288,11 @@ export default function KarjerosPristatymas() {
               <h3 className="text-xl font-semibold mb-6 text-white border-b border-slate-800 pb-4">Ką gausite atlikę vertinimą?</h3>
               <ul className="space-y-4">
                 {[
-                  "Objektyvią profesinių krypčių ir vidinio potencialo analizę.",
-                  "Nepriklausomus, duomenimis pagrįstus rezultatus be išorinio spaudimo.",
-                  "Aiškią struktūrą ir tikrumą dėl ateities sprendimų.",
-                  "Konkretų akademinį žemėlapį ir VBE pasirinkimo rekomendacijas.",
-                  "Individulų ataskaitos aptarimą su karjeros konsultantu."
+                  "Profesionalus profilis: Gausite detalų psichologinį savo stiprybių ir silpnybių aprašymą.",
+                  "Karjeros planas: 10+ konkrečių profesijų, kurios labiausiai atitinka tavo duomenis.",
+                  "Studijų žemėlapis: Rekomendacijos, kur stoti Lietuvoje ir Europoje bei kokių egzaminų reikės.",
+                  "Komunikacijos gidas: Patarimai, kaip tavo asmenybės tipui geriausia bendrauti ir dirbti komandoje.",
+                  "Nepriklausomi, duomenimis pagrįsti rezultatai be išorinio spaudimo."
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
                     <CheckCircle2 className="text-emerald-400 shrink-0 mt-1" size={18} />
@@ -303,14 +305,14 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- FEATURE SECTION --- */}
+      {/* FEATURE SECTION - SLIDE MAPPING */}
       <section id="verte" className="py-24 container mx-auto px-6">
         <div className="text-center max-w-2xl mx-auto mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900 tracking-tight">
-            Mokslu pagrįsta 7 dimensijų metodika
+            Mokslu pagrįsta vertinimo metodika
           </h2>
           <p className="text-slate-600 text-base leading-relaxed">
-            Diagnostikai taikomas tarptautiniu mastu pripažintas vertinimo modelis, naudojamas organizacijų psichologijoje, pritaikytas akademiniam ir profesiniam nukreipimui.
+            Individualizuota asmenybės analizė, tinkančių profesijų sąrašas ir ateities studijų planas apjungia esminius žingsnius aiškiai ateičiai.
           </p>
         </div>
 
@@ -318,23 +320,23 @@ export default function KarjerosPristatymas() {
           {[
             { 
               icon: <BrainCircuit className="text-slate-800" />, 
-              title: "Kompetencijų profilis", 
-              desc: "Atskleidžiamos esminės asmenybės savybės: analitiniai gebėjimai, lyderystė, struktūruotas mąstymas ar kūrybinis potencialas." 
+              title: "Profesionalus profilis", 
+              desc: "Gausite detalų psichologinį savo stiprybių ir silpnybių aprašymą." 
             },
             { 
-              icon: <Target className="text-slate-800" />, 
-              title: "10 profesinių krypčių", 
-              desc: "Pateikiamas struktūruotas sąrašas specialybių, kuriose jūsų natūralūs elgsenos pavyzdžiai suteikia konkurencinį pranašumą." 
+              icon: <Briefcase className="text-slate-800" />, 
+              title: "Karjeros planas", 
+              desc: "10+ konkrečių profesijų, kurios labiausiai atitinka tavo duomenis." 
             },
             { 
               icon: <Compass className="text-slate-800" />, 
-              title: "Akademinis planas", 
-              desc: "Tikslus valstybinių brandos egzaminų (VBE) ir akademinių reikalavimų suderinimas su pasirinktomis sritimis." 
+              title: "Studijų žemėlapis", 
+              desc: "Rekomendacijos, kur stoti Lietuvoje ir Europoje bei kokių egzaminų reikės." 
             },
             { 
-              icon: <Users className="text-slate-800" />, 
-              title: "Darbo ir mokymosi stilius", 
-              desc: "Informacijos įsisavinimo specifikos, streso valdymo bei efektyvumo didinimo rekomendacijos." 
+              icon: <MessageSquare className="text-slate-800" />, 
+              title: "Komunikacijos gidas", 
+              desc: "Patarimai, kaip tavo asmenybės tipui geriausia bendrauti ir dirbti komandoje." 
             }
           ].map((item, idx) => (
             <div key={idx} className="bg-white p-8 rounded-2xl border border-slate-200/80 shadow-sm hover:shadow-md transition-all duration-200">
@@ -348,7 +350,40 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- HOW IT WORKS / CONSULTATION --- */}
+      {/* PERSONALITY PROFILES SECTION */}
+      <section className="py-24 bg-slate-50 border-t border-slate-200/80">
+        <div className="container mx-auto px-6">
+           <div className="text-center max-w-2xl mx-auto mb-16">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900 tracking-tight">
+              Asmenybės profiliai
+            </h2>
+            <p className="text-slate-600 text-base leading-relaxed">
+              Mūsų metodika išskiria penkis esminius asmenybės archetipus, padedančius tiksliai įvertinti jūsų polinkius.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {[
+              { id: "A", title: "Sistemų Architektas", type: "Inžinerinis-Techninis", icon: <BrainCircuit /> },
+              { id: "B", title: "Žmonių Ugdytojas", type: "Socialinis-Emocinis", icon: <Users /> },
+              { id: "C", title: "Vizijų Kūrėjas", type: "Kūrybinis-Meninis", icon: <Star /> },
+              { id: "D", title: "Strategas & Lyderis", type: "Verslo-Vadybinis", icon: <Target /> },
+              { id: "E", title: "Saugotojas & Tyrėjas", type: "Mokslo-Struktūrinis", icon: <ShieldCheck /> }
+            ].map((profile, i) => (
+              <div key={i} className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col items-center text-center hover:shadow-md transition-all">
+                <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-4">
+                  {profile.icon}
+                </div>
+                <div className="text-slate-400 font-bold text-lg mb-2">{profile.id}</div>
+                <h4 className="font-bold text-slate-900 mb-2">{profile.title}</h4>
+                <p className="text-slate-500 text-xs italic">{profile.type}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* HOW IT WORKS / CONSULTATION */}
       <section id="kaip-veikia" className="py-24 bg-white border-t border-slate-200/80">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="text-center max-w-2xl mx-auto mb-16">
@@ -389,7 +424,7 @@ export default function KarjerosPristatymas() {
                 <a href={`mailto:${CONTACT_EMAIL}`} className="text-emerald-400 font-medium underline underline-offset-2">
                   {CONTACT_EMAIL}
                 </a>{' '}
-                – suderinsime jums patogų konsultacijos laiką.
+                - suderinsime jums patogų konsultacijos laiką.
               </p>
               <div className="flex items-center gap-2 text-[11px] font-medium text-emerald-400 bg-slate-800/80 px-3 py-2 rounded-lg border border-slate-700/60">
                 <CalendarCheck size={14} /> Nemokama konsultacija įskaičiuota
@@ -399,7 +434,7 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- TIKSLIUKAI.LT INTEGRATION --- */}
+      {/* TIKSLIUKAI.LT INTEGRATION */}
       <section className="bg-slate-900 py-24 text-white overflow-hidden relative border-t border-slate-800">
         <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16 relative z-10">
           <div className="lg:w-1/2">
@@ -465,7 +500,7 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- FOOTER / FINAL CTA --- */}
+      {/* FOOTER / FINAL CTA */}
       <section className="py-24 text-center container mx-auto px-6">
         <div className="bg-white rounded-3xl py-16 px-6 border border-slate-200/80 shadow-sm max-w-4xl mx-auto">
           <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 tracking-tight">
