@@ -209,25 +209,18 @@ export default function KarjerosPristatymas() {
               Daugiau nei 30% studentų pakeičia arba nutraukia studijas dėl skubotų sprendimų. Atlikite mokslu pagrįstą asmenybės bei elgsenos tyrimą ir išsiaiškinkite 10+ geriausiai jūsų potencialą atitinkančių profesinių krypčių.
             </p>
 
-            <div className="w-full max-w-2xl mb-10 rounded-2xl overflow-hidden border border-slate-200">
-              <img 
-                src="/images/hero-students.jpg" 
-                alt="Moksleiviai renkasi studijų kryptį" 
-                className="w-full h-56 sm:h-72 object-cover"
-              />
-            </div>
-
-            <div className="text-sm font-medium mb-10" style={{ color: BRAND_BLUE }}>
-              Įskaičiuota asmeninė ekspertinė konsultacija po vertinimo
-            </div>
-            
-            <div className="w-full max-w-2xl mb-10 rounded-2xl overflow-hidden border border-slate-200">
+                        <div className="w-full max-w-2xl mb-10 rounded-2xl overflow-hidden border border-slate-200">
   <img 
     src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-razone-gn-598584859-26926327.webp" 
     alt="Moksleiviai renkasi studijų kryptį" 
     className="w-full h-56 sm:h-72 object-cover"
   />
 </div>
+
+            <div className="text-sm font-medium mb-10" style={{ color: BRAND_BLUE }}>
+              Įskaičiuota asmeninė ekspertinė konsultacija po vertinimo
+            </div>
+            
             
             <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-medium border-t border-slate-100 pt-8">
               <span>Saugus atsiskaitymas</span>
@@ -327,7 +320,7 @@ export default function KarjerosPristatymas() {
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <div className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: BRAND_BLUE }}>
-              Kompleksinė paslauga
+              Vienas mokėjimas daug pliusų
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900 tracking-tight">Procesas ir eiga</h2>
             <p className="text-slate-600 text-base">
@@ -337,7 +330,13 @@ export default function KarjerosPristatymas() {
 
           <div className="grid md:grid-cols-3 gap-8 relative">
             <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
-              <img src="/images/step-1-order.jpg" alt="Užsakymo apmokėjimas" className="w-full h-36 object-cover" />
+              <img src="<div className="w-full max-w-2xl mb-10 rounded-2xl overflow-hidden border border-slate-200">
+  <img 
+    src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-razone-gn-598584859-26926327.webp" 
+    alt="Moksleiviai renkasi studijų kryptį" 
+    className="w-full h-56 sm:h-72 object-cover"
+  />
+</div>" alt="Užsakymo apmokėjimas" className="w-full h-36 object-cover" />
               <div className="p-8">
               <div className="w-10 h-10 text-white rounded-lg flex items-center justify-center font-semibold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>01</div>
               <h3 className="text-lg font-semibold mb-2 text-slate-900">Užsakymas</h3>
@@ -348,7 +347,7 @@ export default function KarjerosPristatymas() {
             </div>
 
             <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
-              <img src="/images/step-2-diagnostics.jpg" alt="Klausimyno pildymas" className="w-full h-36 object-cover" />
+              <img src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-worawat-li-2154715066-34025040.webp" alt="Klausimyno pildymas" className="w-full h-36 object-cover" />
               <div className="p-8">
               <div className="w-10 h-10 text-white rounded-lg flex items-center justify-center font-semibold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>02</div>
               <h3 className="text-lg font-semibold mb-2 text-slate-900">Diagnostika</h3>
@@ -358,8 +357,8 @@ export default function KarjerosPristatymas() {
               </div>
             </div>
 
-            <div className="bg-slate-900 text-white rounded-2xl border border-slate-800 overflow-hidden">
-              <img src="/images/step-3-consultation.jpg" alt="Eksperto konsultacija" className="w-full h-36 object-cover" />
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
+              <img src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-gije-5432833.webp" alt="Eksperto konsultacija" className="w-full h-36 object-cover" />
               <div className="p-8">
               <div className="w-10 h-10 text-slate-950 rounded-lg flex items-center justify-center font-bold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>03</div>
               <h3 className="text-lg font-semibold mb-2 text-white">Eksperto konsultacija</h3>
@@ -379,67 +378,57 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- TIKSLIUKAI.LT INTEGRATION --- */}
-      <section className="bg-slate-900 py-24 text-white overflow-hidden relative border-t border-slate-800">
-        <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16 relative z-10">
-          <div className="lg:w-1/2">
-            <div className="text-xs font-semibold uppercase tracking-wider mb-6" style={{ color: BRAND_BLUE }}>
-              Akademinis palaikymas
-            </div>
-            <h2 className="text-3xl lg:text-5xl font-bold mb-6 tracking-tight leading-tight">
-              Atsakingas pasirengimas <br/>
-              <span className="text-slate-400 font-normal">studijų tikslams pasiekti.</span>
-            </h2>
-            
-            <p className="text-slate-300 text-base mb-8 leading-relaxed font-normal">
-              Atskleidus tinkamiausią karjeros kryptį ir reikalingus egzaminus, „Tiksliukai.lt“ komanda padeda užtikrinti aukščiausius akademinius rezultatus. Jungiame patyrusius mentorius ir korepetitorius kryptingam VBE pasirengimui.
-            </p>
-            
-            <a 
-              href="https://tiksliukai.lt" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center bg-white hover:bg-slate-100 text-slate-900 px-8 py-4 rounded-xl font-medium text-base transition-all"
-            >
-              Susipažinti su Tiksliukai.lt
-            </a>
-          </div>
-          
-          <div className="lg:w-1/2 flex justify-center w-full">
-            <div className="bg-slate-950 text-white rounded-2xl max-w-md w-full border border-slate-800 overflow-hidden">
-              <img src="/images/academy-tutoring.jpg" alt="Tiksliukai.lt korepetavimas" className="w-full h-40 object-cover" />
-              <div className="p-8">
-              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-slate-800">
-                <div className="w-10 h-10 bg-white text-slate-900 rounded-lg flex items-center justify-center font-bold text-lg">
-                  T
-                </div>
-                <div>
-                  <h4 className="font-semibold text-base leading-tight">Tiksliukai.lt Akademija</h4>
-                  <p className="text-slate-400 text-xs">Tikslinis VBE ir dalykinis pasirengimas</p>
-                </div>
-              </div>
-              <div className="space-y-4 text-sm">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800/50">
-                  <span className="font-medium text-slate-300">Matematika</span>
-                  <span className="text-slate-400 text-xs font-mono">VBE Standartinis</span>
-                </div>
-                <div className="flex items-center justify-between pb-2 border-b border-slate-800/50">
-                  <span className="font-medium text-slate-300">Fizika</span>
+{/* --- TIKSLIUKAI.LT INTEGRATION --- */}
+<section className="py-24 text-white overflow-hidden relative" style={{ backgroundColor: BRAND_BLUE }}>
+  <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16 relative z-10">
+    <div className="lg:w-1/2">
+      <div className="text-xs font-semibold uppercase tracking-wider mb-6 text-white/70">
+        Akademinis palaikymas
+      </div>
+      <h2 className="text-3xl lg:text-5xl font-bold mb-6 tracking-tight leading-tight">
+        Atsakingas pasirengimas <br/>
+        <span className="text-white/70 font-normal">studijų tikslams pasiekti.</span>
+      </h2>
       
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium text-slate-300">Informatika</span>
-                  <span className="text-slate-400 text-xs font-mono">C++, Python, Office</span>
-                </div>
-              </div>
-              <div className="mt-8 pt-6 border-t border-slate-800">
-                <span className="text-slate-400 text-xs font-medium">Aukšti VBE įvertinimai</span>
-              </div>
-              </div>
-            </div>
+      <p className="text-white/80 text-base mb-8 leading-relaxed font-normal">
+        Atskleidus tinkamiausią karjeros kryptį ir reikalingus egzaminus, „Tiksliukai.lt“ komanda padeda užtikrinti aukščiausius akademinius rezultatus. Jungiame patyrusius mentorius ir korepetitorius kryptingam VBE pasirengimui.
+      </p>
+      
+      <a 
+        href="https://tiksliukai.lt" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center bg-white hover:bg-white/90 text-slate-900 px-8 py-4 rounded-xl font-medium text-base transition-all"
+      >
+        Susipažinti su Tiksliukai.lt
+      </a>
+    </div>
+    
+    <div className="lg:w-1/2 flex justify-center w-full">
+      <div className="bg-white/10 backdrop-blur-sm text-white rounded-2xl max-w-md w-full border border-white/15 p-8">
+        <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/15">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-lg" style={{ color: BRAND_BLUE }}>
+            T
+          </div>
+          <div>
+            <h4 className="font-semibold text-base leading-tight">Tiksliukai korepetitoriai</h4>
+            <p className="text-white/70 text-xs">Tikslinis VBE ir dalykinis pasirengimas</p>
           </div>
         </div>
-      </section>
+        <ul className="space-y-3">
+          {["Matematika", "Anglų kalba", "Chemija", "Biologija", "Fizika"].map((subject, i) => (
+            <li key={i} className="pl-3 border-l-2 border-white/50 text-white/90 text-sm font-medium py-1">
+              {subject}
+            </li>
+          ))}
+        </ul>
+        <div className="mt-8 pt-6 border-t border-white/15">
+          <span className="text-white/70 text-xs font-medium">Aukšti VBE įvertinimai</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* --- FOOTER / FINAL CTA --- */}
       <section className="py-24 text-center container mx-auto px-6">
