@@ -97,10 +97,10 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                 <p className="font-semibold text-white text-base leading-snug mt-1">Karjeros ir asmenybės profilis 2026</p>
                 <ul className="mt-4 space-y-2.5 text-xs text-slate-300 leading-relaxed">
                   <li className="pl-3 border-l-2 border-slate-700">
-                    Detali psichologinė ataskaita pagal 7 elgsenos dimensijas.
+                    Detali psichologinė ataskaita.
                   </li>
                   <li className="pl-3 border-l-2 border-slate-700">
-                    10 geriausiai suderinamų profesinių krypčių analitika.
+                    10+ geriausiai suderinamų profesinių krypčių analitika.
                   </li>
                   <li className="pl-3 border-l-2 border-slate-700">
                     Individualus VBE ir akademinių studijų planas.
@@ -221,19 +221,13 @@ export default function KarjerosPristatymas() {
               Įskaičiuota asmeninė ekspertinė konsultacija po vertinimo
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
-              <button 
-                onClick={handleBuyClick}
-                className="flex items-center justify-center gap-3 text-white px-8 py-4 rounded-xl font-medium text-base transition-all hover:opacity-90"
-                style={{ backgroundColor: BRAND_BLUE }}
-              >
-                Karjeros testas ({PRODUCT_PRICE} €)
-              </button>
-              
-              <Link href="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-razone-gn-598584859-26926327.webp" className="flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-xl font-medium text-base transition-all">
-                Vertinimo metodika
-              </Link>
-            </div>
+            <div className="w-full max-w-2xl mb-10 rounded-2xl overflow-hidden border border-slate-200">
+  <img 
+    src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-razone-gn-598584859-26926327.webp" 
+    alt="Moksleiviai renkasi studijų kryptį" 
+    className="w-full h-56 sm:h-72 object-cover"
+  />
+</div>
             
             <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-medium border-t border-slate-100 pt-8">
               <span>Saugus atsiskaitymas</span>
@@ -247,47 +241,47 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- PROBLEM/SOLUTION SECTION --- */}
-      <section className="py-24 bg-slate-950 text-white">
-        <div className="container mx-auto px-6 max-w-5xl">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="text-slate-400 font-semibold mb-4 uppercase tracking-widest text-xs">
-                Pasirinkimo rizikos
-              </div>
-              <h2 className="text-3xl lg:text-4xl font-bold mb-6 tracking-tight leading-snug">
-                Klaidingas akademinis kelias reikalauja didelių išteklių.
-              </h2>
-              <p className="text-slate-400 text-base leading-relaxed mb-6">
-                Vidutinės vienų metų studijų bei pragyvenimo išlaidos siekia 3,000–5,000 €. Negana to, prarandamas brangus laikas, patiriamas akademinis stresas ir neapibrėžtumas dėl ateities.
-              </p>
-              <p className="text-slate-200 text-base leading-relaxed font-medium">
-                Sumažinkite neapibrėžtumą investuodami {PRODUCT_PRICE} € į psichologiniais tyrimais pagrįstą elgsenos bei profesinio potencialo analizę.
-              </p>
-            </div>
-            
-            <div className="bg-slate-900 p-8 rounded-2xl border border-slate-800 relative">
-              <div className="absolute -top-3 -right-3 bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold px-3 py-1 rounded-full">
-                Diagnostinis paketas
-              </div>
-              <h3 className="text-xl font-semibold mb-6 text-white border-b border-slate-800 pb-4">Ką gausite atlikę vertinimą?</h3>
-              <ul className="space-y-3.5">
-                {[
-                  "Objektyvią profesinių krypčių ir vidinio potencialo analizę.",
-                  "Nepriklausomus, duomenimis pagrįstus rezultatus be išorinio spaudimo.",
-                  "Aiškią struktūrą ir tikrumą dėl ateities sprendimų.",
-                  "Konkretų akademinį žemėlapį ir VBE pasirinkimo rekomendacijas.",
-                  "Individulų ataskaitos aptarimą su karjeros konsultantu."
-                ].map((item, i) => (
-                  <li key={i} className="pl-3 text-slate-300 text-sm leading-relaxed" style={{ borderLeft: `2px solid ${BRAND_BLUE}` }}>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+{/* --- PROBLEM/SOLUTION SECTION --- */}
+<section className="py-24 text-white" style={{ backgroundColor: BRAND_BLUE }}>
+  <div className="container mx-auto px-6 max-w-5xl">
+    <div className="grid md:grid-cols-2 gap-12 items-center">
+      <div>
+        <div className="text-white/70 font-semibold mb-4 uppercase tracking-widest text-xs">
+          Pasirinkimo rizikos
         </div>
-      </section>
+        <h2 className="text-3xl lg:text-4xl font-bold mb-6 tracking-tight leading-snug">
+          Klaidingas akademinis kelias reikalauja didelių išteklių.
+        </h2>
+        <p className="text-white/80 text-base leading-relaxed mb-6">
+          Vidutinės vienų metų studijų bei pragyvenimo išlaidos siekia 3,000–5,000 €. Negana to, prarandamas brangus laikas, patiriamas akademinis stresas ir neapibrėžtumas dėl ateities.
+        </p>
+        <p className="text-white text-base leading-relaxed font-medium">
+          Sumažinkite neapibrėžtumą investuodami {PRODUCT_PRICE} € į psichologiniais tyrimais pagrįstą elgsenos bei profesinio potencialo analizę.
+        </p>
+      </div>
+      
+      <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/15 relative">
+        <div className="absolute -top-3 -right-3 bg-slate-950 border border-white/10 text-white text-xs font-semibold px-3 py-1 rounded-full">
+          Diagnostinis paketas
+        </div>
+        <h3 className="text-xl font-semibold mb-6 text-white border-b border-white/15 pb-4">Ką gausite atlikę vertinimą?</h3>
+        <ul className="space-y-3.5">
+          {[
+            "Objektyvią profesinių krypčių ir vidinio potencialo analizę.",
+            "Nepriklausomus, duomenimis pagrįstus rezultatus be išorinio spaudimo.",
+            "Aiškią struktūrą ir tikrumą dėl ateities sprendimų.",
+            "Konkretų akademinį žemėlapį ir VBE pasirinkimo rekomendacijas.",
+            "Individulų ataskaitos aptarimą su karjeros konsultantu."
+          ].map((item, i) => (
+            <li key={i} className="pl-3 text-white/90 text-sm leading-relaxed border-l-2 border-white/50">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* --- FEATURE SECTION --- */}
       <section id="verte" className="py-24 container mx-auto px-6">
