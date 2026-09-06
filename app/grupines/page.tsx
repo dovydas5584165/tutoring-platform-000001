@@ -91,6 +91,7 @@ export default function GrupinesPamokos() {
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
             Mokykitės kartu su bendraamžiais, dalinkitės žiniomis ir siekite geriausių rezultatų. 
             Pasirinkite užsienio kalbų grupes arba kryptingą pasiruošimą mokyklos patikrinimams bei egzaminams.
+            Grupės gali būti trijų arba šešių asmenų. Pamokos trukmė- valanda. Trijų žmonių grupės pamokos kaina- 15 , šešių žmonių grupės pamokos kaina- 10
           </p>
         </motion.div>
 
@@ -109,7 +110,7 @@ export default function GrupinesPamokos() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Anglų kalba</h2>
             <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
-              Tobulinkite kalbėjimo, rašymo ir supratimo įgūdžius. Nuo pradedančiųjų (A1) iki pažengusių (C1). Grupės gali būti trijų arba šešių asmenų. Pamokos trukmė- valanda. Trijų žmonių grupės pamokos kaina- 15 , šešių žmonių grupės pamokos kaina- 10
+              Tobulinkite kalbėjimo, rašymo ir supratimo įgūdžius. Nuo pradedančiųjų (A1) iki pažengusių (C1). 
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
