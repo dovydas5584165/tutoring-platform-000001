@@ -230,7 +230,7 @@ export default function KarjerosPristatymas() {
                 Karjeros testas ({PRODUCT_PRICE} €)
               </button>
               
-              <Link href="#kaip-veikia" className="flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-xl font-medium text-base transition-all">
+              <Link href="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-razone-gn-598584859-26926327.webp" className="flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-xl font-medium text-base transition-all">
                 Vertinimo metodika
               </Link>
             </div>
