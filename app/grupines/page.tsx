@@ -109,7 +109,7 @@ export default function GrupinesPamokos() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Anglų kalba</h2>
             <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
-              Tobulinkite kalbėjimo, rašymo ir supratimo įgūdžius. Nuo pradedančiųjų (A1) iki pažengusių (C1).
+              Tobulinkite kalbėjimo, rašymo ir supratimo įgūdžius. Nuo pradedančiųjų (A1) iki pažengusių (C1). Grupės gali būti trijų arba šešių asmenų. Pamokos trukmė- valanda. Trijų žmonių grupės pamokos kaina- 15 , šešių žmonių grupės pamokos kaina- 10
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
