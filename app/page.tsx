@@ -394,14 +394,14 @@ export default function Home() {
         Korepetitoriai, kurie{" "}
         <span className="relative inline-block">
           <span className="relative z-10 bg-white text-[#3B65CE] px-4 py-1 rounded-xl shadow-xl transform -rotate-2 inline-block">
-            padeda realiai
+            visada padės
           </span>
         </span>
       </h1>
 
       {/* Subheadline */}
       <h2 className="text-lg lg:text-xl font-medium text-white/80 max-w-xl leading-relaxed">
-        Individualios pamokos su patikrintais mokytojais 1–12 klasių mokiniams. Rezervuok pamoką per kelias minutes.
+        Individualios pamokos su profesionaliais mokytojais 1–12 klasių mokiniams. Rezervuok pamoką per kelias minutes.
       </h2>
 
       {/* CTA BUTTONS GROUP */}
