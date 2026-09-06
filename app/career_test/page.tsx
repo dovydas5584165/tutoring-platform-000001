@@ -343,7 +343,7 @@ export default function KarjerosPristatymas() {
 
           <div className="grid md:grid-cols-3 gap-8 relative">
             <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
-              <img src="/images/step-1-order.jpg" alt="Užsakymo apmokėjimas" className="w-full h-36 object-cover" />
+              <img src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-lana-kravchenko-25433295-33164661.webp" alt="Užsakymo apmokėjimas" className="w-full h-36 object-cover" />
               <div className="p-8">
               <div className="w-10 h-10 text-white rounded-lg flex items-center justify-center font-semibold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>01</div>
               <h3 className="text-lg font-semibold mb-2 text-slate-900">Užsakymas</h3>
@@ -367,16 +367,16 @@ export default function KarjerosPristatymas() {
             <div className="bg-slate-50 rounded-2xl border border-slate-200 overflow-hidden">
               <img src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/pexels-gije-5432833.webp" alt="Eksperto konsultacija" className="w-full h-36 object-cover" />
               <div className="p-8">
-              <div className="w-10 h-10 text-slate-950 rounded-lg flex items-center justify-center font-bold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>03</div>
-              <h3 className="text-lg font-semibold mb-2 text-white">Eksperto konsultacija</h3>
-              <p className="text-slate-300 text-xs leading-relaxed mb-4">
+              <div className="w-10 h-10 text-white rounded-lg flex items-center justify-center font-semibold text-sm mb-6" style={{ backgroundColor: BRAND_BLUE }}>03</div>
+              <h3 className="text-lg font-semibold mb-2 text-slate-900">Eksperto konsultacija</h3>
+              <p className="text-slate-600 text-xs leading-relaxed mb-4">
                 Parašykite mums el. paštu{' '}
                 <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium underline underline-offset-2" style={{ color: BRAND_BLUE }}>
                   {CONTACT_EMAIL}
                 </a>{' '}
                 – suderinsime jums patogų konsultacijos laiką.
               </p>
-              <div className="text-[11px] font-medium bg-slate-800/80 px-3 py-2 rounded-lg border border-slate-700/60" style={{ color: BRAND_BLUE }}>
+              <div className="text-[11px] font-medium bg-slate-100 px-3 py-2 rounded-lg border border-slate-200" style={{ color: BRAND_BLUE }}>
                 Konsultacija įskaičiuota
               </div>
               </div>
