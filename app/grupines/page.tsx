@@ -116,7 +116,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-[#3B65CE]">Grupės pilnos<</p>
+              <p className="text-sm font-bold text-[#3B65CE]">Grupės pilnos</p>
             </div>
           </motion.div>
 
@@ -176,7 +176,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-emerald-600">Grupės pilnos<</p>
+              <p className="text-sm font-bold text-emerald-600">Grupės pilnos</p>
             </div>
           </motion.div>
 
@@ -196,7 +196,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-violet-600">Grupės pilnos<</p>
+              <p className="text-sm font-bold text-violet-600">Grupės pilnos</p>
             </div>
           </motion.div>
 
@@ -216,7 +216,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-orange-500">Grupės pilnos<</p>
+              <p className="text-sm font-bold text-orange-500">Grupės pilnos</p>
             </div>
           </motion.div>
 
