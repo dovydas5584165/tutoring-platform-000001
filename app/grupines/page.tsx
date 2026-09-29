@@ -91,7 +91,7 @@ export default function GrupinesPamokos() {
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
             Mokykitės kartu su bendraamžiais, dalinkitės žiniomis ir siekite geriausių rezultatų. 
             Pasirinkite užsienio kalbų grupes arba kryptingą pasiruošimą mokyklos patikrinimams bei egzaminams.
-            Grupės gali būti trijų arba šešių asmenų. Pamokos trukmė- valanda. Trijų žmonių grupės pamokos kaina- 15 , šešių žmonių grupės pamokos kaina- 10
+            Pamokos trukmė- valanda, pamokos mažose grupėse kainuoja 25 eur/ pam, didesnėse grupėse 22 eur/ pam, indvidualiai 40 eur
           </p>
         </motion.div>
 
