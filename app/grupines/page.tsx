@@ -12,6 +12,7 @@ import { supabase } from "../../lib/supabaseClient";
 
 export default function GrupinesPamokos() {
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [subject, setSubject] = useState(""); 
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "validation_error">("idle");
 
@@ -23,14 +24,14 @@ export default function GrupinesPamokos() {
       return;
     }
     
-    if (!email) return;
+    if (!email || !phone) return;
 
     setStatus("loading");
 
     try {
       const { error } = await supabase
         .from('group_registrations')
-        .insert([{ email: email, subject: subject }]);
+        .insert([{ email: email, phone: phone, subject: subject }]);
 
       if (error) {
         throw error;
@@ -38,6 +39,7 @@ export default function GrupinesPamokos() {
       
       setStatus("success");
       setEmail("");
+      setPhone("");
       setSubject("");
       
     } catch (error) {
@@ -114,7 +116,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-[#3B65CE]">Grupės renkamos</p>
+              <p className="text-sm font-bold text-[#3B65CE]">Grupės pilnos<</p>
             </div>
           </motion.div>
 
@@ -174,7 +176,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-emerald-600">Grupės renkamos</p>
+              <p className="text-sm font-bold text-emerald-600">Grupės pilnos<</p>
             </div>
           </motion.div>
 
@@ -194,7 +196,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-violet-600">Grupės renkamos</p>
+              <p className="text-sm font-bold text-violet-600">Grupės pilnos<</p>
             </div>
           </motion.div>
 
@@ -214,7 +216,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-orange-500">Grupės renkamos</p>
+              <p className="text-sm font-bold text-orange-500">Grupės pilnos<</p>
             </div>
           </motion.div>
 
@@ -234,7 +236,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-cyan-500">Grupės renkamos</p>
+              <p className="text-sm font-bold text-cyan-500">Grupės pilnos</p>
             </div>
           </motion.div>
 
@@ -256,7 +258,7 @@ export default function GrupinesPamokos() {
           <div className="relative z-10">
             <h2 className="text-3xl sm:text-5xl font-extrabold mb-6">Prisijunkite prie laukiančiųjų sąrašo</h2>
             <p className="text-blue-100 text-lg mb-10 max-w-2xl mx-auto">
-              Pasirinkite dominančią grupę, įveskite el. paštą ir mes susisieksime, kai tik bus renkama jūsų grupė!
+              Pasirinkite dominančią grupę, įveskite el. paštą bei telefono numerį ir mes susisieksime, kai tik bus renkama jūsų grupė!
             </p>
 
             {status === "success" ? (
@@ -271,31 +273,24 @@ export default function GrupinesPamokos() {
               </motion.div>
             ) : (
               <form onSubmit={handleRegistration} className="flex flex-col gap-4 max-w-2xl mx-auto">
-                <div className="flex flex-col sm:flex-row gap-4">
-                  {/* Dalyko pasirinkimas */}
-                  <select
-                    value={subject}
-                    onChange={(e) => {
-                      setSubject(e.target.value);
-                      if (status === "validation_error") setStatus("idle");
-                    }}
-                    disabled={status === "loading"}
-                    className="flex-1 px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70 bg-white cursor-pointer"
-                  >
-                    <option value="" disabled>Pasirinkite grupę...</option>
-                    <optgroup label="Užsienio kalbos">
-                      <option value="Anglų kalba">Anglų kalba</option>
-                      <option value="Prancūzų kalba">Prancūzų kalba</option>
-                      <option value="Vokiečių kalba">Vokiečių kalba</option>
-                      <option value="Arabų kalba">Arabų kalba</option>
-                    </optgroup>
-                    <optgroup label="Egzaminai ir Patikrinimai">
-                      <option value="VBE grupė">VBE paruošimas</option>
-                      <option value="PUPP grupė">PUPP paruošimas</option>
-                      <option value="NMPP grupė">NMPP paruošimas</option>
-                    </optgroup>
-                  </select>
+                {/* Dalyko pasirinkimas */}
+                <select
+                  value={subject}
+                  onChange={(e) => {
+                    setSubject(e.target.value);
+                    if (status === "validation_error") setStatus("idle");
+                  }}
+                  disabled={status === "loading"}
+                  className="w-full px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70 bg-white cursor-pointer"
+                >
+                  <option value="" disabled>Pasirinkite grupę...</option>
+                  <optgroup label="Užsienio kalbos">
+                    <option value="Prancūzų kalba">Prancūzų kalba</option>
+                    <option value="Vokiečių kalba">Vokiečių kalba</option>
+                  </optgroup>
+                </select>
 
+                <div className="flex flex-col sm:flex-row gap-4">
                   {/* El. pašto įvestis */}
                   <input
                     type="email"
@@ -304,7 +299,22 @@ export default function GrupinesPamokos() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     disabled={status === "loading"}
-                    className="flex-[2] px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70"
+                    className="flex-1 px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70"
+                  />
+
+                  {/* Telefono numerio įvestis */}
+                  <input
+                    type="tel"
+                    required
+                    inputMode="tel"
+                    autoComplete="tel"
+                    pattern="^\+?[0-9\s\-()]{8,20}$"
+                    title="Įveskite telefono numerį, pvz. +370 600 00000"
+                    placeholder="Telefono numeris (+370...)"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    disabled={status === "loading"}
+                    className="flex-1 px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70"
                   />
                 </div>
 
