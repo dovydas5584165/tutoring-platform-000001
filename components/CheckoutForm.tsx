@@ -9,7 +9,7 @@ import {
 } from '@stripe/react-stripe-js';
 
 // --- CONFIGURATION ---
-const TEST_PRICE = 14;   // Default price for Career Test
+const TEST_PRICE = 65;   // Default price for Career Test
 const LESSON_PRICE = 25; // Default price for Lessons (if bookingId exists)
 
 interface CheckoutFormProps {
