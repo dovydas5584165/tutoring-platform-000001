@@ -10,28 +10,123 @@ import { Button } from "@/components/ui/button";
 // Importuojame jūsų Supabase klientą
 import { supabase } from "../../lib/supabaseClient"; 
 
+// ---------- VALIDATION HELPERS ----------
+
+const ALLOWED_SUBJECTS = ["Prancūzų kalba", "Vokiečių kalba"];
+
+// Only these email providers are accepted. Add more here if needed.
+const ALLOWED_EMAIL_DOMAINS = [
+  "gmail.com",
+  "googlemail.com",
+  "outlook.com",
+  "hotmail.com",
+  "live.com",
+  "msn.com",
+  "yahoo.com",
+  "icloud.com",
+  "me.com",
+  "proton.me",
+  "protonmail.com",
+  "inbox.lt",
+  "takas.lt",
+  "zebra.lt",
+  "one.lt",
+  "mail.com",
+];
+
+const EMAIL_REGEX = /^[a-z0-9]+([._+-][a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)+$/;
+
+function validateEmail(raw: string): string | null {
+  const value = raw.trim().toLowerCase();
+  if (!value) return "Įveskite el. pašto adresą.";
+  if (value.length > 100) return "El. pašto adresas per ilgas.";
+  if (!EMAIL_REGEX.test(value)) return "Neteisingas el. pašto formatas.";
+
+  const [local, domain] = value.split("@");
+
+  if (!ALLOWED_EMAIL_DOMAINS.includes(domain)) {
+    return "Naudokite populiarų el. paštą (pvz. @gmail.com, @outlook.com, @yahoo.com, @icloud.com, @inbox.lt).";
+  }
+  if (local.length < 3) return "El. pašto pavadinimas per trumpas.";
+  if (/^(.)\1+$/.test(local)) return "Atrodo, kad el. paštas netikras.";
+  if (/^(test|asdf|qwerty|abc|aaa|xxx|fake|none|no)\d*$/.test(local)) {
+    return "Prašome įvesti tikrą el. pašto adresą.";
+  }
+  return null;
+}
+
+// Converts Lithuanian mobile formats to +3706XXXXXXX. Returns null if invalid.
+function normalizeLtPhone(raw: string): string | null {
+  let digits = raw.replace(/[\s\-()]/g, "");
+
+  if (digits.startsWith("00370")) digits = "+370" + digits.slice(5);
+  else if (digits.startsWith("370") && digits.length === 11) digits = "+" + digits;
+  else if (digits.startsWith("86") && digits.length === 9) digits = "+370" + digits.slice(1);
+
+  return /^\+3706\d{7}$/.test(digits) ? digits : null;
+}
+
+function validatePhone(raw: string): string | null {
+  const value = raw.trim();
+  if (!value) return "Įveskite telefono numerį.";
+  if (!/^[+\d\s\-()]+$/.test(value)) return "Telefono numeryje gali būti tik skaitmenys.";
+
+  const normalized = normalizeLtPhone(value);
+  if (!normalized) {
+    return "Įveskite Lietuvos mobilųjį numerį, pvz. +370 600 00000 arba 8 600 00000.";
+  }
+
+  const subscriber = normalized.slice(5); // 7 digits after +3706
+  if (/^(\d)\1+$/.test(subscriber)) return "Atrodo, kad numeris netikras.";
+  if ("01234567890".includes(subscriber) || "98765432109".includes(subscriber)) {
+    return "Atrodo, kad numeris netikras.";
+  }
+  return null;
+}
+
+type FormErrors = { subject?: string; email?: string; phone?: string };
+
 export default function GrupinesPamokos() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [subject, setSubject] = useState(""); 
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "validation_error">("idle");
+  const [honeypot, setHoneypot] = useState(""); // bot trap, real users never see it
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "duplicate">("idle");
+
+  const clearError = (field: keyof FormErrors) => {
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+    if (status === "error" || status === "duplicate") setStatus("idle");
+  };
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!subject) {
-      setStatus("validation_error");
+
+    // Bots fill hidden fields: pretend success, save nothing
+    if (honeypot) {
+      setStatus("success");
       return;
     }
-    
-    if (!email || !phone) return;
+
+    const newErrors: FormErrors = {};
+    if (!ALLOWED_SUBJECTS.includes(subject)) newErrors.subject = "Prašome pasirinkti dominančią programą.";
+    const emailError = validateEmail(email);
+    if (emailError) newErrors.email = emailError;
+    const phoneError = validatePhone(phone);
+    if (phoneError) newErrors.phone = phoneError;
+
+    setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPhone = normalizeLtPhone(phone) as string;
 
     setStatus("loading");
 
     try {
       const { error } = await supabase
         .from('group_registrations')
-        .insert([{ email: email, phone: phone, subject: subject }]);
+        .insert([{ email: cleanEmail, phone: cleanPhone, subject: subject }]);
 
       if (error) {
         throw error;
@@ -41,12 +136,23 @@ export default function GrupinesPamokos() {
       setEmail("");
       setPhone("");
       setSubject("");
+      setErrors({});
       
     } catch (error) {
+      // 23505 = unique violation (same email already registered for this group)
+      if ((error as { code?: string })?.code === "23505") {
+        setStatus("duplicate");
+        return;
+      }
       console.error("Klaida išsaugant registraciją:", error);
       setStatus("error");
     }
   };
+
+  const inputBase =
+    "w-full px-6 py-4 rounded-2xl text-gray-900 text-lg outline-none transition-all shadow-inner disabled:opacity-70";
+  const okRing = "focus:ring-4 focus:ring-yellow-400/50";
+  const badRing = "ring-4 ring-red-400/70";
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col">
@@ -272,55 +378,90 @@ export default function GrupinesPamokos() {
                 <p className="text-blue-100">Informaciją perduosime atitinkamos srities mokytojams. Laukite laiško!</p>
               </motion.div>
             ) : (
-              <form onSubmit={handleRegistration} className="flex flex-col gap-4 max-w-2xl mx-auto">
+              <form onSubmit={handleRegistration} noValidate className="flex flex-col gap-4 max-w-2xl mx-auto">
+                {/* Honeypot: hidden from real users */}
+                <input
+                  type="text"
+                  name="website"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  className="hidden"
+                />
+
                 {/* Dalyko pasirinkimas */}
-                <select
-                  value={subject}
-                  onChange={(e) => {
-                    setSubject(e.target.value);
-                    if (status === "validation_error") setStatus("idle");
-                  }}
-                  disabled={status === "loading"}
-                  className="w-full px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70 bg-white cursor-pointer"
-                >
-                  <option value="" disabled>Pasirinkite grupę...</option>
-                  <optgroup label="Užsienio kalbos">
-                    <option value="Prancūzų kalba">Prancūzų kalba</option>
-                    <option value="Vokiečių kalba">Vokiečių kalba</option>
-                  </optgroup>
-                </select>
+                <div className="text-left">
+                  <select
+                    value={subject}
+                    onChange={(e) => {
+                      setSubject(e.target.value);
+                      clearError("subject");
+                    }}
+                    disabled={status === "loading"}
+                    className={`${inputBase} bg-white cursor-pointer ${errors.subject ? badRing : okRing}`}
+                  >
+                    <option value="" disabled>Pasirinkite grupę...</option>
+                    <optgroup label="Užsienio kalbos">
+                      <option value="Prancūzų kalba">Prancūzų kalba</option>
+                      <option value="Vokiečių kalba">Vokiečių kalba</option>
+                    </optgroup>
+                  </select>
+                  {errors.subject && (
+                    <p className="text-yellow-300 text-sm font-medium mt-2 ml-2">{errors.subject}</p>
+                  )}
+                </div>
 
                 <div className="flex flex-col sm:flex-row gap-4">
                   {/* El. pašto įvestis */}
-                  <input
-                    type="email"
-                    required
-                    placeholder="Jūsų el. pašto adresas"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    disabled={status === "loading"}
-                    className="flex-1 px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70"
-                  />
+                  <div className="flex-1 text-left">
+                    <input
+                      type="email"
+                      inputMode="email"
+                      autoComplete="email"
+                      maxLength={100}
+                      placeholder="Jūsų el. pašto adresas"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        clearError("email");
+                      }}
+                      onBlur={() => {
+                        if (email) setErrors((prev) => ({ ...prev, email: validateEmail(email) ?? undefined }));
+                      }}
+                      disabled={status === "loading"}
+                      className={`${inputBase} ${errors.email ? badRing : okRing}`}
+                    />
+                    {errors.email && (
+                      <p className="text-yellow-300 text-sm font-medium mt-2 ml-2">{errors.email}</p>
+                    )}
+                  </div>
 
                   {/* Telefono numerio įvestis */}
-                  <input
-                    type="tel"
-                    required
-                    inputMode="tel"
-                    autoComplete="tel"
-                    pattern="^\+?[0-9\s\-()]{8,20}$"
-                    title="Įveskite telefono numerį, pvz. +370 600 00000"
-                    placeholder="Telefono numeris (+370...)"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    disabled={status === "loading"}
-                    className="flex-1 px-6 py-4 rounded-2xl text-gray-900 text-lg focus:ring-4 focus:ring-yellow-400/50 outline-none transition-all shadow-inner disabled:opacity-70"
-                  />
+                  <div className="flex-1 text-left">
+                    <input
+                      type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
+                      maxLength={20}
+                      placeholder="Telefono numeris (+370...)"
+                      value={phone}
+                      onChange={(e) => {
+                        setPhone(e.target.value);
+                        clearError("phone");
+                      }}
+                      onBlur={() => {
+                        if (phone) setErrors((prev) => ({ ...prev, phone: validatePhone(phone) ?? undefined }));
+                      }}
+                      disabled={status === "loading"}
+                      className={`${inputBase} ${errors.phone ? badRing : okRing}`}
+                    />
+                    {errors.phone && (
+                      <p className="text-yellow-300 text-sm font-medium mt-2 ml-2">{errors.phone}</p>
+                    )}
+                  </div>
                 </div>
-
-                {status === "validation_error" && (
-                  <p className="text-yellow-300 text-sm font-medium text-left ml-2">Prašome pasirinkti dominančią programą.</p>
-                )}
 
                 <Button
                   type="submit"
@@ -332,6 +473,10 @@ export default function GrupinesPamokos() {
               </form>
             )}
             
+            {status === "duplicate" && (
+              <p className="text-yellow-300 mt-4 font-medium">Šis el. paštas jau užregistruotas į pasirinktą grupę.</p>
+            )}
+
             {status === "error" && (
               <p className="text-red-300 mt-4 font-medium">Įvyko klaida duomenų bazėje. Prašome pabandyti vėliau.</p>
             )}
