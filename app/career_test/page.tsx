@@ -13,7 +13,7 @@ import CheckoutForm from '../../components/CheckoutForm';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // --- CONFIGURATION ---
-const PRODUCT_PRICE = 14;
+const PRODUCT_PRICE = 65;
 const CONTACT_EMAIL = 'info.tiksliukai@gmail.com';
 const BRAND_BLUE = '#5170FF';
 const PAGE_TITLE = 'Tiksliukai. Karjeros testas';
