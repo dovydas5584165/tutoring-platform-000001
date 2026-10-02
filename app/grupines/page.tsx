@@ -262,7 +262,7 @@ export default function GrupinesPamokos() {
             </p>
             <div className="bg-gray-50 rounded-xl p-3 text-center">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
-              <p className="text-sm font-bold text-yellow-600">Grupės renkamos</p>
+              <p className="text-sm font-bold text-yellow-600">Grupės pilnos</p>
             </div>
           </motion.div>
 
