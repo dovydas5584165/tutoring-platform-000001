@@ -405,7 +405,7 @@ export default function GrupinesPamokos() {
                     <option value="" disabled>Pasirinkite grupę...</option>
                     <optgroup label="Užsienio kalbos">
                       <option value="Prancūzų kalba">Prancūzų kalba</option>
-                      <option value="Vokiečių kalba">Vokiečių kalba</option>
+                      {/* <option value="Vokiečių kalba">Vokiečių kalba</option> */}
                     </optgroup>
                   </select>
                   {errors.subject && (
