@@ -566,7 +566,7 @@ export default function ScheduleLanding() {
       <div className="mt-4 pt-6 max-w-md bg-white rounded-2xl shadow-md p-6 ml-auto">
         <h2 className="text-2xl font-semibold mb-4">Jūsų pasirinktos pamokos</h2>
         {selectedSlots.length === 0 ? (
-          <p>Jūs dar nepasirinkote pamokų. Jei kyla neaiškumų, galite skambinti +37060395532</p>
+          <p>Jūs dar nepasirinkote pamokų. Jei kyla neaiškumų, galite rašyti info.tiksliukai@gmail.com</p>
         ) : (
           <>
             <ul className="mb-4 space-y-2">
