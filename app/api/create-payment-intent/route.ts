@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
     const stripe = getServerStripe();
 
-    const TEST_PRICE_CENTS = 1400; // 14.00 EUR
+    const TEST_PRICE_CENTS = 6500; // 14.00 EUR
 
     // ==========================================
     // SCENARIO 1: Tutoring Booking (Existing Logic)
