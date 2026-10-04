@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState, useEffect } from "react";
@@ -245,7 +244,7 @@ const RESULTS = {
 };
 
 // Dynamic questions mix including Work Values
-const DYNAMIC_QUESTIONS = [
+const BASE_QUESTIONS = [
   {
     type: "choice",
     q: "Kokia veikla komandiniame projekte tau atrodytų patraukliausia?",
@@ -346,6 +345,141 @@ const DYNAMIC_QUESTIONS = [
   { type: "likert", q: "Nebijau rizikuoti ir išeiti iš komforto zonos, jei matau galimybę pasiekti sėkmę.", t: "D" },
   { type: "likert", q: "Mėgstu klasifikuoti informaciją, palaikyti griežtą tvarką ir visada tikrinu faktus.", t: "E" },
 ];
+
+// ---- 100 industry-specific "day in the life" questions (20 per type) ----
+type TypeKey = "A" | "B" | "C" | "D" | "E";
+
+interface LikertQuestion {
+  type: "likert";
+  q: string;
+  t: TypeKey;
+}
+
+const RAW: Record<TypeKey, string[]> = {
+  A: [
+    "Man patiktų kelias valandas ieškoti klaidos kode, kol ji pagaliau randama.",
+    "Atrodo įdomu projektuoti serverių sistemą, kuri turi atlaikyti milijoną vartotojų vienu metu.",
+    "Galėčiau visą dieną dirbti prie ekrano, beveik be pokalbių.",
+    "Jei programa sustotų 3 val. nakties, labiau domintų rasti priežastį nei išsigąsčiau.",
+    "Patiktų rašyti dokumentaciją, kad kiti suprastų, kaip veikia mano sukurta sistema.",
+    "Pamatęs neefektyvų procesą, iškart noriu parašyti skriptą, kuris jį automatizuotų.",
+    "Patiktų jungti grandines ir bandyti prototipą, kol jis pradės veikti.",
+    "Man malonu mokytis naujos technologijos kas kelis mėnesius, nes ši sritis nuolat keičiasi.",
+    "Patiktų analizuoti, kaip programišius galėtų įsilaužti į sistemą, ir ją užtaisyti.",
+    "Mėgčiau dirbti su milžiniška duomenų lentele ir ieškoti dėsningumų, kurių niekas nepastebėjo.",
+    "Galėčiau kelias dienas tobulinti algoritmą, kad jis veiktų 5 % greičiau.",
+    "Patiktų per kodo peržiūrą detaliai komentuoti kolegų sprendimus.",
+    "Įdomu, kaip veikia dirbtinis intelektas, ir norėčiau išmokyti modelį atpažinti paveikslėlius.",
+    "Jei klientas prašytų techniškai neįmanomos funkcijos, paaiškinčiau kodėl ir pasiūlyčiau alternatyvą.",
+    "Patiktų projektuoti roboto ranką, kuri tiksliai paima trapų daiktą.",
+    "Patogu dirbti pagal aiškią techninę specifikaciją ir tikrinti, ar viskas jai atitinka.",
+    "Mielai dalyvaučiau hakatone ir per parą sukurčiau veikiantį prototipą.",
+    "Patiktų testuoti programėlę ir bandyti ją „sulaužyti“ visais įmanomais būdais.",
+    "Įdomu perkelti įmonės duomenis iš senos sistemos į debesį ir užtikrinti, kad nieko nedingtų.",
+    "Mane tenkintų, jei mano darbu naudotųsi tūkstančiai žmonių, nors niekada nežinotų, kas jį sukūrė.",
+  ],
+  B: [
+    "Jei kolegė verktų dėl asmeninių problemų, iškart norėčiau nutraukti savo darbą ir ją išklausyti.",
+    "Patiktų visą dieną kalbėtis su skirtingais žmonėmis apie jų rūpesčius.",
+    "Galėčiau ramiai padėti pacientui, kuris išsigandęs ir nenori bendradarbiauti.",
+    "Patiktų vesti užsiėmimą paaugliams apie emocijų valdymą.",
+    "Jei klasėje du mokiniai pyktųsi, mielai tapčiau tarpininku ir padėčiau jiems susitaikyti.",
+    "Patiktų lydėti žmogų per sunkų gyvenimo etapą (liga, skyrybos, netektis), nors tai emociškai alina.",
+    "Po darbo dienos man svarbu žinoti, kad kam nors tikrai padėjau, net jei atlyginimas nedidelis.",
+    "Galėčiau kantriai prižiūrėti pagyvenusį žmogų, net kai jis kartoja tuos pačius klausimus.",
+    "Patiktų suburti savanorių komandą, kuri šventėje išdalins maisto šeimoms.",
+    "Patiktų dirbti su vaikais, turinčiais mokymosi sunkumų, ir džiaugtis net mažu jų progresu.",
+    "Jei reikėtų pranešti liūdną naujieną, stengčiausi tai padaryti taktiškai ir užjaučiančiai.",
+    "Mielai vesčiau komandos stiprinimo mokymus įmonės darbuotojams.",
+    "Pokalbio metu dažnai pastebiu, kad žmogus jaučiasi kitaip, nei sako.",
+    "Jei ligoninėje pacientui reikėtų užsakyti specialų maitinimą, pasirūpinčiau, kad jis gautų būtent tai, kas jam tinka, ir paklausčiau jo paties nuomonės.",
+    "Galėčiau atrinkti kandidatus į darbą vertindamas ne tik CV, bet ir motyvaciją bei charakterį.",
+    "Patiktų padėti žmogui po traumos vėl išmokti vaikščioti ar rašyti.",
+    "Jei bendruomenei trūktų vietos jaunimui, inicijuočiau projektą ir įtikinėčiau savivaldybę jį finansuoti.",
+    "Galėčiau valandą klausyti besiskundžiančio žmogaus ir nepalūžti kantrybės.",
+    "Patiktų rašyti ataskaitas apie šeimų situaciją ir siūlyti, kokios pagalbos joms reikia.",
+    "Net kai darbas emociškai sunkus, man svarbiau jausti prasmę nei turėti ramią dieną.",
+  ],
+  C: [
+    "Patiktų gauti tuščią lapą ir kūrybinį užsakymą be jokių apribojimų.",
+    "Galėčiau valandų valandas derinti šriftus, spalvas ir tarpus, kol kompozicija atrodys „teisingai“.",
+    "Jei klientas paprašytų pakeisti mano dizainą, stengčiausi suprasti jo poreikį, o ne įsižeisčiau.",
+    "Patiktų kurti vaizdo klipą: nuo idėjos ir scenarijaus iki montažo.",
+    "Mielai dirbčiau chaotišku grafiku, jei darbas leistų išreikšti save.",
+    "Patiktų projektuoti kavinės interjerą ir parinkti kiekvieną detalę.",
+    "Galėčiau parašyti reklaminį šūkį ir dešimt kartų jį perrašyti, kol skambės puikiai.",
+    "Įdomu, kodėl vienos programėlės patogios, o kitos erzina, ir norėčiau tai pagerinti.",
+    "Patiktų kurti vaizdo žaidimo personažą, jo istoriją ir pasaulį.",
+    "Vienodas darbas nuo 9 iki 17 su ta pačia rutina man atrodytų nepakeliamas.",
+    "Patiktų fotografuoti renginius ar produktus ir retušuoti nuotraukas.",
+    "Galėčiau pristatyti savo idėją komandai ir įtikinti ją vaizdais bei istorija.",
+    "Mėgčiau kurti mados kolekciją, rinktis audinius ir stebėti, kaip piešinys virsta drabužiu.",
+    "Eiti į muziejus ir galerijas ieškoti idėjų darbui man būtų malonus darbo dienos dalis.",
+    "Patiktų kurti muziką ar garso takelį filmui ar žaidimui.",
+    "Kritiką dėl savo darbo priimu ramiai, nes žinau, kad kūryba tobulėja per atsiliepimus.",
+    "Patiktų sukurti įmonės prekės ženklo vizualinį stilių nuo logotipo iki svetainės.",
+    "Mėgčiau animuoti trumpą filmuką, kuriame kiekvienas kadras kruopščiai apgalvotas.",
+    "Mane domintų architektūros maketai ir trimačiai modeliai.",
+    "Man svarbu, kad tai, ką sukuriu, sukeltų žmonėms emociją.",
+  ],
+  D: [
+    "Patiktų kiekvieną rytą vertinti rinkos naujienas ir spręsti, ar pirkti, ar parduoti akcijas.",
+    "Jei akcijos kaina staiga nukristų 10 %, sprendimą priimčiau pagal duomenis, o ne panikuočiau.",
+    "Patiktų derėtis su tiekėju ir iškovoti geresnes sutarties sąlygas.",
+    "Galėčiau vesti susitikimą su dešimčia žmonių ir priimti galutinį sprendimą, kai nuomonės išsiskiria.",
+    "Mielai pristatyčiau startuolio idėją investuotojams ir atsakinėčiau į aštrius klausimus.",
+    "Patiktų planuoti projekto biudžetą ir stebėti, ar neviršijama sąmata.",
+    "Jei komandoje vėlautų terminai, iškart perskirstyčiau užduotis ir atsakomybes.",
+    "Įdomu, kaip padidinti įmonės pardavimus 20 % per metus.",
+    "Patiktų analizuoti konkurentus ir ieškoti rinkos nišos.",
+    "Galėčiau priimti sprendimą, kai informacijos nepakanka, ir prisiimti už jį atsakomybę.",
+    "Patiktų pirkti nekilnojamąjį turtą, vertinti jo potencialą ir organizuoti remontą ar statybas.",
+    "Mielai skambinčiau potencialiems klientams ir po atsakymo „ne“ bandyčiau vėl.",
+    "Man tinka dirbti, kai kasdien daug skubių sprendimų ir mažai ramybės.",
+    "Patiktų kurti produkto plėtros planą ir derinti IT, dizaino bei pardavimų komandas.",
+    "Jei kita įmonė pasiūlytų susijungti, atidžiai suskaičiuočiau riziką ir naudą.",
+    "Galėčiau priimti sprendimą atleisti ar įdarbinti žmogų, jei to reikalauja įmonės interesai.",
+    "Mielai atsakyčiau už įmonės pelną, žinodamas, kad jis priklauso nuo mano sprendimų.",
+    "Patiktų kurti marketingo kampaniją ir matuoti, kiek pardavimų ji atnešė.",
+    "Galėčiau rizikuoti savo pinigais pradėdamas verslą, jei matyčiau gerą galimybę.",
+    "Man patinka stebėti verslo rodiklius (pajamas, maržą, augimą) ir iš jų spręsti, ką daryti toliau.",
+  ],
+  E: [
+    "Patiktų kasdien tikrinti skaičius ir sąskaitas, ieškant net mažiausių neatitikimų.",
+    "Galėčiau kelis kartus kartoti tą patį laboratorinį tyrimą, kad būčiau tikras dėl rezultato.",
+    "Jei pastebėčiau kolegos klaidą dokumente, pasakyčiau, net jei tai nemalonu.",
+    "Patiktų skaityti sutartis ir ieškoti punktų, galinčių sukelti riziką.",
+    "Galėčiau dirbti atsakingą darbą, kur klaida turi rimtų pasekmių, ir tai manęs negąsdintų.",
+    "Patiktų dirbti ligoninėje ir greitai, bet kruopščiai nustatinėti diagnozes pagal simptomus.",
+    "Mielai dirbčiau pagal griežtus protokolus, nes jie užtikrina saugumą.",
+    "Patiktų tirti, kaip plinta liga, ir analizuoti duomenis ieškant priežasčių.",
+    "Nebijau ilgai mokytis ir laikyti sudėtingų egzaminų, kad gaučiau profesinį pripažinimą.",
+    "Patiktų tikrinti, ar produktas atitinka standartus, ir sustabdyti partiją, jei randu defektą.",
+    "Galėčiau paaiškinti pacientui vaisto vartojimo taisykles ir sąveiką su kitais vaistais.",
+    "Mielai atlikčiau įmonės auditą ir pateikčiau nešališką išvadą.",
+    "Patiktų ruošti dokumentus teismui ir tikrinti kiekvieną faktą.",
+    "Mielai dirbčiau su mikroskopu ar DNR sekoskaita ir dokumentuočiau kiekvieną žingsnį.",
+    "Man svarbu, kad darbe būtų aiškios taisyklės ir žinočiau, ko iš manęs tikimasi.",
+    "Patiktų gydyti gyvūnus ir aiškintis, kas jiems negerai, nors jie negali papasakoti.",
+    "Galėčiau skaičiuoti draudimo riziką ir tikimybes pagal statistiką.",
+    "Jei planas pasikeistų paskutinę minutę, jausčiausi nepatogiai ir norėčiau jį atidžiai peržiūrėti.",
+    "Patiktų projektuoti tilto konstrukciją ir tikrinti, ar ji atlaikys apkrovą.",
+    "Man malonu, kad žmonės mano darbu pasitiki, nes žino, kad esu tikslus.",
+  ],
+};
+
+// Interleave A,B,C,D,E,A,B,... so the quiz doesn't ask 20 questions of one type in a row.
+const TYPES: TypeKey[] = ["A", "B", "C", "D", "E"];
+const INDUSTRY_QUESTIONS: LikertQuestion[] = [];
+for (let i = 0; i < 20; i++) {
+  TYPES.forEach((t) => {
+    INDUSTRY_QUESTIONS.push({ type: "likert", q: RAW[t][i], t });
+  });
+}
+
+
+// Base questions + industry questions
+const DYNAMIC_QUESTIONS: any[] = [...BASE_QUESTIONS, ...INDUSTRY_QUESTIONS];
 
 const APTITUDE_QUESTIONS = [
   { q: "Kokia sekos tąsa: 2, 5, 8, 11, 14, ...?", options: ["15", "17", "16", "18"], correct: 1, cat: "numerine" },
@@ -1066,4 +1200,3 @@ export default function CareerQuiz() {
     </main>
   );
 }
-
