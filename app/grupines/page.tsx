@@ -38,6 +38,10 @@ const SUBJECT_OPTIONS = [
 
 const CONFIRM_PHRASE = "suprantu, kad kaina yra nuo 22 eur";
 
+// Ignores upper/lower case, commas and extra spaces when comparing the phrase.
+const normalizePhrase = (s: string) =>
+  s.toLowerCase().replace(/,/g, "").replace(/\s+/g, " ").trim();
+
 // Only these email providers are accepted. Add more here if needed.
 const ALLOWED_EMAIL_DOMAINS = [
   "gmail.com",
@@ -160,7 +164,7 @@ export default function GrupinesPamokos() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "duplicate">("idle");
 
-  const phraseOk = phrase.trim().toLowerCase() === CONFIRM_PHRASE;
+  const phraseOk = normalizePhrase(phrase) === normalizePhrase(CONFIRM_PHRASE);
   const isLoading = status === "loading";
 
   const clearError = (field: keyof FormErrors) => {
