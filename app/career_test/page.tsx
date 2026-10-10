@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
 
 // --- IMPORT CHECKOUT FORM (Up 2 levels) ---
 import CheckoutForm from '../../components/CheckoutForm';
@@ -25,25 +26,68 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
   const [showDetails, setShowDetails] = useState(false);
+  
+  // Phone number step states
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [isPhoneSubmitted, setIsPhoneSubmitted] = useState(false);
+  const [isLoadingPayment, setIsLoadingPayment] = useState(false);
 
+  // Clear modal states if it gets fully closed and reopened without completion (optional behavior)
   useEffect(() => {
-    if (isOpen && !clientSecret) {
-      fetch('/api/create-payment-intent', {
+    if (!isOpen) {
+      // Optional: reset states on close if you want them to re-enter phone next time
+      // setPhoneNumber('');
+      // setIsPhoneSubmitted(false);
+      // setClientSecret('');
+      setError('');
+    }
+  }, [isOpen]);
+
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!phoneNumber) return;
+    
+    setIsLoadingPayment(true);
+    setError('');
+
+    try {
+      // 1. Save phone number to Supabase 'purchases' table
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
+      
+      if (supabaseUrl && supabaseKey) {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        const { error: supabaseError } = await supabase
+          .from('purchases')
+          .insert([{ number: phoneNumber }]);
+          
+        if (supabaseError) {
+          console.error('Supabase insert error:', supabaseError);
+          // Depending on your strictness, you can throw here, or just log and continue to payment
+        }
+      } else {
+        console.warn('Supabase credentials not found. Ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set.');
+      }
+
+      // 2. Initialize Stripe Payment Intent
+      const res = await fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_type: 'career_test' }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) throw new Error(data.error);
-          setClientSecret(data.clientSecret);
-        })
-        .catch((err) => {
-          console.error(err);
-          setError('Nepavyko inicijuoti mokėjimo. Bandykite vėliau.');
-        });
+        body: JSON.stringify({ product_type: 'career_test', phone: phoneNumber }),
+      });
+      
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      
+      setClientSecret(data.clientSecret);
+      setIsPhoneSubmitted(true);
+    } catch (err) {
+      console.error(err);
+      setError('Nepavyko inicijuoti mokėjimo. Bandykite vėliau.');
+    } finally {
+      setIsLoadingPayment(false);
     }
-  }, [isOpen, clientSecret]);
+  };
 
   if (!isOpen) return null;
 
@@ -117,7 +161,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                 <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2" style={{ color: BRAND_BLUE }}>
                   {CONTACT_EMAIL}
                 </a>{' '}
-                ir suderinsime jums tinkamą susitikimo laiką.
+                ir suderinsime jums tinkamą susitikimo laiką. Galioja 3 mėnesius po apmokėjimo.
               </div>
             </div>
 
@@ -144,20 +188,59 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             <h2 className="text-xl font-semibold text-slate-900 mb-1">Apmokėjimas</h2>
             <p className="text-slate-500 text-xs mb-6">Saugus atsiskaitymas. Patvirtinimą gausite iškart po apmokėjimo.</p>
 
-            {!clientSecret && !error && (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-7 w-7 border-b-2" style={{ borderBottomColor: BRAND_BLUE }}></div>
-              </div>
-            )}
-
             {error && (
               <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200 mb-4 text-xs">{error}</div>
             )}
 
-            {clientSecret && (
-              <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
-                <CheckoutForm returnUrl={returnUrl} />
-              </Elements>
+            {!isPhoneSubmitted ? (
+              // STEP 1: Phone Number Collection
+              <form onSubmit={handlePhoneSubmit} className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    Jūsų telefono numeris
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    required
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    placeholder="+370 600 00000"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:border-transparent outline-none transition-all text-slate-900"
+                    style={{ focusRingColor: BRAND_BLUE }}
+                  />
+                  <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                    Reikalingas norint sklandžiai susisiekti ir suderinti konsultacijos laiką.
+                  </p>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isLoadingPayment}
+                  className="w-full text-white font-semibold py-3 px-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-70 flex justify-center items-center shadow-md"
+                  style={{ backgroundColor: BRAND_BLUE }}
+                >
+                  {isLoadingPayment ? (
+                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  ) : (
+                    'Tęsti apmokėjimą'
+                  )}
+                </button>
+              </form>
+            ) : (
+              // STEP 2: Stripe Checkout
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
+                {!clientSecret && !error && (
+                  <div className="flex justify-center items-center py-12">
+                    <div className="animate-spin rounded-full h-7 w-7 border-b-2" style={{ borderBottomColor: BRAND_BLUE }}></div>
+                  </div>
+                )}
+
+                {clientSecret && (
+                  <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
+                    <CheckoutForm returnUrl={returnUrl} />
+                  </Elements>
+                )}
+              </div>
             )}
 
             <div className="mt-8 text-center text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
