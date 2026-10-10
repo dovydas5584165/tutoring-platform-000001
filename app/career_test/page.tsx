@@ -14,86 +14,11 @@ import CheckoutForm from '../../components/CheckoutForm';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // --- CONFIGURATION ---
-const CONSULTATION_PRICE = 59; // must match the amount your /api/create-payment-intent charges for 'career_consultation'
+const CONSULTATION_PRICE = 65; // must match the amount /api/create-payment-intent charges for 'career_test'
 const CONTACT_EMAIL = 'info.tiksliukai@gmail.com';
 const BRAND_BLUE = '#5170FF';
 const PAGE_TITLE = 'Tiksliukai. Nemokamas karjeros testas';
-const FREE_TEST_PATH = '/test-start';
-const LEAD_ENDPOINT = '/api/free-test-signup'; // optional: stores the email; if it doesn't exist the form still works
-
-// --- FREE TEST SIGN-UP MODAL ---
-function FreeTestModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [loading, setLoading] = useState(false);
-
-  if (!isOpen) return null;
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setLoading(true);
-    try {
-      await fetch(LEAD_ENDPOINT, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'free_career_test' }),
-      });
-    } catch (err) {
-      console.error(err); // never block the test because of a failed sign-up call
-    }
-    router.push(`${FREE_TEST_PATH}?email=${encodeURIComponent(email)}`);
-  };
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-md" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-md rounded-2xl shadow-2xl border border-slate-200 p-8">
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
-          aria-label="Uždaryti"
-        >
-          <X size={18} />
-        </button>
-
-        <h2 className="text-xl font-semibold text-slate-900 mb-2">Pradėkite nemokamą testą</h2>
-        <p className="text-slate-500 text-sm mb-6 leading-relaxed">
-          Įveskite el. paštą – ten atsiųsime nuorodą į rezultatus, kad galėtumėte jų nepamesti.
-        </p>
-
-        <form onSubmit={handleSubmit}>
-          <label htmlFor="free-test-email" className="block text-xs font-semibold text-slate-700 mb-1.5">
-            El. paštas
-          </label>
-          <input
-            id="free-test-email"
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="vardas@pastas.lt"
-            className="w-full border border-slate-300 rounded-lg px-4 py-3 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:border-transparent"
-            style={{ ['--tw-ring-color' as string]: BRAND_BLUE }}
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="mt-4 w-full text-white px-6 py-3.5 rounded-xl font-medium text-base transition-all hover:opacity-90 disabled:opacity-60"
-            style={{ backgroundColor: BRAND_BLUE }}
-          >
-            {loading ? 'Kraunama...' : 'Pradėti testą'}
-          </button>
-        </form>
-
-        <p className="mt-4 text-[11px] text-slate-400 leading-relaxed">
-          Testas nemokamas, kortelės duomenų nereikia. Šiuo el. paštu atsiųsime rezultatus ir informaciją apie
-          konsultaciją. Atsisakyti galite bet kada.
-        </p>
-      </div>
-    </div>
-  );
-}
+const FREE_TEST_PATH = '/test-start?payment_intent=pi_3SuJh43JaNQeVNtM0AgvnIeI'; // temporary: shared link that opens the test without payment
 
 // --- CONSULTATION PAYMENT MODAL ---
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
@@ -106,7 +31,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
       fetch('/api/create-payment-intent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_type: 'career_consultation' }),
+        body: JSON.stringify({ product_type: 'career_test' }),
       })
         .then((res) => res.json())
         .then((data) => {
@@ -247,7 +172,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
 // --- MAIN LANDING PAGE COMPONENT ---
 export default function KarjerosPristatymas() {
-  const [isFreeOpen, setIsFreeOpen] = useState(false);
+  const router = useRouter();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [showPaidBanner, setShowPaidBanner] = useState(false);
 
@@ -263,7 +188,7 @@ export default function KarjerosPristatymas() {
 
   const handleFreeClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsFreeOpen(true);
+    router.push(FREE_TEST_PATH);
   };
 
   const handleConsultationClick = (e: React.MouseEvent) => {
@@ -273,7 +198,6 @@ export default function KarjerosPristatymas() {
 
   return (
     <div className="bg-slate-50 text-slate-900 font-sans antialiased">
-      <FreeTestModal isOpen={isFreeOpen} onClose={() => setIsFreeOpen(false)} />
       <PaymentModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
 
       {/* --- PAID CONFIRMATION BANNER --- */}
@@ -472,7 +396,7 @@ export default function KarjerosPristatymas() {
                 </div>
                 <h3 className="text-lg font-semibold mb-2 text-slate-900">Nemokamas testas</h3>
                 <p className="text-slate-600 text-xs leading-relaxed">
-                  Įveskite el. paštą ir pradėkite. Klausimyno užpildymas užtrunka apie 30 minučių.
+                  Spauskite mygtuką ir pradėkite iškart. Klausimyno užpildymas užtrunka apie 30 minučių.
                 </p>
               </div>
             </div>
