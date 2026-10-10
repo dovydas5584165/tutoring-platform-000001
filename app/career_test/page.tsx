@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -602,4 +603,112 @@ export default function KarjerosPristatymas() {
               <button onClick={handleFreeClick} className="font-medium underline underline-offset-2" style={{ color: BRAND_BLUE }}>
                 Pradėkite nemokamai
               </button>
-              . Konsultaciją galėsite užsisakyti
+              . Konsultaciją galėsite užsisakyti ir vėliau.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* --- TIKSLIUKAI.LT INTEGRATION --- */}
+      <section className="py-24 text-white overflow-hidden relative" style={{ backgroundColor: BRAND_BLUE }}>
+        <div className="container mx-auto px-6 flex flex-col lg:flex-row items-center gap-16 relative z-10">
+          <div className="lg:w-1/2">
+            <div className="text-xs font-semibold uppercase tracking-wider mb-6 text-white/70">Akademinis palaikymas</div>
+            <h2 className="text-3xl lg:text-5xl font-bold mb-6 tracking-tight leading-tight">
+              Atsakingas pasirengimas <br />
+              <span className="text-white/70 font-normal">studijų tikslams pasiekti.</span>
+            </h2>
+
+            <p className="text-white/80 text-base mb-8 leading-relaxed font-normal">
+              Atskleidus tinkamiausią karjeros kryptį ir reikalingus egzaminus, „Tiksliukai.lt“ komanda padeda užtikrinti
+              aukščiausius akademinius rezultatus. Jungiame patyrusius mentorius ir korepetitorius kryptingam VBE
+              pasirengimui.
+            </p>
+
+            <a
+              href="https://tiksliukai.lt"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center bg-white hover:bg-white/90 text-slate-900 px-8 py-4 rounded-xl font-medium text-base transition-all"
+            >
+              Susipažinti su Tiksliukai.lt
+            </a>
+          </div>
+
+          <div className="lg:w-1/2 flex justify-center w-full">
+            <div className="bg-white/10 backdrop-blur-sm text-white rounded-2xl max-w-md w-full border border-white/15 p-8">
+              <div className="flex items-center gap-4 mb-6 pb-6 border-b border-white/15">
+                <div
+                  className="w-10 h-10 bg-white rounded-lg flex items-center justify-center font-bold text-lg"
+                  style={{ color: BRAND_BLUE }}
+                >
+                  T
+                </div>
+                <div>
+                  <h4 className="font-semibold text-base leading-tight">Tiksliukai korepetitoriai</h4>
+                  <p className="text-white/70 text-xs">Tikslinis VBE ir dalykinis pasirengimas</p>
+                </div>
+              </div>
+              <ul className="space-y-3">
+                {['Matematika', 'Anglų kalba', 'Chemija', 'Biologija', 'Fizika'].map((subject, i) => (
+                  <li key={i} className="pl-3 border-l-2 border-white/50 text-white/90 text-sm font-medium py-1">
+                    {subject}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-8 pt-6 border-t border-white/15">
+                <span className="text-white/70 text-xs font-medium">Aukšti VBE įvertinimai</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* --- FOOTER / FINAL CTA --- */}
+      <section className="py-24 text-center container mx-auto px-6">
+        <div className="bg-white rounded-3xl py-16 px-6 border border-slate-200/80 max-w-4xl mx-auto">
+          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 tracking-tight">Pradėkite nuo nemokamo testo</h2>
+          <p className="text-base text-slate-600 mb-10 max-w-xl mx-auto leading-relaxed">
+            Atsakykite į klausimyno teiginius ir gaukite savo profilį bei 3 tinkamiausias kryptis. Jei norėsite aiškaus
+            plano, konsultaciją galėsite užsisakyti bet kada.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <button
+              onClick={handleFreeClick}
+              className="inline-flex items-center gap-3 text-white px-10 py-4 rounded-xl font-medium text-lg transition-all hover:opacity-90"
+              style={{ backgroundColor: BRAND_BLUE }}
+            >
+              Atlikti nemokamą testą
+            </button>
+            <button
+              onClick={handleConsultationClick}
+              className="inline-flex items-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-xl font-medium text-base transition-all"
+            >
+              Užsakyti konsultaciją ({CONSULTATION_PRICE} €)
+            </button>
+          </div>
+          <p className="mt-4 text-xs text-slate-400">Testas nemokamas. Konsultacija – vienkartinis {CONSULTATION_PRICE} € mokėjimas.</p>
+        </div>
+      </section>
+
+      <footer className="py-8 border-t border-slate-200 bg-white">
+        <div className="container mx-auto px-6 text-slate-500 text-xs flex flex-col md:flex-row justify-between items-center gap-4">
+          <p>&copy; {new Date().getFullYear()} Tiksliukai.lt Karjeros Tyrimas. Visos teisės saugomos.</p>
+          <div className="flex gap-6">
+            <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-slate-900 transition-colors">
+              {CONTACT_EMAIL}
+            </a>
+            <Link href="#" className="hover:text-slate-900 transition-colors">
+              Naudojimo taisyklės
+            </Link>
+            <Link href="#" className="hover:text-slate-900 transition-colors">
+              Privatumo politika
+            </Link>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+```
