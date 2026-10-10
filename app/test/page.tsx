@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
 import {
   CheckCircle2,
   XCircle,
@@ -26,6 +28,8 @@ import {
   Users,
   ShieldCheck,
   Lock,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import {
   RadarChart,
@@ -36,6 +40,17 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+
+// --- IMPORT CHECKOUT FORM (Up 2 levels) ---
+import CheckoutForm from '../../components/CheckoutForm';
+
+// Initialize Stripe
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+
+// --- CONFIGURATION ---
+const CONSULTATION_PRICE = 65; // must match the amount /api/create-payment-intent charges for 'career_test'
+const CONTACT_EMAIL = 'info.tiksliukai@gmail.com';
+const BRAND_BLUE = '#5170FF';
 
 // ============================================================================
 // DATA & TYPES
@@ -528,13 +543,13 @@ DYNAMIC_QUESTIONS.forEach(q => {
   }
 });
 
-function getAptitudeBand(pct) {
+function getAptitudeBand(pct: number) {
   if (pct >= 75) return { label: "Aukštas", color: "#166534", text: "Stiprūs analitiniai gebėjimai. Puikiai tvarkotės su logika ir skaičiais." };
   if (pct >= 45) return { label: "Vidutinis", color: "#92400e", text: "Vidutiniai analitiniai gebėjimai. Dalis užduočių įveikta sėkmingai, tačiau loginėms grandinėms gali reikėti daugiau praktikos." };
   return { label: "Pradinis", color: "#7f1d1d", text: "Šįkart užduotys pasirodė sudėtingesnės. Tai puiki proga pasipraktikuoti loginio mąstymo ir matematikos sferoje." };
 }
 
-function buildTraitNarrative(result) {
+function buildTraitNarrative(result: any) {
   const pos = result.positives.join(", ");
   const neg = result.negatives.join(", ");
   return `Atsakymai į savęs pažinimo klausimyną atskleidžia, kad ryškiausios savybės yra: ${pos}. Šios stiprybės paaiškina, kodėl šis profilis natūraliai dera su kryptimi „${result.title}“. Kartu vertėtų sąmoningai stebėti sritis, kurios ateityje gali tapti iššūkiu: ${neg}. Tai nėra trūkumai – tai tiesiog kryptys, kurias ugdant galima dar labiau atskleisti savo potencialą.`;
@@ -544,7 +559,158 @@ function buildTraitNarrative(result) {
 // COMPONENTS
 // ============================================================================
 
-function ProfessionModal({ profession, onClose }) {
+// --- CONSULTATION PAYMENT MODAL ---
+function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const [clientSecret, setClientSecret] = useState('');
+  const [error, setError] = useState('');
+  const [showDetails, setShowDetails] = useState(false);
+
+  useEffect(() => {
+    if (isOpen && !clientSecret) {
+      fetch('/api/create-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ product_type: 'career_test' }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.error) throw new Error(data.error);
+          setClientSecret(data.clientSecret);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError('Nepavyko inicijuoti mokėjimo. Bandykite vėliau.');
+        });
+    }
+  }, [isOpen, clientSecret]);
+
+  if (!isOpen) return null;
+
+  const appearance = {
+    theme: 'stripe' as const,
+    variables: {
+      colorPrimary: BRAND_BLUE,
+      borderRadius: '8px',
+      fontSizeBase: '15px',
+      fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+    },
+  };
+
+  // After payment Stripe sends the user back to this same page; a banner then explains how to book.
+  const returnUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}${window.location.pathname}?paid=consultation`
+      : '';
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center sm:p-4">
+      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity" onClick={onClose} />
+
+      <div className="relative bg-white w-full h-[95vh] md:h-auto md:max-h-[90vh] md:max-w-4xl rounded-t-2xl md:rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden transition-all transform border border-slate-200">
+        <button
+          onClick={onClose}
+          className="md:hidden absolute top-4 right-4 z-20 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
+          aria-label="Uždaryti"
+        >
+          <X size={18} />
+        </button>
+
+        {/* --- LEFT SIDE (SUMMARY) --- */}
+        <div className="bg-slate-900 text-white md:w-2/5 flex-shrink-0 border-b md:border-b-0 md:border-r border-slate-800">
+          <div className="p-6 md:p-8 flex flex-col justify-between h-full">
+            <div>
+              <h3 className="text-lg font-semibold tracking-wide text-slate-200 mb-2 md:mb-6">Užsakymo suvestinė</h3>
+
+              <div className="flex justify-between items-end mb-4 md:hidden">
+                <span className="text-slate-400 font-medium text-sm">Suma:</span>
+                <span className="text-2xl font-semibold text-white">{CONSULTATION_PRICE.toFixed(2)} €</span>
+              </div>
+
+              <button
+                onClick={() => setShowDetails(!showDetails)}
+                className="flex items-center gap-1 text-slate-300 text-xs font-semibold uppercase tracking-wider md:hidden mb-4"
+              >
+                {showDetails ? 'Slėpti detales' : 'Kas įeina'}
+                {showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              </button>
+
+              <div
+                className={`${showDetails ? 'block' : 'hidden'} md:block bg-slate-800/80 p-5 rounded-xl border border-slate-700/60 transition-all`}
+              >
+                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: BRAND_BLUE }}>
+                  Asmeninė konsultacija
+                </span>
+                <p className="font-semibold text-white text-base leading-snug mt-1">Karjeros testo rezultatų aptarimas</p>
+                <ul className="mt-4 space-y-2.5 text-xs text-slate-300 leading-relaxed">
+                  <li className="pl-3 border-l-2 border-slate-700">Pokalbis su karjeros konsultantu.</li>
+                  <li className="pl-3 border-l-2 border-slate-700">Pilnas 10+ geriausiai tinkančių krypčių sąrašas su paaiškinimais.</li>
+                  <li className="pl-3 border-l-2 border-slate-700">Individualus VBE ir studijų planas.</li>
+                  <li className="pl-3 font-medium text-slate-200" style={{ borderLeft: `2px solid ${BRAND_BLUE}` }}>
+                    Atsakymai į jūsų klausimus apie specialybes ir stojimą.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-5 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
+                <span className="font-semibold text-white">Po apmokėjimo:</span> parašykite el. paštu{' '}
+                <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2" style={{ color: BRAND_BLUE }}>
+                  {CONTACT_EMAIL}
+                </a>{' '}
+                ir suderinsime jums tinkamą susitikimo laiką.
+              </div>
+            </div>
+
+            <div className="hidden md:block mt-6 pt-6 border-t border-slate-800">
+              <div className="flex justify-between items-end">
+                <span className="text-slate-400 text-sm font-medium">Iš viso:</span>
+                <span className="text-3xl font-semibold text-white">{CONSULTATION_PRICE.toFixed(2)} €</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* --- RIGHT SIDE (STRIPE FORM) --- */}
+        <div className="flex-1 bg-white flex flex-col h-full overflow-hidden">
+          <button
+            onClick={onClose}
+            className="hidden md:block absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors z-10"
+            aria-label="Uždaryti"
+          >
+            <X size={18} />
+          </button>
+
+          <div className="overflow-y-auto p-6 md:p-8 h-full pb-20 md:pb-8">
+            <h2 className="text-xl font-semibold text-slate-900 mb-1">Apmokėjimas</h2>
+            <p className="text-slate-500 text-xs mb-6">Saugus atsiskaitymas. Patvirtinimą gausite iškart po apmokėjimo.</p>
+
+            {!clientSecret && !error && (
+              <div className="flex justify-center items-center py-12">
+                <div className="animate-spin rounded-full h-7 w-7 border-b-2" style={{ borderBottomColor: BRAND_BLUE }}></div>
+              </div>
+            )}
+
+            {error && (
+              <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200 mb-4 text-xs">{error}</div>
+            )}
+
+            {clientSecret && (
+              <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
+                <CheckoutForm returnUrl={returnUrl} />
+              </Elements>
+            )}
+
+            <div className="mt-8 text-center text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
+              256-bit SSL šifruotas mokėjimas
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+function ProfessionModal({ profession, onClose }: { profession: any, onClose: () => void }) {
   if (!profession) return null;
   return (
     <motion.div
@@ -585,7 +751,7 @@ function ProfessionModal({ profession, onClose }) {
   );
 }
 
-function ReportSection({ icon, title, children }) {
+function ReportSection({ icon, title, children }: { icon: any, title: string, children: React.ReactNode }) {
   return (
     <div className="report-section mb-10 break-inside-avoid">
       <h3 className="text-lg md:text-xl font-bold text-slate-900 mb-4 flex items-center gap-3 pb-3 border-b-2 border-slate-800" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
@@ -596,16 +762,18 @@ function ReportSection({ icon, title, children }) {
   );
 }
 
-function ResultsView({ result, resultKey, scores, aptitude, respondentName, dateStr, onRestart }) {
-  const [selectedProfession, setSelectedProfession] = useState(null);
+function ResultsView({ result, resultKey, scores, aptitude, respondentName, dateStr, onRestart }: any) {
+  const [selectedProfession, setSelectedProfession] = useState<any>(null);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  
   const overallPct = Math.round((aptitude.correctTotal / APTITUDE_QUESTIONS.length) * 100);
   const band = getAptitudeBand(overallPct);
 
   const radarData = Object.keys(DIMENSION_SHORT).map((key) => ({
-    subject: DIMENSION_SHORT[key],
+    subject: DIMENSION_SHORT[key as keyof typeof DIMENSION_SHORT],
     key,
     score: scores[key],
-    fullMark: MAX_PER_DIMENSION[key],
+    fullMark: MAX_PER_DIMENSION[key as keyof typeof MAX_PER_DIMENSION],
   }));
   const radarMax = Math.max(...Object.values(MAX_PER_DIMENSION));
 
@@ -624,6 +792,8 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
           .break-inside-avoid { break-inside: avoid; }
         }
       `}</style>
+
+      <PaymentModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
 
       <AnimatePresence>
         {selectedProfession && <ProfessionModal profession={selectedProfession} onClose={() => setSelectedProfession(null)} />}
@@ -673,7 +843,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
             <div className="bg-emerald-50/60 p-5 rounded-2xl border border-emerald-100">
               <h4 className="text-emerald-800 font-bold mb-3 text-sm uppercase tracking-wide">Stipriosios savybės</h4>
               <div className="flex flex-wrap gap-2">
-                {result.positives.map((item, i) => (
+                {result.positives.map((item: string, i: number) => (
                   <span key={i} className="px-3 py-1.5 bg-white text-emerald-900 text-sm font-semibold rounded-lg border border-emerald-200">
                     {item}
                   </span>
@@ -683,7 +853,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
             <div className="bg-rose-50/60 p-5 rounded-2xl border border-rose-100">
               <h4 className="text-rose-800 font-bold mb-3 text-sm uppercase tracking-wide">Augimo zonos</h4>
               <div className="flex flex-wrap gap-2">
-                {result.negatives.map((item, i) => (
+                {result.negatives.map((item: string, i: number) => (
                   <span key={i} className="px-3 py-1.5 bg-white text-rose-900 text-sm font-semibold rounded-lg border border-rose-200">
                     {item}
                   </span>
@@ -698,7 +868,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
             Žemiau pateikiami žinomi lyderiai, mokslininkai ar kūrėjai, kurių veiklos stilius ir pasiekimai atspindi šį asmenybės tipą:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {result.famousPeople.map((person, i) => (
+            {result.famousPeople.map((person: any, i: number) => (
               <div key={i} className="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col justify-between">
                 <div>
                   <h5 className="font-bold text-slate-900 text-base">{person.name}</h5>
@@ -761,7 +931,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
               return (
                 <div key={cat}>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm text-slate-600">{CAT_LABELS[cat]}</span>
+                    <span className="text-sm text-slate-600">{CAT_LABELS[cat as keyof typeof CAT_LABELS]}</span>
                     <span className="text-sm font-semibold text-slate-700">{pct}%</span>
                   </div>
                   <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
@@ -804,7 +974,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
             <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
               <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Universitetai Lietuvoje</h5>
               <ul className="space-y-2">
-                {result.uniLt.map((uni, i) => (
+                {result.uniLt.map((uni: any, i: number) => (
                   <li key={i} className="flex justify-between items-center text-sm">
                     <span className="text-slate-700">{uni.name}</span>
                     <span className="text-xs font-bold bg-slate-200 text-slate-700 px-2 py-0.5 rounded ml-2 whitespace-nowrap">{uni.score}</span>
@@ -815,7 +985,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
             <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
               <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Universitetai Europoje</h5>
               <ul className="space-y-2">
-                {result.uniEu.split(",").map((uni, i) => (
+                {result.uniEu.split(",").map((uni: string, i: number) => (
                   <li key={i} className="text-sm text-slate-700">{uni.trim()}</li>
                 ))}
               </ul>
@@ -836,7 +1006,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
             {/* Overlay */}
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100/30 backdrop-blur-[2px] z-10">
                <Lock className="w-8 h-8 text-slate-700 mb-3" />
-               <div className="bg-slate-900 text-white px-6 py-3 rounded-full font-bold shadow-xl flex items-center gap-2 cursor-pointer hover:bg-slate-800 transition-colors pointer-events-auto">
+               <div onClick={() => setIsCheckoutOpen(true)} className="bg-slate-900 text-white px-6 py-3 rounded-full font-bold shadow-xl flex items-center gap-2 cursor-pointer hover:bg-slate-800 transition-colors pointer-events-auto">
                  Atrakinti stipendijų informaciją
                </div>
             </div>
@@ -849,7 +1019,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 relative">
             {/* Show only first 3 clearly */}
-            {result.professions.slice(0, 3).map((prof, i) => (
+            {result.professions.slice(0, 3).map((prof: any, i: number) => (
               <div
                 key={i}
                 onClick={() => setSelectedProfession(prof)}
@@ -863,7 +1033,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
             ))}
 
             {/* Render 3 blurred alternatives */}
-            {result.professions.slice(3, 6).map((prof, i) => (
+            {result.professions.slice(3, 6).map((prof: any, i: number) => (
               <div
                 key={i + 3}
                 className="bg-white p-5 rounded-xl border border-slate-200 flex flex-col justify-between h-full select-none blur-[6px] opacity-70 pointer-events-none"
@@ -877,7 +1047,7 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
 
             {/* Overlay for the hidden section */}
             <div className="absolute inset-0 top-1/2 flex items-center justify-center pointer-events-none z-10">
-               <div className="bg-slate-900/90 text-white px-6 py-3 rounded-full font-bold shadow-xl backdrop-blur-sm pointer-events-auto cursor-pointer flex items-center gap-2 hover:bg-slate-800 transition-all">
+               <div onClick={() => setIsCheckoutOpen(true)} className="bg-slate-900/90 text-white px-6 py-3 rounded-full font-bold shadow-xl backdrop-blur-sm pointer-events-auto cursor-pointer flex items-center gap-2 hover:bg-slate-800 transition-all">
                  <Lock className="w-4 h-4" /> Atrakinti visas {result.professions.length} profesijų
                </div>
             </div>
@@ -906,15 +1076,27 @@ export default function CareerQuiz() {
   const [respondentName, setRespondentName] = useState("");
   const [currentIdx, setCurrentIdx] = useState(0);
   const [scores, setScores] = useState({ A: 0, B: 0, C: 0, D: 0, E: 0 });
-  const [history, setHistory] = useState([]);
+  const [history, setHistory] = useState<any[]>([]);
 
-  const [selectedMulti, setSelectedMulti] = useState([]);
+  const [selectedMulti, setSelectedMulti] = useState<any[]>([]);
 
   const [aptIdx, setAptIdx] = useState(0);
   const [aptAnswers, setAptAnswers] = useState(Array(APTITUDE_QUESTIONS.length).fill(null));
   const [timeLeft, setTimeLeft] = useState(20);
+  
+  const [showPaidBanner, setShowPaidBanner] = useState(false);
 
   const dateStr = new Date().toLocaleDateString("lt-LT", { year: "numeric", month: "long", day: "numeric" });
+
+  useEffect(() => {
+    // Returning from Stripe after a successful consultation payment
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('paid') === 'consultation' && params.get('redirect_status') === 'succeeded') {
+      setShowPaidBanner(true);
+      // Optional: fast-forward to results if you want to recover them, 
+      // but if the page refreshed the state is lost without persistence.
+    }
+  }, []);
 
   const startGame = () => {
     setCurrentIdx(0);
@@ -925,14 +1107,14 @@ export default function CareerQuiz() {
     setGameState("personality");
   };
 
-  const handleDynamicAnswer = (answerObj) => {
+  const handleDynamicAnswer = (answerObj: any) => {
     setHistory((prev) => [...prev, answerObj]);
     setScores((prev) => {
       const newScores = { ...prev };
       if (Array.isArray(answerObj)) {
-        answerObj.forEach((item) => { newScores[item.type] += item.score; });
+        answerObj.forEach((item) => { newScores[item.type as keyof typeof newScores] += item.score; });
       } else {
-        newScores[answerObj.type] += answerObj.score;
+        newScores[answerObj.type as keyof typeof newScores] += answerObj.score;
       }
       return newScores;
     });
@@ -951,9 +1133,9 @@ export default function CareerQuiz() {
     setScores((prev) => {
       const newScores = { ...prev };
       if (Array.isArray(lastEntry)) {
-        lastEntry.forEach((item) => { newScores[item.type] -= item.score; });
+        lastEntry.forEach((item) => { newScores[item.type as keyof typeof newScores] -= item.score; });
       } else {
-        newScores[lastEntry.type] -= lastEntry.score;
+        newScores[lastEntry.type as keyof typeof newScores] -= lastEntry.score;
       }
       return newScores;
     });
@@ -962,7 +1144,7 @@ export default function CareerQuiz() {
     setSelectedMulti([]);
   };
 
-  const toggleMulti = (option) => {
+  const toggleMulti = (option: any) => {
     setSelectedMulti((prev) =>
       prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]
     );
@@ -989,7 +1171,7 @@ export default function CareerQuiz() {
     }
   }, [timeLeft, gameState]);
 
-  const handleAptitudeAnswer = (optionIdx) => {
+  const handleAptitudeAnswer = (optionIdx: number) => {
     const updated = [...aptAnswers];
     updated[aptIdx] = optionIdx;
     setAptAnswers(updated);
@@ -1007,13 +1189,13 @@ export default function CareerQuiz() {
   };
 
   const getWinner = () => {
-    return Object.keys(scores).reduce((a, b) => (scores[a] > scores[b] ? a : b));
+    return Object.keys(scores).reduce((a, b) => (scores[a as keyof typeof scores] > scores[b as keyof typeof scores] ? a : b));
   };
 
   const getAptitudeSummary = () => {
     let correctTotal = 0;
-    const catTotal = { numerine: 0, logine: 0, verbaline: 0 };
-    const catCorrect = { numerine: 0, logine: 0, verbaline: 0 };
+    const catTotal: Record<string, number> = { numerine: 0, logine: 0, verbaline: 0 };
+    const catCorrect: Record<string, number> = { numerine: 0, logine: 0, verbaline: 0 };
 
     APTITUDE_QUESTIONS.forEach((q, i) => {
       catTotal[q.cat] = (catTotal[q.cat] || 0) + 1;
@@ -1023,7 +1205,7 @@ export default function CareerQuiz() {
       }
     });
 
-    const byCategoryPct = {};
+    const byCategoryPct: Record<string, number> = {};
     Object.keys(catTotal).forEach((cat) => {
       byCategoryPct[cat] = Math.round((catCorrect[cat] / catTotal[cat]) * 100);
     });
@@ -1035,8 +1217,26 @@ export default function CareerQuiz() {
   const stepNumber = gameState === "personality" ? currentIdx + 1 : gameState === "aptitude" ? DYNAMIC_QUESTIONS.length + aptIdx + 1 : totalQuestions;
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col w-full h-full">
-      <div className="bg-slate-900 px-4 py-4 md:px-8 text-white flex justify-between items-center z-10 sticky top-0 shadow-md no-print">
+    <main className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col w-full h-full relative">
+      {/* --- PAID CONFIRMATION BANNER --- */}
+      {showPaidBanner && (
+        <div className="text-white text-sm w-full z-50 sticky top-0" style={{ backgroundColor: BRAND_BLUE }}>
+          <div className="container mx-auto px-6 py-4 flex items-start justify-between gap-4">
+            <p className="leading-relaxed">
+              Ačiū, konsultacija apmokėta. Parašykite{' '}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold underline underline-offset-2">
+                {CONTACT_EMAIL}
+              </a>{' '}
+              ir suderinsime jums patogų laiką.
+            </p>
+            <button onClick={() => setShowPaidBanner(false)} aria-label="Uždaryti" className="p-1 hover:opacity-80">
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div className={`bg-slate-900 px-4 py-4 md:px-8 text-white flex justify-between items-center z-10 shadow-md no-print ${showPaidBanner ? 'relative' : 'sticky top-0'}`}>
         <div className="flex items-center">
           <span className="font-bold tracking-widest text-lg md:text-xl" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
             TIKSLIUKAI.LT
@@ -1139,7 +1339,7 @@ export default function CareerQuiz() {
                   {/* CHOICE TYPE */}
                   {DYNAMIC_QUESTIONS[currentIdx].type === "choice" && (
                     <div className="flex flex-col gap-3">
-                      {DYNAMIC_QUESTIONS[currentIdx].options.map((opt, i) => (
+                      {DYNAMIC_QUESTIONS[currentIdx].options.map((opt: any, i: number) => (
                         <button key={i} onClick={() => handleDynamicAnswer({ type: opt.t, score: 1 })} className="p-4 md:p-5 rounded-2xl border-2 border-slate-200 bg-white hover:border-slate-500 hover:bg-slate-50 transition-all font-semibold text-slate-700 text-left shadow-sm">
                           {opt.text}
                         </button>
@@ -1151,7 +1351,7 @@ export default function CareerQuiz() {
                   {DYNAMIC_QUESTIONS[currentIdx].type === "multiselect" && (
                     <div className="flex flex-col gap-3">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-2">
-                        {DYNAMIC_QUESTIONS[currentIdx].options.map((opt, i) => {
+                        {DYNAMIC_QUESTIONS[currentIdx].options.map((opt: any, i: number) => {
                           const isSelected = selectedMulti.includes(opt);
                           return (
                             <button key={i} onClick={() => toggleMulti(opt)} className={`p-4 rounded-xl border-2 transition-all flex items-start gap-3 text-left ${isSelected ? "border-slate-800 bg-slate-800 text-white shadow-md" : "border-slate-200 bg-white text-slate-700 hover:border-slate-300"}`}>
@@ -1228,7 +1428,7 @@ export default function CareerQuiz() {
 
           {gameState === "result" && (
             <ResultsView
-              result={RESULTS[getWinner()]}
+              result={RESULTS[getWinner() as keyof typeof RESULTS]}
               resultKey={getWinner()}
               scores={scores}
               aptitude={getAptitudeSummary()}
