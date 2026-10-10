@@ -90,6 +90,7 @@ export default function GrupinesPamokos() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [subject, setSubject] = useState(""); 
+  const [phrase, setPhrase] = useState(""); // Naujas state patvirtinimo frazei
   const [honeypot, setHoneypot] = useState(""); // bot trap, real users never see it
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "duplicate">("idle");
@@ -136,6 +137,7 @@ export default function GrupinesPamokos() {
       setEmail("");
       setPhone("");
       setSubject("");
+      setPhrase("");
       setErrors({});
       
     } catch (error) {
@@ -153,6 +155,24 @@ export default function GrupinesPamokos() {
     "w-full px-6 py-4 rounded-2xl text-gray-900 text-lg outline-none transition-all shadow-inner disabled:opacity-70";
   const okRing = "focus:ring-4 focus:ring-yellow-400/50";
   const badRing = "ring-4 ring-red-400/70";
+
+  // Daugkartinis kainų komponentas kortelėms
+  const PricingBlock = () => (
+    <div className="mb-6 space-y-2 text-sm bg-gray-50 p-4 rounded-xl border border-gray-100 w-full">
+      <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+        <span className="text-gray-600">Didesnė grupė:</span>
+        <span className="font-bold text-gray-900">22 € / pam</span>
+      </div>
+      <div className="flex justify-between items-center border-b border-gray-200 pb-2">
+        <span className="text-gray-600">Maža grupė:</span>
+        <span className="font-bold text-gray-900">25 € / pam</span>
+      </div>
+      <div className="flex justify-between items-center pt-1">
+        <span className="text-gray-600">Individualiai:</span>
+        <span className="font-bold text-gray-900">40 € / pam</span>
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans flex flex-col">
@@ -199,7 +219,7 @@ export default function GrupinesPamokos() {
           <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
             Mokykitės kartu su bendraamžiais, dalinkitės žiniomis ir siekite geriausių rezultatų. 
             Pasirinkite užsienio kalbų grupes arba kryptingą pasiruošimą mokyklos patikrinimams bei egzaminams.
-            Pamokos trukmė- valanda, pamokos mažose grupėse kainuoja 25 eur/ pam, didesnėse grupėse 22 eur/ pam, individualiai 40 eur / pam.
+            Pamokos trukmė – valanda.
           </p>
         </motion.div>
 
@@ -217,10 +237,11 @@ export default function GrupinesPamokos() {
               <Globe2 size={32} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Anglų kalba</h2>
-            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+            <p className="text-gray-600 mb-4 flex-grow text-sm leading-relaxed">
               Tobulinkite kalbėjimo, rašymo ir supratimo įgūdžius. Nuo pradedančiųjų (A1) iki pažengusių (C1). 
             </p>
-            <div className="bg-gray-50 rounded-xl p-3 text-center">
+            <PricingBlock />
+            <div className="bg-gray-50 rounded-xl p-3 text-center mt-auto">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
               <p className="text-sm font-bold text-[#3B65CE]">Grupės pilnos</p>
             </div>
@@ -237,10 +258,11 @@ export default function GrupinesPamokos() {
               <MessageCircle size={32} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Prancūzų kalba</h2>
-            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+            <p className="text-gray-600 mb-4 flex-grow text-sm leading-relaxed">
               Išmokite meilės ir diplomatijos kalbą. Praktinės užduotys, akcentas į tarimą bei laisvą bendravimą.
             </p>
-            <div className="bg-gray-50 rounded-xl p-3 text-center">
+            <PricingBlock />
+            <div className="bg-gray-50 rounded-xl p-3 text-center mt-auto">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
               <p className="text-sm font-bold text-red-600">Grupės renkamos</p>
             </div>
@@ -257,10 +279,11 @@ export default function GrupinesPamokos() {
               <BookOpen size={32} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Vokiečių kalba</h2>
-            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+            <p className="text-gray-600 mb-4 flex-grow text-sm leading-relaxed">
               Griežta, bet logiška gramatika. Puikus pasirinkimas norintiems studijuoti ar keliauti DACH regione.
             </p>
-            <div className="bg-gray-50 rounded-xl p-3 text-center">
+            <PricingBlock />
+            <div className="bg-gray-50 rounded-xl p-3 text-center mt-auto">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
               <p className="text-sm font-bold text-yellow-600">Grupės pilnos</p>
             </div>
@@ -277,10 +300,11 @@ export default function GrupinesPamokos() {
               <Users size={32} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Arabų kalba</h2>
-            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+            <p className="text-gray-600 mb-4 flex-grow text-sm leading-relaxed">
               Atraskite naują pasaulį. Mokomės skaityti, rašyti ir bendrauti viena plačiausiai vartojamų kalbų.
             </p>
-            <div className="bg-gray-50 rounded-xl p-3 text-center">
+            <PricingBlock />
+            <div className="bg-gray-50 rounded-xl p-3 text-center mt-auto">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
               <p className="text-sm font-bold text-emerald-600">Grupės pilnos</p>
             </div>
@@ -297,10 +321,11 @@ export default function GrupinesPamokos() {
               <GraduationCap size={32} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">VBE paruošimas</h2>
-            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+            <p className="text-gray-600 mb-4 flex-grow text-sm leading-relaxed">
               Intensyvus ir kryptingas pasiruošimas Valstybiniams Brandos Egzaminams. Sprendžiame konspektus bei praėjusių metų užduotis.
             </p>
-            <div className="bg-gray-50 rounded-xl p-3 text-center">
+            <PricingBlock />
+            <div className="bg-gray-50 rounded-xl p-3 text-center mt-auto">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
               <p className="text-sm font-bold text-violet-600">Grupės pilnos</p>
             </div>
@@ -317,10 +342,11 @@ export default function GrupinesPamokos() {
               <CheckCircle2 size={32} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">PUPP paruošimas</h2>
-            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+            <p className="text-gray-600 mb-4 flex-grow text-sm leading-relaxed">
               Padedame dešimtokams (II gimnazijos klasėms) pasiruošti Pagrindinio Ugdymo Pasiekimų Patikrinimui be streso.
             </p>
-            <div className="bg-gray-50 rounded-xl p-3 text-center">
+            <PricingBlock />
+            <div className="bg-gray-50 rounded-xl p-3 text-center mt-auto">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
               <p className="text-sm font-bold text-orange-500">Grupės pilnos</p>
             </div>
@@ -337,10 +363,11 @@ export default function GrupinesPamokos() {
               <BookOpen size={32} />
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">NMPP paruošimas</h2>
-            <p className="text-gray-600 mb-6 flex-grow text-sm leading-relaxed">
+            <p className="text-gray-600 mb-4 flex-grow text-sm leading-relaxed">
               Sustipriname 4-os ir 8-os klasės mokinių žinias prieš Nacionalinį Mokinių Pasiekimų Patikrinimą.
             </p>
-            <div className="bg-gray-50 rounded-xl p-3 text-center">
+            <PricingBlock />
+            <div className="bg-gray-50 rounded-xl p-3 text-center mt-auto">
               <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider mb-1">Statusas</p>
               <p className="text-sm font-bold text-cyan-500">Grupės pilnos</p>
             </div>
@@ -463,13 +490,35 @@ export default function GrupinesPamokos() {
                   </div>
                 </div>
 
-                <Button
-                  type="submit"
-                  disabled={status === "loading"}
-                  className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 mt-2 h-auto rounded-2xl font-bold text-lg transition-transform hover:-translate-y-1 shadow-lg disabled:opacity-70 disabled:hover:translate-y-0 w-full sm:w-auto self-center"
-                >
-                  {status === "loading" ? "Siunčiama..." : "Registruotis į grupę"}
-                </Button>
+                {/* Apsaugos frazės įvestis */}
+                <div className="text-left mt-2">
+                  <label className="block text-blue-100 mb-2 text-sm ml-2">
+                    Apsaugai nuo šlamšto, prašome tiksliai įvesti šią frazę: <br/>
+                    <span className="font-bold text-white text-base">suprantu, kad kaina yra nuo 22 eur</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={phrase}
+                    onChange={(e) => setPhrase(e.target.value)}
+                    placeholder="Įveskite patvirtinimo frazę..."
+                    disabled={status === "loading"}
+                    className={`${inputBase} ${okRing}`}
+                  />
+                </div>
+
+                {/* Mygtukas rodomas TIK TADA, kai frazė teisinga */}
+                {phrase.trim().toLowerCase() === "suprantu, kad kaina yra nuo 22 eur" && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+                    <Button
+                      type="submit"
+                      disabled={status === "loading"}
+                      className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 mt-4 h-auto rounded-2xl font-bold text-lg transition-transform hover:-translate-y-1 shadow-lg disabled:opacity-70 disabled:hover:translate-y-0 w-full sm:w-auto self-center"
+                    >
+                      {status === "loading" ? "Siunčiama..." : "Registruotis į grupę"}
+                    </Button>
+                  </motion.div>
+                )}
+
               </form>
             )}
             
