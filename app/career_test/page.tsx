@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -61,7 +60,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
       // (e.g., "pi_12345_secret_abc" -> "pi_12345")
       const intentId = data.paymentIntentId || data.clientSecret.split('_secret')[0];
       
-      // 2. Save BOTH phone number and payment_intent_id to Supabase
+      // 2. Save phone number, payment_intent_id, and AMOUNT to Supabase
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
       
@@ -72,7 +71,8 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
           .insert([{ 
             number: phoneNumber,
             payment_intent_id: intentId,
-            status: 'pending' // Explicitly marking it pending until the webhook confirms it
+            status: 'pending',
+            amount: CONSULTATION_PRICE // <-- PRIDĖTA SUMA, KAD IŠSPRĘSTŲ KLAIDĄ
           }]);
           
         if (supabaseError) {
@@ -710,4 +710,3 @@ export default function KarjerosPristatymas() {
     </div>
   );
 }
-
