@@ -311,7 +311,7 @@ export default function GrupinesPamokos() {
             </div>
             <h2 className="text-2xl font-bold text-gray-900 mb-3">Prancūzų kalba</h2>
             <p className="text-gray-600 mb-4 flex-grow text-sm leading-relaxed">
-              Išmokite meilės ir diplomatijos kalbą. Praktinės užduotys, akcentas į tarimą bei laisvą bendravimą.
+              Išmokite meilės ir diplomatijos kalbą. Praktinės užduotys, akcentas į tarimą bei laisvą bendravimą. Mokoma anglų- prancūzų kalbomis.
             </p>
             <PricingBlock />
             <div className="bg-gray-50 rounded-xl p-3 text-center mt-auto">
@@ -450,7 +450,7 @@ export default function GrupinesPamokos() {
                 Prisijunkite prie laukiančiųjų sąrašo
               </h2>
               <p className="text-blue-100 leading-relaxed">
-                Palikite savo kontaktus, o mes susisieksime, kai tik bus renkama jūsų pasirinkta grupė.
+                Palikite savo kontaktus, o mes susisieksime, kai tik bus renkama jūsų pasirinkta grupė. Mokoma anglų- prancūzų kalbomis.
               </p>
             </div>
 
