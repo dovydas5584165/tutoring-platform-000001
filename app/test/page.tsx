@@ -30,6 +30,7 @@ import {
   Lock,
   ChevronDown,
   ChevronUp,
+  AlertTriangle,
 } from "lucide-react";
 import {
   RadarChart,
@@ -52,9 +53,16 @@ const CONSULTATION_PRICE = 65; // must match the amount /api/create-payment-inte
 const CONTACT_EMAIL = 'info.tiksliukai@gmail.com';
 const BRAND_BLUE = '#5170FF';
 
+// Math is treated as "lacking" when the numerical-aptitude category is at or below this % (3 questions: 0 or 1 correct)
+const LOW_MATH_THRESHOLD = 33;
+const NUMERIC_QUESTION_COUNT = 3;
+
 // ============================================================================
 // DATA & TYPES
 // ============================================================================
+
+type EuUni = { name: string; program: string };
+type AltItem = { name: string; programs: string };
 
 const LAMA_BPO_GENERAL_INFO = {
   mandatoryNotice: "Stojant į Lietuvos aukštąsias mokyklas (VF ir VNF su stipendija) PRIVALOMA būti išlaikius Matematikos VBE, Lietuvių k. ir literatūros VBE bei 3-ią pasirinktą VBE.",
@@ -80,7 +88,12 @@ const RESULTS = {
       { name: "VU Matematikos ir informatikos fak.", score: "KB: >8.8" },
       { name: "VILNIUS TECH", score: "KB: >7.5" },
     ],
-    uniEu: "TU Delft (Olandija), ETH Zurich (Šveicarija), Miuncheno technikos universitetas",
+    uniEu: [
+      { name: "TU Delft (Olandija)", program: "BSc: Aerospace Engineering, Computer Science & Engineering, Nanobiology, Applied Earth Sciences (anglų k.)" },
+      { name: "Eindhoveno technologijos universitetas, TU/e (Olandija)", program: "Inžinerijos bakalauro programos, daugumos dėstomos anglų k. (patikrinkite konkrečią programą)" },
+      { name: "Twente universitetas (Olandija)", program: "BSc Electrical Engineering, Technical Computer Science (anglų k.)" },
+      { name: "Danijos technikos universitetas, DTU (Danija)", program: "BSc General Engineering (vienintelė pilnai anglų k. bakalauro programa)" },
+    ] as EuUni[],
     famousPeople: [
       { name: "Elon Musk", role: "Tesla & SpaceX įkūrėjas" },
       { name: "Bill Gates", role: "Microsoft įkūrėjas" },
@@ -118,7 +131,11 @@ const RESULTS = {
       { name: "LSMU (Sveikatos psichologija)", score: "KB: >8.5" },
       { name: "VDU Socialinių mokslų fak.", score: "KB: >7.0" },
     ],
-    uniEu: "Amsterdamo universitetas (Olandija), KU Leuven (Belgija), Kopenhagos universitetas",
+    uniEu: [
+      { name: "Amsterdamo universitetas (Olandija)", program: "BSc Psychology (anglų k.; patikrinkite uva.nl)" },
+      { name: "Groningeno universitetas (Olandija)", program: "BSc Psychology (anglų k., numerus fixus)" },
+      { name: "Mastrichto universitetas (Olandija)", program: "BSc Psychology (anglų k. kryptis)" },
+    ] as EuUni[],
     famousPeople: [
       { name: "Oprah Winfrey", role: "TV laidų vedėja, filantropė" },
       { name: "Michelle Obama", role: "Advokatė, rašytoja" },
@@ -156,7 +173,12 @@ const RESULTS = {
       { name: "LMTA (Muzikos ir teatro)", score: "KB: Stojamasis" },
       { name: "VU Kūrybinės industrijos", score: "KB: >6.5" },
     ],
-    uniEu: "UAL Londonas (JK), Dizaino akademija Eindhoven (Olandija), Aalto universitetas (Suomija)",
+    uniEu: [
+      { name: "UAL Londonas (JK)", program: "Dizaino ir meno bakalauro programos anglų k." },
+      { name: "Dizaino akademija Eindhoven (Olandija)", program: "BA Design, 4 metai (anglų k.)" },
+      { name: "Gerrit Rietveld Academie (Olandija)", program: "Bakalauro programa (dėstoma anglų k.)" },
+      { name: "Hanze taikomųjų mokslų universitetas (Olandija)", program: "BA Design (anglų k.)" },
+    ] as EuUni[],
     famousPeople: [
       { name: "Steve Jobs", role: "Apple įkūrėjas" },
       { name: "Coco Chanel", role: "Dizainerė" },
@@ -194,7 +216,12 @@ const RESULTS = {
       { name: "VU Verslo mokykla", score: "KB: >7.5" },
       { name: "KTU Ekonomikos ir verslo fak.", score: "KB: >6.5" },
     ],
-    uniEu: "SSE Stokholmas (Švedija), IE verslo mokykla (Ispanija), HEC Paryžius (Prancūzija)",
+    uniEu: [
+      { name: "SSE Stokholmas (Švedija)", program: "BSc Business & Economics, BSc Retail Management (anglų k.)" },
+      { name: "IE verslo mokykla (Ispanija)", program: "Bachelor in Business Administration (anglų k.)" },
+      { name: "Roterdamo vadybos mokykla RSM (Olandija)", program: "BSc International Business Administration (anglų k.)" },
+      { name: "Kopenhagos verslo mokykla CBS (Danija)", program: "BSc International Business ir kitos anglų k. programos" },
+    ] as EuUni[],
     famousPeople: [
       { name: "Jeff Bezos", role: "Amazon įkūrėjas" },
       { name: "Richard Branson", role: "Virgin Group įkūrėjas" },
@@ -232,7 +259,11 @@ const RESULTS = {
       { name: "VU Medicinos fak.", score: "KB: >9.2" },
       { name: "VU Gyvybės mokslų centras", score: "KB: >8.5" },
     ],
-    uniEu: "Heidelbergo universitetas (Vokietija), Karolinska Institutet (Švedija), Sorbona (Prancūzija)",
+    uniEu: [
+      { name: "Varšuvos medicinos universitetas (Lenkija)", program: "6 m. Medicina (MD), anglų k. skyrius" },
+      { name: "Karolio universitetas, Praha (Čekija)", program: "General Medicine (anglų k., mokama)" },
+      { name: "Semmelweiso universitetas (Vengrija)", program: "General Medicine, Dentistry, Pharmacy (anglų k.)" },
+    ] as EuUni[],
     famousPeople: [
       { name: "Marie Curie", role: "Mokslininkė, Nobelio premijos laurentė" },
       { name: "Angela Merkel", role: "Politikė, kvantinės chemijos daktarė" },
@@ -254,6 +285,69 @@ const RESULTS = {
       { title: "Teisės patarėjas", salary: "2000-5000€", description: "Teikia teisines konsultacijas įmonėms ar asmenims, rengia sutartis ir dokumentus." },
       { title: "Kokybės kontrolės inspektorius", salary: "1400-2800€", description: "Užtikrina, kad gaminiai ar paslaugos atitiktų griežčiausius nustatytus standartus." },
       { title: "Veterinaras", salary: "1500-3500€", description: "Diagnozuoja ir gydo gyvūnų ligas, atlieka operacijas ir rūpinasi jų sveikata." },
+    ],
+  },
+};
+
+// Shown when the numerical-aptitude result is low. Names verified against Lithuanian government/directory sources;
+// programme lists change (several colleges were merged in 2024), so the report tells students to re-check on AIKOS / LAMA BPO.
+const ALT_PATHS: Record<"A" | "B" | "C" | "D" | "E", { colleges: AltItem[]; vocationalSchools: AltItem[] }> = {
+  A: {
+    colleges: [
+      { name: "Lietuvos inžinerijos kolegija (anksčiau Kauno technikos kolegija)", programs: "Inžinerijos, elektronikos ir IT studijų programos" },
+      { name: "Vilniaus kolegija", programs: "Elektronikos, informatikos ir technologijų programos (2024 m. perėmė Vilniaus technologijų ir dizaino kolegiją)" },
+      { name: "Klaipėdos valstybinė kolegija", programs: "Technologijų ir informacinių technologijų programos" },
+    ],
+    vocationalSchools: [
+      { name: "Kauno informacinių technologijų mokykla (KITM)", programs: "Žiniatinklio programuotojas, kompiuterių tinklų derintojas, multimedijos paslaugų teikėjas, mobiliosios elektronikos taisytojas" },
+      { name: "Klaipėdos technologijų mokymo centras", programs: "Jaunesnysis programuotojas (Java, JavaScript, C#, Python), jaunesnysis testuotojas" },
+      { name: "Panevėžio mokymo centras", programs: "Multimedijos technikas, .NET programuotojas, IT aptarnavimo technikas" },
+    ],
+  },
+  B: {
+    colleges: [
+      { name: "Kauno kolegija", programs: "Sveikatos, socialinio darbo ir pedagogikos programos" },
+      { name: "Vilniaus kolegija", programs: "Sveikatos priežiūros, socialinio darbo ir pedagogikos programos" },
+      { name: "Panevėžio kolegija", programs: "Slaugos, socialinio darbo ir ugdymo programos" },
+    ],
+    vocationalSchools: [
+      { name: "Karaliaus Mindaugo profesinio mokymo centras (Kaunas)", programs: "Slaugytojo padėjėjas, socialinio darbuotojo padėjėjas, masažuotojas, paramedikas" },
+      { name: "Klaipėdos Ernesto Galvanausko profesinio mokymo centras", programs: "Slaugytojo padėjėjas, masažuotojas, paramedikas" },
+    ],
+  },
+  C: {
+    colleges: [
+      { name: "Vilniaus kolegija", programs: "Dizaino ir technologijų programos (perėmė Vilniaus technologijų ir dizaino kolegiją)" },
+      { name: "Kauno kolegija", programs: "Dizaino, menų ir ugdymo programos (patikrinkite aktualią pasiūlą AIKOS)" },
+    ],
+    vocationalSchools: [
+      { name: "Kauno taikomosios dailės mokykla", programs: "Interjero apipavidalintojas, floristinis dekoravimas, elektroninės leidybos maketuotojas, meninių amatų specialybės" },
+      { name: "Karaliaus Mindaugo profesinio mokymo centras (Kaunas)", programs: "Kosmetikas, visažistas" },
+    ],
+  },
+  D: {
+    colleges: [
+      { name: "Vilniaus kolegija", programs: "Verslo vadyba, rinkodara, logistika" },
+      { name: "Kauno kolegija", programs: "Verslo vadyba, turizmas, logistika" },
+      { name: "Klaipėdos valstybinė kolegija", programs: "Verslo, logistikos ir rinkodaros programos" },
+      { name: "Panevėžio kolegija", programs: "Verslo ir vadybos programos" },
+    ],
+    vocationalSchools: [
+      { name: "Profesinio mokymo centras „Žirmūnai“ (Vilnius)", programs: "Turizmo, apgyvendinimo ir maitinimo paslaugų programos; logistas" },
+      { name: "Panevėžio mokymo centras", programs: "Pardavėjas konsultantas, e. pardavėjas-konsultantas, apskaitininkas" },
+      { name: "Kauno informacinių technologijų mokykla (KITM)", programs: "Apskaitininkas ir kasininkas, bankinių operacijų tvarkytojas" },
+    ],
+  },
+  E: {
+    colleges: [
+      { name: "Kauno kolegija", programs: "Sveikatos ir biomedicinos srities programos" },
+      { name: "Vilniaus kolegija", programs: "Sveikatos priežiūros programos" },
+      { name: "Panevėžio kolegija", programs: "Slaugos ir apskaitos programos" },
+    ],
+    vocationalSchools: [
+      { name: "Karaliaus Mindaugo profesinio mokymo centras (Kaunas)", programs: "Slaugytojo padėjėjas, paramedikas, gyvūnų prižiūrėtojas" },
+      { name: "Klaipėdos Ernesto Galvanausko profesinio mokymo centras", programs: "Paramedikas, slaugytojo padėjėjas, masažuotojas" },
+      { name: "Kauno informacinių technologijų mokykla (KITM)", programs: "Apskaitininkas ir kasininkas" },
     ],
   },
 };
@@ -768,6 +862,12 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
   const overallPct = Math.round((aptitude.correctTotal / APTITUDE_QUESTIONS.length) * 100);
   const band = getAptitudeBand(overallPct);
 
+  // Math level check (numerical-aptitude category)
+  const numericPct: number = aptitude.byCategoryPct?.numerine ?? 100;
+  const numericCorrect = Math.round((numericPct / 100) * NUMERIC_QUESTION_COUNT);
+  const lowMath = numericPct <= LOW_MATH_THRESHOLD;
+  const altPaths = ALT_PATHS[resultKey as TypeKey];
+
   const radarData = Object.keys(DIMENSION_SHORT).map((key) => ({
     subject: DIMENSION_SHORT[key as keyof typeof DIMENSION_SHORT],
     key,
@@ -826,6 +926,59 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
       </div>
 
       <div className="p-6 md:p-12 space-y-2">
+        {/* ---------- LOW MATH: WARNING + COLLEGES / VOCATIONAL SCHOOLS ON TOP ---------- */}
+        {lowMath && (
+          <div className="report-section mb-10 break-inside-avoid rounded-2xl border-2 border-amber-300 bg-amber-50 p-6 md:p-8">
+            <div className="flex items-start gap-3 mb-4">
+              <AlertTriangle className="w-6 h-6 text-amber-700 mt-0.5 shrink-0" />
+              <div>
+                <h3 className="text-lg md:text-xl font-bold text-amber-900" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                  Dėmesio: matematikos lygis kol kas nepakankamas
+                </h3>
+                <p className="text-sm text-amber-900 leading-relaxed mt-2">
+                  Skaičiavimo užduotyse teisingai atsakei į <span className="font-bold">{numericCorrect} iš {NUMERIC_QUESTION_COUNT}</span> klausimų.
+                  Tai trumpas testas, todėl tai ne nuosprendis, bet aiškus signalas. Stojant į universitetus (VF ir VNF su stipendija)
+                  Matematikos VBE yra privalomas, o su dabartiniu lygiu jį išlaikyti bus sunku.
+                </p>
+                <p className="text-sm text-amber-900 leading-relaxed mt-2 font-semibold">
+                  Jei tikslas – universitetas, pradėk sistemingai mokytis matematikos jau dabar (pagrindai, procentai, sekos, lygtys, VBE užduočių praktika).
+                  Jei matematika nėra tavo kelias, žemiau rasi kolegijų ir profesinių mokyklų, kuriose matematikos krūvis dažnai mažesnis, o profesiją gali įgyti greičiau.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 mt-6">
+              <div className="bg-white rounded-2xl border border-amber-200 p-5">
+                <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Kolegijos</h5>
+                <ul className="space-y-3">
+                  {altPaths.colleges.map((c, i) => (
+                    <li key={i}>
+                      <div className="text-sm font-semibold text-slate-800">{c.name}</div>
+                      <div className="text-xs text-slate-600 mt-0.5">{c.programs}</div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-white rounded-2xl border border-amber-200 p-5">
+                <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Profesinės mokyklos</h5>
+                <ul className="space-y-3">
+                  {altPaths.vocationalSchools.map((s, i) => (
+                    <li key={i}>
+                      <div className="text-sm font-semibold text-slate-800">{s.name}</div>
+                      <div className="text-xs text-slate-600 mt-0.5">{s.programs}</div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <p className="text-xs text-amber-800 leading-relaxed mt-4">
+              Kolegijų ir profesinių mokyklų programų pasiūla bei stojimo reikalavimai keičiasi (2024 m. kai kurios kolegijos buvo sujungtos),
+              todėl aktualią informaciją būtinai pasitikrink LAMA BPO ir AIKOS (aikos.smm.lt) svetainėse.
+            </p>
+          </div>
+        )}
+
         <ReportSection icon={<Compass className="w-5 h-5 text-slate-700" />} title="Rezultatų santrauka">
           <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 md:p-8">
             <span className="inline-block py-1 px-3 rounded-full bg-slate-800 text-white text-xs font-bold tracking-widest uppercase mb-4">
@@ -959,6 +1112,12 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
                     <li key={idx}>{crit}</li>
                   ))}
                 </ul>
+                {lowMath && (
+                  <p className="text-xs text-amber-900 font-bold mt-3">
+                    Atsižvelgiant į tavo skaičiavimo rezultatą: universitetams reikalingam Matematikos VBE šiuo metu trūksta pasirengimo –
+                    pradėk mokytis iš anksto arba apsvarstyk ataskaitos pradžioje pateiktas kolegijas ir profesines mokyklas.
+                  </p>
+                )}
               </div>
             </div>
           </div>
@@ -982,12 +1141,18 @@ function ResultsView({ result, resultKey, scores, aptitude, respondentName, date
               </ul>
             </div>
             <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5">
-              <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Universitetai Europoje</h5>
-              <ul className="space-y-2">
-                {result.uniEu.split(",").map((uni: string, i: number) => (
-                  <li key={i} className="text-sm text-slate-700">{uni.trim()}</li>
+              <h5 className="font-bold text-slate-800 mb-3 text-sm uppercase tracking-wide">Universitetai Europoje (programos anglų k.)</h5>
+              <ul className="space-y-3">
+                {result.uniEu.map((uni: EuUni, i: number) => (
+                  <li key={i}>
+                    <div className="text-sm font-semibold text-slate-800">{uni.name}</div>
+                    <div className="text-xs text-slate-600 mt-0.5">{uni.program}</div>
+                  </li>
                 ))}
               </ul>
+              <p className="text-[11px] text-slate-400 mt-3 leading-snug">
+                Programų kalbą ir stojimo sąlygas visada patikrink universiteto svetainėje.
+              </p>
             </div>
           </div>
         </ReportSection>
