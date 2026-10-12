@@ -57,12 +57,11 @@ const BRAND_BLUE = '#5170FF';
 // ============================================================================
 
 const LAMA_BPO_GENERAL_INFO = {
-  mandatoryNotice: "Stojant į Lietuvos aukštąsias mokyklas (VF ir VNF su stipendija) PRIVALOMA būti išlaikius Matematikos VBE (išskyrus menų studijas) ir Lietuvių k. ir literatūros VBE bei 3-ią pasirinktą VBE.",
+  mandatoryNotice: "Stojant į Lietuvos aukštąsias mokyklas (VF ir VNF su stipendija) PRIVALOMA būti išlaikius Matematikos VBE, Lietuvių k. ir literatūros VBE bei 3-ią pasirinktą VBE.",
   minCriteria: [
     "Ne mažiau 3 valstybiniai brandos egzaminai (VBE): Lietuvių k., Matematika + 1 pasirinktinis VBE.",
-    "Minimali VBE išlaikymo ribinė reikšmė: pasiekta pagrindinio pasiekimų lygio riba (≥16 balų).",
-    "5 geriausių dalykų metinių įvertinimų vidurkis: ne mažesnis nei 7 (universitetuose) arba 6 (kolegijose).",
-    "Minimalus konkursinis balas (KB): paprastai ≥ 5.4 universitetuose ir ≥ 4.3 kolegijose (tikslina kiekviena aukštoji mokykla).",
+    "Minimali VBE išlaikymo ribinė reikšmė: pasiekta pagrindinio pasiekimų lygio riba (≥25 balų).",
+    "Minimalus konkursinis balas (KB): paprastai ≥ 5.4 universitetuose ir ≥ 3.3 kolegijose (tikslina kiekviena aukštoji mokykla).",
   ]
 };
 
