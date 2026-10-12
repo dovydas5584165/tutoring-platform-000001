@@ -400,13 +400,15 @@ export default function KarjerosPristatymas() {
 
       {/* --- FEATURE SECTION --- */}
       <section id="verte" className="py-24 container mx-auto px-6">
-        <div className="text-center max-w-2xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900 tracking-tight">
             Mokslu pagrįsta ir specialistų patvirtinta metodika
           </h2>
-          <p className="text-slate-600 text-base leading-relaxed">
-            Diagnostikai taikomas tarptautiniu mastu pripažintas vertinimo modelis, naudojamas organizacijų psichologijoje,
-            pritaikytas akademiniam ir profesiniam nukreipimui.
+          <p className="text-slate-600 text-base leading-relaxed mb-4">
+            Diagnostikos algoritmas sukurtas apjungiant pasaulyje pripažintas ir laiko patikrintas psichologijos teorijas. Vertinimo struktūra remiasi <strong>„Didžiojo penketo“ (angl. Big Five / OCEAN)</strong> asmenybės bruožų modelio konceptais, <strong>profesinių interesų tipologijos (paremtos J. Holland RIASEC teorija)</strong> principais, adaptuotais į penkias esmines sritis, bei <strong>darbo aplinkos preferencijų (angl. Preference Inventory)</strong> analize, plačiai taikoma organizacinėje psichologijoje.
+          </p>
+          <p className="text-slate-500 text-sm leading-relaxed">
+            Tai – unikali, savarankiška šių akademinių tyrimų sintezė, specialiai pritaikyta moksleivių ir abiturientų akademiniam bei karjeros planavimui.
           </p>
         </div>
 
@@ -414,22 +416,22 @@ export default function KarjerosPristatymas() {
           {[
             {
               title: 'Kompetencijų profilis',
-              desc: 'Atskleidžiamos esminės asmenybės savybės: analitiniai gebėjimai, lyderystė, struktūruotas mąstymas ar kūrybinis potencialas.',
+              desc: 'Remiantis OCEAN asmenybės savybėmis atskleidžiamas analitinis, lyderystės, struktūruoto mąstymo ar kūrybinis potencialas.',
               paid: false,
             },
             {
               title: 'Profesinės kryptys',
-              desc: 'Nemokamai matote 3 geriausiai tinkančias kryptis. Pilną 10+ krypčių sąrašą su paaiškinimais aptariame konsultacijoje.',
+              desc: '5 sričių interesų analizė parodo 3 geriausiai tinkančias kryptis. Pilną 10+ krypčių sąrašą aptariame konsultacijoje.',
               paid: false,
             },
             {
               title: 'Akademinis planas',
-              desc: 'Tikslus valstybinių brandos egzaminų (VBE) ir akademinių reikalavimų suderinimas su pasirinktomis sritimis.',
+              desc: 'Tikslus valstybinių brandos egzaminų (VBE) ir akademinių reikalavimų suderinimas su jūsų asmenybės profiliu.',
               paid: true,
             },
             {
               title: 'Darbo ir mokymosi stilius',
-              desc: 'Informacijos įsisavinimo specifikos, streso valdymo bei efektyvumo didinimo rekomendacijos.',
+              desc: 'Elgsenos preferencijų vertinimas parodo informacijos įsisavinimo specifiką ir aplinkos, kurioje jaučiatės geriausiai, tipą.',
               paid: false,
             },
           ].map((item, idx) => (
