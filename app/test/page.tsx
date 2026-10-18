@@ -2,8 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
 import {
   CheckCircle2,
   XCircle,
@@ -27,9 +25,6 @@ import {
   CheckSquare,
   Users,
   ShieldCheck,
-  Lock,
-  ChevronDown,
-  ChevronUp,
   AlertTriangle,
   Layers,
 } from "lucide-react";
@@ -43,17 +38,7 @@ import {
   Tooltip,
 } from "recharts";
 
-// --- IMPORT CHECKOUT FORM (Up 2 levels) ---
-import CheckoutForm from '../../components/CheckoutForm';
-
-// Initialize Stripe
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
 // --- CONFIGURATION ---
-const CONSULTATION_PRICE = 65; // must match the amount /api/create-payment-intent charges for 'career_test'
-const CONTACT_EMAIL = 'info.tiksliukai@gmail.com';
-const BRAND_BLUE = '#5170FF';
-
 // Math is treated as "lacking" when the numerical-aptitude category is at or below this % (3 questions: 0 or 1 correct)
 const LOW_MATH_THRESHOLD = 33;
 const NUMERIC_QUESTION_COUNT = 3;
@@ -977,157 +962,6 @@ function buildTraitNarrative(result: ResultData, secondary?: ResultData) {
 // COMPONENTS
 // ============================================================================
 
-// --- CONSULTATION PAYMENT MODAL ---
-function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [clientSecret, setClientSecret] = useState('');
-  const [error, setError] = useState('');
-  const [showDetails, setShowDetails] = useState(false);
-
-  useEffect(() => {
-    if (isOpen && !clientSecret) {
-      fetch('/api/create-payment-intent', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ product_type: 'career_test' }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.error) throw new Error(data.error);
-          setClientSecret(data.clientSecret);
-        })
-        .catch((err) => {
-          console.error(err);
-          setError('Nepavyko inicijuoti mokėjimo. Bandykite vėliau.');
-        });
-    }
-  }, [isOpen, clientSecret]);
-
-  if (!isOpen) return null;
-
-  const appearance = {
-    theme: 'stripe' as const,
-    variables: {
-      colorPrimary: BRAND_BLUE,
-      borderRadius: '8px',
-      fontSizeBase: '15px',
-      fontFamily: 'ui-sans-serif, system-ui, sans-serif',
-    },
-  };
-
-  // After payment Stripe sends the user back to this same page; a banner then explains how to book.
-  const returnUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}${window.location.pathname}?paid=consultation`
-      : '';
-
-  return (
-    <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center sm:p-4">
-      <div className="absolute inset-0 bg-slate-950/70 backdrop-blur-md transition-opacity" onClick={onClose} />
-
-      <div className="relative bg-white w-full h-[95vh] md:h-auto md:max-h-[90vh] md:max-w-4xl rounded-t-2xl md:rounded-2xl shadow-2xl flex flex-col md:flex-row overflow-hidden transition-all transform border border-slate-200">
-        <button
-          onClick={onClose}
-          className="md:hidden absolute top-4 right-4 z-20 p-2 bg-slate-100 rounded-full text-slate-500 hover:bg-slate-200 transition-colors"
-          aria-label="Uždaryti"
-        >
-          <X size={18} />
-        </button>
-
-        {/* --- LEFT SIDE (SUMMARY) --- */}
-        <div className="bg-slate-900 text-white md:w-2/5 flex-shrink-0 border-b md:border-b-0 md:border-r border-slate-800">
-          <div className="p-6 md:p-8 flex flex-col justify-between h-full">
-            <div>
-              <h3 className="text-lg font-semibold tracking-wide text-slate-200 mb-2 md:mb-6">Užsakymo suvestinė</h3>
-
-              <div className="flex justify-between items-end mb-4 md:hidden">
-                <span className="text-slate-400 font-medium text-sm">Suma:</span>
-                <span className="text-2xl font-semibold text-white">{CONSULTATION_PRICE.toFixed(2)} €</span>
-              </div>
-
-              <button
-                onClick={() => setShowDetails(!showDetails)}
-                className="flex items-center gap-1 text-slate-300 text-xs font-semibold uppercase tracking-wider md:hidden mb-4"
-              >
-                {showDetails ? 'Slėpti detales' : 'Kas įeina'}
-                {showDetails ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-              </button>
-
-              <div
-                className={`${showDetails ? 'block' : 'hidden'} md:block bg-slate-800/80 p-5 rounded-xl border border-slate-700/60 transition-all`}
-              >
-                <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: BRAND_BLUE }}>
-                  Asmeninė konsultacija
-                </span>
-                <p className="font-semibold text-white text-base leading-snug mt-1">Karjeros testo rezultatų aptarimas</p>
-                <ul className="mt-4 space-y-2.5 text-xs text-slate-300 leading-relaxed">
-                  <li className="pl-3 border-l-2 border-slate-700">Pokalbis su karjeros konsultantu.</li>
-                  <li className="pl-3 border-l-2 border-slate-700">Pilnas 10+ geriausiai tinkančių krypčių sąrašas su paaiškinimais.</li>
-                  <li className="pl-3 border-l-2 border-slate-700">Individualus VBE ir studijų planas.</li>
-                  <li className="pl-3 font-medium text-slate-200" style={{ borderLeft: `2px solid ${BRAND_BLUE}` }}>
-                    Atsakymai į jūsų klausimus apie specialybes ir stojimą.
-                  </li>
-                </ul>
-              </div>
-
-              <div className="mt-5 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
-                <span className="font-semibold text-white">Po apmokėjimo:</span> parašykite el. paštu{' '}
-                <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2" style={{ color: BRAND_BLUE }}>
-                  {CONTACT_EMAIL}
-                </a>{' '}
-                ir suderinsime jums tinkamą susitikimo laiką.
-              </div>
-            </div>
-
-            <div className="hidden md:block mt-6 pt-6 border-t border-slate-800">
-              <div className="flex justify-between items-end">
-                <span className="text-slate-400 text-sm font-medium">Iš viso:</span>
-                <span className="text-3xl font-semibold text-white">{CONSULTATION_PRICE.toFixed(2)} €</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* --- RIGHT SIDE (STRIPE FORM) --- */}
-        <div className="flex-1 bg-white flex flex-col h-full overflow-hidden">
-          <button
-            onClick={onClose}
-            className="hidden md:block absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors z-10"
-            aria-label="Uždaryti"
-          >
-            <X size={18} />
-          </button>
-
-          <div className="overflow-y-auto p-6 md:p-8 h-full pb-20 md:pb-8">
-            <h2 className="text-xl font-semibold text-slate-900 mb-1">Apmokėjimas</h2>
-            <p className="text-slate-500 text-xs mb-6">Saugus atsiskaitymas. Patvirtinimą gausite iškart po apmokėjimo.</p>
-
-            {!clientSecret && !error && (
-              <div className="flex justify-center items-center py-12">
-                <div className="animate-spin rounded-full h-7 w-7 border-b-2" style={{ borderBottomColor: BRAND_BLUE }}></div>
-              </div>
-            )}
-
-            {error && (
-              <div className="bg-red-50 text-red-700 p-4 rounded-lg border border-red-200 mb-4 text-xs">{error}</div>
-            )}
-
-            {clientSecret && (
-              <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
-                <CheckoutForm returnUrl={returnUrl} />
-              </Elements>
-            )}
-
-            <div className="mt-8 text-center text-[10px] text-slate-400 uppercase tracking-widest font-semibold">
-              256-bit SSL šifruotas mokėjimas
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-
 function ProfessionModal({ profession, onClose }: { profession: Profession | null, onClose: () => void }) {
   if (!profession) return null;
   return (
@@ -1227,7 +1061,6 @@ function StudyBlock({ data, heading }: { data: ResultData; heading?: string }) {
 
 function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, aptitude, respondentName, dateStr, onRestart }: any) {
   const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const primary: ResultData = result;
   const second: ResultData = secondary;
@@ -1288,9 +1121,23 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
     </p>
   );
 
-  // Professions: 3 from the main profile visible; blurred preview comes from the secondary profile
-  const blurred = (second ? second.professions : primary.professions.slice(3)).slice(0, 3);
-  const totalProfessions = primary.professions.length + (second ? second.professions.length : 0);
+  // Grid of clickable profession cards (used for both the primary and the secondary profile)
+  const professionGrid = (list: Profession[]) => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {list.map((prof, i) => (
+        <div
+          key={i}
+          onClick={() => setSelectedProfession(prof)}
+          className="bg-white p-5 rounded-xl border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between h-full"
+        >
+          <h4 className="font-bold text-base text-slate-800 mb-2">{prof.title}</h4>
+          <span className="text-xs font-extrabold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 self-start">
+            {prof.salary}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <motion.div
@@ -1307,8 +1154,6 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
           .break-inside-avoid { break-inside: avoid; }
         }
       `}</style>
-
-      <PaymentModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
 
       <AnimatePresence>
         {selectedProfession && <ProfessionModal profession={selectedProfession} onClose={() => setSelectedProfession(null)} />}
@@ -1545,22 +1390,11 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
         </ReportSection>
 
         <ReportSection icon={<Building2 className="w-5 h-5 text-slate-700" />} title="Stipendijos ir finansavimo galimybės">
-          <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 p-6">
-            <div className="blur-[6px] opacity-60 select-none pointer-events-none">
-              <h4 className="font-bold text-slate-800 mb-2">Valstybės finansuojamos vietos (VF)</h4>
-              <p className="text-sm text-slate-700 mb-4">Gaukite pilną studijų kainos padengimą. Reikalavimai: 3 išlaikyti valstybiniai brandos egzaminai, kurių balų vidurkis ne mažesnis nei nustatyta norma...</p>
-              <h4 className="font-bold text-slate-800 mb-2">Skatinamosios stipendijos</h4>
-              <p className="text-sm text-slate-700 mb-4">Už puikius akademinius rezultatus universitetai skiria nuo 50€ iki 250€ per mėnesį, priklausomai nuo pasirinktos krypties ir pažymių vidurkio...</p>
-              <h4 className="font-bold text-slate-800 mb-2">Tikslinės išmokos</h4>
-              <p className="text-sm text-slate-700">Specialios išmokos regionų plėtrai, prioritetinių ir trūkstamoms profesijoms, skiriamos papildomos lėšos studentų rėmimui ir integracijai į darbo rinką...</p>
-            </div>
-            {/* Overlay */}
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100/30 backdrop-blur-[2px] z-10">
-               <Lock className="w-8 h-8 text-slate-700 mb-3" />
-               <div onClick={() => setIsCheckoutOpen(true)} className="bg-slate-900 text-white px-6 py-3 rounded-full font-bold shadow-xl flex items-center gap-2 cursor-pointer hover:bg-slate-800 transition-colors pointer-events-auto">
-                 Atrakinti stipendijų informaciją
-               </div>
-            </div>
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6">
+            <p className="text-slate-800 text-base font-semibold">Aptariama konsultacijos metu.</p>
+            <p className="text-slate-600 text-sm leading-relaxed mt-2">
+              Stipendijos ir finansavimo galimybės yra labai individualios, todėl jas peržiūrime kartu pagal tavo situaciją.
+            </p>
           </div>
         </ReportSection>
 
@@ -1568,41 +1402,16 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
           <p className="text-xs text-slate-500 mb-4 flex items-center gap-1 no-print">
             <Info className="w-3.5 h-3.5" /> Paspausk kortelę informacijai
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 relative">
-            {/* First 3 of the main profile are shown clearly */}
-            {primary.professions.slice(0, 3).map((prof, i) => (
-              <div
-                key={i}
-                onClick={() => setSelectedProfession(prof)}
-                className="bg-white p-5 rounded-xl border border-slate-200 hover:border-slate-400 hover:shadow-md transition-all cursor-pointer flex flex-col justify-between h-full relative z-20"
-              >
-                <h4 className="font-bold text-base text-slate-800 mb-2">{prof.title}</h4>
-                <span className="text-xs font-extrabold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 self-start">
-                  {prof.salary}
-                </span>
-              </div>
-            ))}
-
-            {/* Blurred preview from the secondary profile */}
-            {blurred.map((prof, i) => (
-              <div
-                key={i + 3}
-                className="bg-white p-5 rounded-xl border border-slate-200 flex flex-col justify-between h-full select-none blur-[6px] opacity-70 pointer-events-none"
-              >
-                <h4 className="font-bold text-base text-slate-800 mb-2">{prof.title}</h4>
-                <span className="text-xs font-extrabold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-lg border border-slate-200 self-start">
-                  {prof.salary}
-                </span>
-              </div>
-            ))}
-
-            {/* Overlay for the hidden section */}
-            <div className="absolute inset-0 top-1/2 flex items-center justify-center pointer-events-none z-10">
-               <div onClick={() => setIsCheckoutOpen(true)} className="bg-slate-900/90 text-white px-6 py-3 rounded-full font-bold shadow-xl backdrop-blur-sm pointer-events-auto cursor-pointer flex items-center gap-2 hover:bg-slate-800 transition-all">
-                 <Lock className="w-4 h-4" /> Atrakinti visas {totalProfessions} profesijų (abiejų profilių)
-               </div>
-            </div>
-          </div>
+          <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wide mb-3">{primary.title}</h4>
+          {professionGrid(primary.professions)}
+          {second && (
+            <>
+              <h4 className="text-sm font-bold text-slate-500 uppercase tracking-wide mt-8 mb-3">
+                Antrinis profilis: {second.title}
+              </h4>
+              {professionGrid(second.professions)}
+            </>
+          )}
         </ReportSection>
 
         <div className="pt-8 flex flex-wrap justify-center gap-4 no-print">
@@ -1637,17 +1446,7 @@ export default function CareerQuiz() {
   const [aptAnswers, setAptAnswers] = useState(Array(APTITUDE_QUESTIONS.length).fill(null));
   const [timeLeft, setTimeLeft] = useState(20);
 
-  const [showPaidBanner, setShowPaidBanner] = useState(false);
-
   const dateStr = new Date().toLocaleDateString("lt-LT", { year: "numeric", month: "long", day: "numeric" });
-
-  useEffect(() => {
-    // Returning from Stripe after a successful consultation payment
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('paid') === 'consultation' && params.get('redirect_status') === 'succeeded') {
-      setShowPaidBanner(true);
-    }
-  }, []);
 
   const startGame = () => {
     setCurrentIdx(0);
@@ -1768,25 +1567,7 @@ export default function CareerQuiz() {
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-800 font-sans flex flex-col w-full h-full relative">
-      {/* --- PAID CONFIRMATION BANNER --- */}
-      {showPaidBanner && (
-        <div className="text-white text-sm w-full z-50 sticky top-0" style={{ backgroundColor: BRAND_BLUE }}>
-          <div className="container mx-auto px-6 py-4 flex items-start justify-between gap-4">
-            <p className="leading-relaxed">
-              Ačiū, konsultacija apmokėta. Parašykite{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold underline underline-offset-2">
-                {CONTACT_EMAIL}
-              </a>{' '}
-              ir suderinsime jums patogų laiką.
-            </p>
-            <button onClick={() => setShowPaidBanner(false)} aria-label="Uždaryti" className="p-1 hover:opacity-80">
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-      )}
-
-      <div className={`bg-slate-900 px-4 py-4 md:px-8 text-white flex justify-between items-center z-10 shadow-md no-print ${showPaidBanner ? 'relative' : 'sticky top-0'}`}>
+      <div className="bg-slate-900 px-4 py-4 md:px-8 text-white flex justify-between items-center z-10 shadow-md no-print sticky top-0">
         <div className="flex items-center">
           <span className="font-bold tracking-widest text-lg md:text-xl" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
             TIKSLIUKAI.LT
