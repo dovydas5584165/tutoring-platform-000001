@@ -139,7 +139,7 @@ const RESULTS: Record<TypeKey, ResultData> = {
     ],
   },
   B: {
-    title: "Žmonių Palydėtojas (Socialinis-Emocinis)",
+    title: "Empatas (Socialinis-Emocinis)",
     summary:
       "Tavo stiprybė – empatija ir gebėjimas būti šalia. Tu jauti kitų emocijas, gebi išklausyti, palaikyti ir padėti rasti kelią sunkiu metu. Tau svarbu darbas, turintis prasmę.",
     positives: ["Empatija", "Klausymo įgūdžiai", "Diplomatija", "Kantrybė"],
@@ -154,8 +154,8 @@ const RESULTS: Record<TypeKey, ResultData> = {
     ],
     uniEu: [
       { name: "Amsterdamo universitetas (Olandija)", program: "BSc Psychology (anglų k.; patikrinkite uva.nl)" },
-      { name: "Groningeno universitetas (Olandija)", program: "BSc Psychology (anglų k., numerus fixus)" },
-      { name: "Mastrichto universitetas (Olandija)", program: "BSc Psychology (anglų k. kryptis)" },
+      { name: "Groningeno universitetas (Olandija)", program: "BSc Psychology (anglų k.)" },
+      { name: "Mastrichto universitetas (Olandija)", program: "BSc Psychology (anglų k.)" },
     ],
     famousPeople: [
       { name: "Oprah Winfrey", role: "TV laidų vedėja, filantropė" },
@@ -183,7 +183,7 @@ const RESULTS: Record<TypeKey, ResultData> = {
     negatives: ["Perfekcionizmas", "Sunkumas priimti kritiką", "Per ilgas detalių derinimas"],
     communication:
       "Mąstai vaizdais, todėl geriausiai paaiškini eskizais ir pavyzdžiais. Draugai vertina tavo skonį ir gebėjimą pastebėti tai, ko kiti nemato.",
-    exams: "Matematika (VBE), Lietuvių k. (VBE), Anglų k. (VBE), Dailės / architektūros stojamasis egzaminas ar portfelis (architektūrai ir dizainui).",
+    exams: "Matematika (VBE - Privalomas), Lietuvių k. (VBE), Anglų k. (VBE), Dailės / architektūros stojamasis egzaminas ar portfelis (architektūrai ir dizainui).",
     uniLt: [
       { name: "VILNIUS TECH Architektūros fak.", score: "KB: >7.5 + egz." },
       { name: "Vilniaus Dailės Akademija (VDA) – dizainas", score: "Portfelis + egz." },
@@ -374,7 +374,7 @@ const RESULTS: Record<TypeKey, ResultData> = {
       "Kalbi struktūruotai ir įtikinamai. Mėgsti diskusijas ir debatus, o draugai tave kviečia kaip „teisėją“ ginčuose.",
     exams: "Lietuvių k. (VBE), Matematika (VBE - Privalomas), Istorija arba Anglų k. (VBE).",
     uniLt: [
-      { name: "VU Teisės fak.", score: "KB: >9.0" },
+      { name: "VU Teisės fak.", score: "KB: >8.0" },
       { name: "MRU Teisės mokykla", score: "KB: >8.0" },
       { name: "VU Tarptautinių santykių ir politikos mokslų inst.", score: "KB: >8.5" },
       { name: "VDU Teisės fak.", score: "KB: >7.5" },
@@ -412,10 +412,10 @@ const RESULTS: Record<TypeKey, ResultData> = {
       "Esi socialus ir lengvai užmezgi pokalbį. Moki papasakoti istoriją, todėl tave mielai klausosi.",
     exams: "Lietuvių k. (VBE), Anglų k. (VBE), Matematika (VBE - Privalomas), Istorija (kai kuriose programose).",
     uniLt: [
-      { name: "VU Komunikacijos fak.", score: "KB: >8.0" },
-      { name: "KTU Socialinių, humanitarinių mokslų ir menų fak.", score: "KB: >6.5" },
-      { name: "MRU Komunikacijos ir vadybos programos", score: "KB: >7.0" },
-      { name: "VDU Humanitarinių mokslų fak.", score: "KB: >6.5" },
+      { name: "VU Komunikacijos fak.", score: "KB: >6.0" },
+      { name: "KTU Socialinių, humanitarinių mokslų ir menų fak.", score: "KB: >5" },
+      { name: "MRU Komunikacijos ir vadybos programos", score: "KB: >5.0" },
+      { name: "VDU Humanitarinių mokslų fak.", score: "KB: >5.5" },
     ],
     uniEu: [
       { name: "Amsterdamo universitetas (Olandija)", program: "BA Communication Science (anglų k.)" },
@@ -746,7 +746,7 @@ const RAW: Record<TypeKey, string[]> = {
     "Pamatęs neefektyvų procesą, iškart noriu parašyti skriptą, kuris jį automatizuotų.",
     "Patiktų jungti grandines ir bandyti prototipą, kol jis pradės veikti.",
     "Man malonu mokytis naujos technologijos kas kelis mėnesius, nes ši sritis nuolat keičiasi.",
-    "Patiktų analizuoti, kaip programišius galėtų įsilaužti į sistemą, ir ją užtaisyti.",
+    "Patiktų įsilaužti į įvairias informacines sistemas.",
     "Įdomu, kaip veikia dirbtinis intelektas, ir norėčiau išmokyti modelį atpažinti paveikslėlius.",
     "Patiktų projektuoti roboto ranką, kuri tiksliai paima trapų daiktą.",
     "Mielai dalyvaučiau hakatone ir per parą sukurčiau veikiantį prototipą.",
@@ -793,7 +793,7 @@ const RAW: Record<TypeKey, string[]> = {
     "Patiktų paaiškinti pacientui vaisto vartojimo taisykles ir sąveiką su kitais vaistais.",
     "Mielai dirbčiau pagal griežtus medicininius protokolus, nes jie užtikrina saugumą.",
     "Patiktų gydyti gyvūnus ir aiškintis, kas jiems negerai, nors jie negali papasakoti.",
-    "Nebijau ilgai mokytis (6 metus ar daugiau), kad taptau gydytoju ar odontologu.",
+    "Nebijau ilgai mokytis (6 metus ar daugiau), kad tapčiau gydytoju ar odontologu.",
     "Galėčiau budėti naktį, jei reikėtų padėti sergančiam žmogui.",
     "Patiktų padėti žmogui po traumos vėl išmokti vaikščioti ar rašyti.",
     "Jei ligoninėje pacientui reikėtų specialaus maitinimo, pasirūpinčiau, kad jis gautų būtent tai, kas jam tinka.",
@@ -855,7 +855,7 @@ const RAW: Record<TypeKey, string[]> = {
     "Mėgčiau animuoti trumpą filmuką, kuriame kiekvienas kadras kruopščiai apgalvotas.",
     "Patiktų kurti muziką ar garso takelį filmui ar žaidimui.",
     "Mielai dirbčiau chaotišku grafiku, jei darbas leistų išreikšti save.",
-    "Galėčiau ištisas valandas piešti ar tapyti, kad pagaučiau nuotaiką.",
+    "Galėčiau ištisas valandas piešti ar tapyti, kad pagaučiau tinkamą vaibą.",
     "Eiti į muziejus ir galerijas ieškoti idėjų darbui man būtų malonus darbo dienos dalis.",
     "Man svarbu, kad tai, ką sukuriu, sukeltų žmonėms emociją.",
   ],
