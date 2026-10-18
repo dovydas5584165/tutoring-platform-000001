@@ -1,3 +1,4 @@
+// app/api/create-payment-intent/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerStripe } from '../../../lib/stripe'; // Keep your existing helper
 import { supabase } from '../../../lib/supabaseClient';
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     const stripe = getServerStripe();
 
-    const TEST_PRICE_CENTS = 6500; // 14.00 EUR
+    const TEST_PRICE_CENTS = 11900; // 119.00 EUR (Pašaukimas: test + consultation)
 
     // ==========================================
     // SCENARIO 1: Tutoring Booking (Existing Logic)
@@ -73,11 +74,11 @@ export async function POST(request: NextRequest) {
     }
 
     // ==========================================
-    // SCENARIO 2: Career Test (New Logic)
+    // SCENARIO 2: Career Test (Pašaukimas + consultation)
     // ==========================================
     else if (product_type === 'career_test') {
-      // Fixed price: 30.00 EUR
-      const amount = TEST_PRICE_CENTS; 
+      // Fixed price: 119.00 EUR
+      const amount = TEST_PRICE_CENTS;
 
       const paymentIntent = await stripe.paymentIntents.create({
         amount: amount,
@@ -85,7 +86,7 @@ export async function POST(request: NextRequest) {
         automatic_payment_methods: { enabled: true },
         metadata: {
           product_type: 'career_test',
-          product_name: 'Karjeros analizė 2026',
+          product_name: 'Pašaukimas',
           type: 'digital_good'
         },
       });
@@ -101,7 +102,7 @@ export async function POST(request: NextRequest) {
     // ==========================================
     else {
       return NextResponse.json(
-        { error: 'Missing bookingId or product_type' }, 
+        { error: 'Missing bookingId or product_type' },
         { status: 400 }
       );
     }
