@@ -15,33 +15,45 @@ import CheckoutForm from '../../components/CheckoutForm';
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
 
 // --- CONFIGURATION ---
-const CONSULTATION_PRICE = 65; 
+const TEST_NAME = 'Pašaukimas';
+const PACKAGE_PRICE = 119; // test + consultation, EUR
 const CONTACT_EMAIL = 'info.tiksliukai@gmail.com';
 const BRAND_BLUE = '#5170FF';
-const PAGE_TITLE = 'Tiksliukai. Nemokamas karjeros testas';
-const FREE_TEST_PATH = '/test-start?payment_intent=pi_3SuJh43JaNQeVNtM0AgvnIeI'; 
+const PAGE_TITLE = 'Pašaukimas. Karjeros testas ir konsultacija';
+// After a successful payment Stripe redirects here and appends
+// ?payment_intent=...&redirect_status=succeeded (same format the test page already expects)
+const TEST_START_PATH = '/test-start';
 
-// --- CONSULTATION PAYMENT MODAL ---
+// --- PAYMENT MODAL ---
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  const router = useRouter();
+
   const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
   const [showDetails, setShowDetails] = useState(false);
-  
+
   // Phone number step states
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isPhoneSubmitted, setIsPhoneSubmitted] = useState(false);
   const [isLoadingPayment, setIsLoadingPayment] = useState(false);
 
+  // Access code states
+  const [showCode, setShowCode] = useState(false);
+  const [code, setCode] = useState('');
+  const [codeError, setCodeError] = useState('');
+  const [isCheckingCode, setIsCheckingCode] = useState(false);
+
   useEffect(() => {
     if (!isOpen) {
       setError('');
+      setCodeError('');
     }
   }, [isOpen]);
 
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phoneNumber) return;
-    
+
     setIsLoadingPayment(true);
     setError('');
 
@@ -52,29 +64,29 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ product_type: 'career_test', phone: phoneNumber }),
       });
-      
+
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      // Extract the Payment Intent ID directly from the clientSecret 
+      // Extract the Payment Intent ID directly from the clientSecret
       // (e.g., "pi_12345_secret_abc" -> "pi_12345")
       const intentId = data.paymentIntentId || data.clientSecret.split('_secret')[0];
-      
-      // 2. Save phone number, payment_intent_id, and AMOUNT to Supabase
+
+      // 2. Save phone number, payment_intent_id, and amount to Supabase
       const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
       const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-      
+
       if (supabaseUrl && supabaseKey) {
         const supabase = createClient(supabaseUrl, supabaseKey);
-        const { error: supabaseError } = await supabase
-          .from('purchases')
-          .insert([{ 
+        const { error: supabaseError } = await supabase.from('purchases').insert([
+          {
             number: phoneNumber,
             payment_intent_id: intentId,
             status: 'pending',
-            amount: CONSULTATION_PRICE // <-- PRIDĖTA SUMA, KAD IŠSPRĘSTŲ KLAIDĄ
-          }]);
-          
+            amount: PACKAGE_PRICE,
+          },
+        ]);
+
         if (supabaseError) {
           console.error('Supabase insert error:', supabaseError);
         }
@@ -92,6 +104,36 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
     }
   };
 
+  // Validates the code on the server and, if valid, sends the person straight to the test
+  const handleCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!code.trim()) return;
+
+    setIsCheckingCode(true);
+    setCodeError('');
+
+    try {
+      const res = await fetch('/api/redeem-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.url) {
+        setCodeError('Neteisingas kodas.');
+        return;
+      }
+
+      router.push(data.url);
+    } catch (err) {
+      console.error(err);
+      setCodeError('Nepavyko patikrinti kodo. Bandykite dar kartą.');
+    } finally {
+      setIsCheckingCode(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   const appearance = {
@@ -104,10 +146,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
     },
   };
 
-  const returnUrl =
-    typeof window !== 'undefined'
-      ? `${window.location.origin}${window.location.pathname}?paid=consultation`
-      : '';
+  const returnUrl = typeof window !== 'undefined' ? `${window.location.origin}${TEST_START_PATH}` : '';
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end md:items-center justify-center sm:p-4">
@@ -130,7 +169,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
               <div className="flex justify-between items-end mb-4 md:hidden">
                 <span className="text-slate-400 font-medium text-sm">Suma:</span>
-                <span className="text-2xl font-semibold text-white">{CONSULTATION_PRICE.toFixed(2)} €</span>
+                <span className="text-2xl font-semibold text-white">{PACKAGE_PRICE.toFixed(2)} €</span>
               </div>
 
               <button
@@ -145,10 +184,11 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                 className={`${showDetails ? 'block' : 'hidden'} md:block bg-slate-800/80 p-5 rounded-xl border border-slate-700/60 transition-all`}
               >
                 <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: BRAND_BLUE }}>
-                  Asmeninė konsultacija
+                  {TEST_NAME}
                 </span>
-                <p className="font-semibold text-white text-base leading-snug mt-1">Karjeros testo rezultatų aptarimas</p>
+                <p className="font-semibold text-white text-base leading-snug mt-1">Karjeros testas ir konsultacija</p>
                 <ul className="mt-4 space-y-2.5 text-xs text-slate-300 leading-relaxed">
+                  <li className="pl-3 border-l-2 border-slate-700">Karjeros testas „{TEST_NAME}“.</li>
                   <li className="pl-3 border-l-2 border-slate-700">Pokalbis su karjeros konsultantu.</li>
                   <li className="pl-3 border-l-2 border-slate-700">Pilnas 10+ geriausiai tinkančių krypčių sąrašas su paaiškinimais.</li>
                   <li className="pl-3 border-l-2 border-slate-700">Individualus VBE ir studijų planas.</li>
@@ -159,24 +199,25 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
               </div>
 
               <div className="mt-5 bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 text-xs text-slate-300 leading-relaxed">
-                <span className="font-semibold text-white">Po apmokėjimo:</span> parašykite el. paštu{' '}
+                <span className="font-semibold text-white">Po apmokėjimo</span> iškart pateksite į testą. Atlikę jį, parašykite
+                el. paštu{' '}
                 <a href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2" style={{ color: BRAND_BLUE }}>
                   {CONTACT_EMAIL}
                 </a>{' '}
-                ir suderinsime jums tinkamą susitikimo laiką. Galioja 3 mėnesius po apmokėjimo.
+                ir suderinsime jums tinkamą konsultacijos laiką. Galioja 3 mėnesius po apmokėjimo.
               </div>
             </div>
 
             <div className="hidden md:block mt-6 pt-6 border-t border-slate-800">
               <div className="flex justify-between items-end">
                 <span className="text-slate-400 text-sm font-medium">Iš viso:</span>
-                <span className="text-3xl font-semibold text-white">{CONSULTATION_PRICE.toFixed(2)} €</span>
+                <span className="text-3xl font-semibold text-white">{PACKAGE_PRICE.toFixed(2)} €</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* --- RIGHT SIDE (STRIPE FORM) --- */}
+        {/* --- RIGHT SIDE (PHONE / CODE / STRIPE FORM) --- */}
         <div className="flex-1 bg-white flex flex-col h-full overflow-hidden">
           <button
             onClick={onClose}
@@ -195,39 +236,87 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
             )}
 
             {!isPhoneSubmitted ? (
-              // STEP 1: Phone Number Collection
-              <form onSubmit={handlePhoneSubmit} className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    Jūsų telefono numeris
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    required
-                    value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
-                    placeholder="+370 600 00000"
-                    className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:border-transparent outline-none transition-all text-slate-900"
-                    style={{ focusRingColor: BRAND_BLUE }}
-                  />
-                  <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
-                    Reikalingas norint sklandžiai susisiekti ir suderinti konsultacijos laiką.
-                  </p>
-                </div>
-                <button
-                  type="submit"
-                  disabled={isLoadingPayment}
-                  className="w-full text-white font-semibold py-3 px-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-70 flex justify-center items-center shadow-md"
-                  style={{ backgroundColor: BRAND_BLUE }}
-                >
-                  {isLoadingPayment ? (
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                  ) : (
-                    'Tęsti apmokėjimą'
+              <>
+                {/* STEP 1: Phone Number Collection */}
+                <form onSubmit={handlePhoneSubmit} className="space-y-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <div>
+                    <label htmlFor="phone" className="block text-sm font-semibold text-slate-700 mb-1.5">
+                      Jūsų telefono numeris
+                    </label>
+                    <input
+                      type="tel"
+                      id="phone"
+                      required
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      placeholder="+370 600 00000"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#5170FF] focus:border-transparent outline-none transition-all text-slate-900"
+                    />
+                    <p className="text-[11px] text-slate-500 mt-2 leading-relaxed">
+                      Reikalingas norint sklandžiai susisiekti ir suderinti konsultacijos laiką.
+                    </p>
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={isLoadingPayment}
+                    className="w-full text-white font-semibold py-3 px-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-70 flex justify-center items-center shadow-md"
+                    style={{ backgroundColor: BRAND_BLUE }}
+                  >
+                    {isLoadingPayment ? (
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                    ) : (
+                      'Tęsti apmokėjimą'
+                    )}
+                  </button>
+                </form>
+
+                {/* ACCESS CODE OPTION */}
+                <div className="mt-8 pt-6 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setShowCode(!showCode)}
+                    className="flex items-center gap-1 text-sm font-medium"
+                    style={{ color: BRAND_BLUE }}
+                  >
+                    Turite prieigos kodą?
+                    {showCode ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  </button>
+
+                  {showCode && (
+                    <form onSubmit={handleCodeSubmit} className="mt-4 space-y-3 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                      <label htmlFor="access-code" className="block text-sm font-semibold text-slate-700">
+                        Prieigos kodas
+                      </label>
+                      <input
+                        type="text"
+                        id="access-code"
+                        value={code}
+                        onChange={(e) => {
+                          setCode(e.target.value);
+                          setCodeError('');
+                        }}
+                        autoComplete="off"
+                        autoCapitalize="none"
+                        spellCheck={false}
+                        placeholder="Įveskite kodą"
+                        className="w-full px-4 py-3 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#5170FF] focus:border-transparent outline-none transition-all text-slate-900"
+                      />
+                      {codeError && <p className="text-xs text-red-600">{codeError}</p>}
+                      <button
+                        type="submit"
+                        disabled={isCheckingCode || !code.trim()}
+                        className="w-full bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 font-semibold py-3 px-4 rounded-xl transition-all disabled:opacity-60 flex justify-center items-center"
+                      >
+                        {isCheckingCode ? (
+                          <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-slate-500"></div>
+                        ) : (
+                          'Pradėti testą su kodu'
+                        )}
+                      </button>
+                    </form>
                   )}
-                </button>
-              </form>
+                </div>
+              </>
             ) : (
               // STEP 2: Stripe Checkout
               <div className="animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -257,26 +346,13 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
 // --- MAIN LANDING PAGE COMPONENT ---
 export default function KarjerosPristatymas() {
-  const router = useRouter();
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [showPaidBanner, setShowPaidBanner] = useState(false);
 
   useEffect(() => {
     document.title = PAGE_TITLE;
-
-    // Returning from Stripe after a successful consultation payment
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('paid') === 'consultation' && params.get('redirect_status') === 'succeeded') {
-      setShowPaidBanner(true);
-    }
   }, []);
 
-  const handleFreeClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    router.push(FREE_TEST_PATH);
-  };
-
-  const handleConsultationClick = (e: React.MouseEvent) => {
+  const handleBuyClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setIsCheckoutOpen(true);
   };
@@ -284,24 +360,6 @@ export default function KarjerosPristatymas() {
   return (
     <div className="bg-slate-50 text-slate-900 font-sans antialiased">
       <PaymentModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />
-
-      {/* --- PAID CONFIRMATION BANNER --- */}
-      {showPaidBanner && (
-        <div className="text-white text-sm" style={{ backgroundColor: BRAND_BLUE }}>
-          <div className="container mx-auto px-6 py-4 flex items-start justify-between gap-4">
-            <p className="leading-relaxed">
-              Ačiū, konsultacija apmokėta. Parašykite{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="font-semibold underline underline-offset-2">
-                {CONTACT_EMAIL}
-              </a>{' '}
-              ir suderinsime jums patogų laiką.
-            </p>
-            <button onClick={() => setShowPaidBanner(false)} aria-label="Uždaryti" className="p-1 hover:opacity-80">
-              <X size={16} />
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* --- HERO SECTION --- */}
       <section className="relative overflow-hidden bg-white py-24 lg:py-32 border-b border-slate-200/80">
@@ -312,13 +370,13 @@ export default function KarjerosPristatymas() {
             </span>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-slate-900 mb-6 leading-[1.1]">
-              Tiksliukai. <span className="font-normal text-slate-500">Nemokamas karjeros testas.</span>
+              {TEST_NAME}. <span className="font-normal text-slate-500">Karjeros testas ir konsultacija.</span>
             </h1>
 
             <p className="text-base sm:text-lg text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto font-normal">
               Daugiau nei 30% studentų pakeičia arba nutraukia studijas dėl skubotų sprendimų. Atlikite mokslu pagrįstą
-              asmenybės bei elgsenos testą, sužinokite savo kompetencijų profilį ir 3 geriausiai tinkančias profesines
-              kryptis. Jei norėsite aiškaus plano, rezultatus galėsite aptarti su karjeros konsultantu.
+              asmenybės bei elgsenos testą, sužinokite savo kompetencijų profilį ir geriausiai tinkančias profesines
+              kryptis, o su karjeros konsultantu sudarykite aiškų planą.
             </p>
 
             <div className="w-full max-w-2xl mb-10 rounded-2xl overflow-hidden border border-slate-200">
@@ -331,27 +389,27 @@ export default function KarjerosPristatymas() {
 
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto justify-center">
               <button
-                onClick={handleFreeClick}
+                onClick={handleBuyClick}
                 className="flex items-center justify-center gap-3 text-white px-8 py-4 rounded-xl font-medium text-base transition-all hover:opacity-90"
                 style={{ backgroundColor: BRAND_BLUE }}
               >
-                Atlikti nemokamą testą
+                Įsigyti ({PACKAGE_PRICE} €)
               </button>
 
               <Link
-                href="#konsultacija"
+                href="#kaip-veikia"
                 className="flex items-center justify-center gap-2 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-xl font-medium text-base transition-all"
               >
-                Konsultacija ({CONSULTATION_PRICE} €)
+                Kaip tai veikia
               </Link>
             </div>
 
             <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 font-medium border-t border-slate-100 pt-8">
-              <span>Nemokama, be kortelės</span>
+              <span>Vienkartinis mokėjimas</span>
               <span className="hidden sm:inline-block text-slate-300">•</span>
               <span>Rezultatai per 30 minučių</span>
               <span className="hidden sm:inline-block text-slate-300">•</span>
-              <span>Konsultacija – tik jei jos norėsite</span>
+              <span>Konsultacija įskaičiuota</span>
             </div>
           </div>
         </div>
@@ -371,22 +429,21 @@ export default function KarjerosPristatymas() {
                 brangus laikas, patiriamas akademinis stresas ir neapibrėžtumas dėl ateities.
               </p>
               <p className="text-white text-base leading-relaxed font-medium">
-                Testas nieko nekainuoja. Jis parodys, kurios kryptys jums artimiausios, o jei po jo liks klausimų, galėsite
-                juos aptarti su konsultantu.
+                „{TEST_NAME}“ parodo, kurios kryptys jums artimiausios, o konsultacija padeda jas paversti aiškiu planu.
               </p>
             </div>
 
             <div className="bg-white/10 backdrop-blur-sm p-8 rounded-2xl border border-white/15 relative">
               <div className="absolute -top-3 -right-3 bg-slate-950 border border-white/10 text-white text-xs font-semibold px-3 py-1 rounded-full">
-                Nemokamai
+                {PACKAGE_PRICE} €
               </div>
-              <h3 className="text-xl font-semibold mb-6 text-white border-b border-white/15 pb-4">Ką gausite atlikę testą?</h3>
+              <h3 className="text-xl font-semibold mb-6 text-white border-b border-white/15 pb-4">Ką gausite?</h3>
               <ul className="space-y-3.5">
                 {[
                   'Savo kompetencijų ir asmenybės profilį.',
-                  '3 geriausiai tinkančias profesines kryptis.',
+                  'Pilną 10+ geriausiai tinkančių profesinių krypčių sąrašą.',
                   'Darbo ir mokymosi stiliaus apžvalgą.',
-                  'Nepriklausomus, duomenimis pagrįstus rezultatus be išorinio spaudimo.',
+                  'Asmeninę konsultaciją ir individualų VBE bei studijų planą.',
                 ].map((item, i) => (
                   <li key={i} className="pl-3 text-white/90 text-sm leading-relaxed border-l-2 border-white/50">
                     {item}
@@ -417,35 +474,30 @@ export default function KarjerosPristatymas() {
             {
               title: 'Kompetencijų profilis',
               desc: 'Remiantis OCEAN asmenybės savybėmis atskleidžiamas analitinis, lyderystės, struktūruoto mąstymo ar kūrybinis potencialas.',
-              paid: false,
+              tag: 'Testas',
             },
             {
               title: 'Profesinės kryptys',
-              desc: '5 sričių interesų analizė parodo 3 geriausiai tinkančias kryptis. Pilną 10+ krypčių sąrašą aptariame konsultacijoje.',
-              paid: false,
+              desc: '5 sričių interesų analizė parodo geriausiai tinkančias kryptis. Pilną 10+ krypčių sąrašą aptariame konsultacijoje.',
+              tag: 'Testas ir konsultacija',
             },
             {
               title: 'Akademinis planas',
               desc: 'Tikslus valstybinių brandos egzaminų (VBE) ir akademinių reikalavimų suderinimas su jūsų asmenybės profiliu.',
-              paid: true,
+              tag: 'Konsultacija',
             },
             {
               title: 'Darbo ir mokymosi stilius',
               desc: 'Elgsenos preferencijų vertinimas parodo informacijos įsisavinimo specifiką ir aplinkos, kurioje jaučiatės geriausiai, tipą.',
-              paid: false,
+              tag: 'Testas',
             },
           ].map((item, idx) => (
             <div
               key={idx}
               className="bg-white p-8 rounded-2xl border border-slate-200/80 hover:border-slate-300 transition-all duration-200"
             >
-              <span
-                className={`inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full mb-4 ${
-                  item.paid ? 'text-white' : 'bg-slate-100 text-slate-600'
-                }`}
-                style={item.paid ? { backgroundColor: BRAND_BLUE } : undefined}
-              >
-                {item.paid ? 'Su konsultacija' : 'Nemokamai'}
+              <span className="inline-block text-[11px] font-semibold px-2.5 py-1 rounded-full mb-4 bg-slate-100 text-slate-600">
+                {item.tag}
               </span>
               <h3 className="text-lg font-semibold mb-2 text-slate-900">{item.title}</h3>
               <p className="text-slate-600 text-xs leading-relaxed">{item.desc}</p>
@@ -455,15 +507,15 @@ export default function KarjerosPristatymas() {
       </section>
 
       {/* --- HOW IT WORKS --- */}
-      <section id="kaip-veikia" className="py-24 bg-white border-t border-slate-200/80">
+      <section id="kaip-veikia" className="py-24 bg-white border-t border-slate-200/80 scroll-mt-8">
         <div className="container mx-auto px-6 max-w-5xl">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <div className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: BRAND_BLUE }}>
-              Pradėkite nemokamai
+              Trys žingsniai
             </div>
             <h2 className="text-3xl lg:text-4xl font-bold mb-4 text-slate-900 tracking-tight">Procesas ir eiga</h2>
             <p className="text-slate-600 text-base">
-              Testas ir rezultatai nemokami. Konsultaciją galite užsisakyti iškart arba grįžę prie rezultatų vėliau.
+              Apmokėjus iškart pradedate testą, o konsultacijos laiką suderiname po jo.
             </p>
           </div>
 
@@ -481,9 +533,9 @@ export default function KarjerosPristatymas() {
                 >
                   01
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-slate-900">Nemokamas testas</h3>
+                <h3 className="text-lg font-semibold mb-2 text-slate-900">Testas</h3>
                 <p className="text-slate-600 text-xs leading-relaxed">
-                  Spauskite mygtuką ir pradėkite iškart. Klausimyno užpildymas užtrunka apie 30 minučių.
+                  Apmokėkite ir pradėkite iškart. Klausimyno užpildymas užtrunka apie 30 minučių.
                 </p>
               </div>
             </div>
@@ -503,7 +555,7 @@ export default function KarjerosPristatymas() {
                 </div>
                 <h3 className="text-lg font-semibold mb-2 text-slate-900">Rezultatai</h3>
                 <p className="text-slate-600 text-xs leading-relaxed">
-                  Iškart matote savo kompetencijų profilį ir 3 geriausiai tinkančias kryptis.
+                  Iškart matote savo kompetencijų profilį ir geriausiai tinkančias kryptis.
                 </p>
               </div>
             </div>
@@ -521,9 +573,9 @@ export default function KarjerosPristatymas() {
                 >
                   03
                 </div>
-                <h3 className="text-lg font-semibold mb-2 text-slate-900">Konsultacija (nebūtina)</h3>
+                <h3 className="text-lg font-semibold mb-2 text-slate-900">Konsultacija</h3>
                 <p className="text-slate-600 text-xs leading-relaxed mb-4">
-                  Jei norite pilno krypčių sąrašo ir individualaus plano, aptarkite rezultatus su karjeros konsultantu.
+                  Aptarkite rezultatus su karjeros konsultantu ir gaukite pilną krypčių sąrašą bei individualų planą.
                 </p>
                 <Link
                   href="#konsultacija"
@@ -538,7 +590,7 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      {/* --- CONSULTATION SECTION --- */}
+      {/* --- PACKAGE / CONSULTATION SECTION --- */}
       <section id="konsultacija" className="py-24 container mx-auto px-6 max-w-5xl scroll-mt-8">
         <div className="grid md:grid-cols-2 gap-12 items-start">
           <div>
@@ -574,14 +626,15 @@ export default function KarjerosPristatymas() {
           <div className="bg-white rounded-2xl border-2 p-8" style={{ borderColor: BRAND_BLUE }}>
             <div className="flex items-end justify-between border-b border-slate-100 pb-5 mb-5">
               <div>
-                <h3 className="text-lg font-semibold text-slate-900">Asmeninė konsultacija</h3>
+                <h3 className="text-lg font-semibold text-slate-900">{TEST_NAME}: testas ir konsultacija</h3>
                 <p className="text-slate-500 text-xs mt-1">Vienkartinis mokėjimas</p>
               </div>
-              <div className="text-3xl font-bold text-slate-900">{CONSULTATION_PRICE} €</div>
+              <div className="text-3xl font-bold text-slate-900">{PACKAGE_PRICE} €</div>
             </div>
 
             <ul className="space-y-3 mb-8">
               {[
+                `Karjeros testas „${TEST_NAME}“`,
                 'Rezultatų aptarimas su karjeros konsultantu',
                 'Pilnas 10+ geriausiai tinkančių krypčių sąrašas su paaiškinimais',
                 'Individualus VBE ir studijų planas',
@@ -594,18 +647,14 @@ export default function KarjerosPristatymas() {
             </ul>
 
             <button
-              onClick={handleConsultationClick}
+              onClick={handleBuyClick}
               className="w-full text-white px-8 py-4 rounded-xl font-medium text-base transition-all hover:opacity-90"
               style={{ backgroundColor: BRAND_BLUE }}
             >
-              Užsakyti konsultaciją ({CONSULTATION_PRICE} €)
+              Įsigyti ({PACKAGE_PRICE} €)
             </button>
             <p className="mt-3 text-xs text-slate-500 text-center leading-relaxed">
-              Dar neatlikote testo?{' '}
-              <button onClick={handleFreeClick} className="font-medium underline underline-offset-2" style={{ color: BRAND_BLUE }}>
-                Pradėkite nemokamai
-              </button>
-              . Konsultaciją galėsite užsisakyti ir vėliau.
+              Turite prieigos kodą? Įveskite jį apmokėjimo lange.
             </p>
           </div>
         </div>
@@ -669,27 +718,20 @@ export default function KarjerosPristatymas() {
       {/* --- FOOTER / FINAL CTA --- */}
       <section className="py-24 text-center container mx-auto px-6">
         <div className="bg-white rounded-3xl py-16 px-6 border border-slate-200/80 max-w-4xl mx-auto">
-          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 tracking-tight">Pradėkite nuo nemokamo testo</h2>
+          <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 mb-4 tracking-tight">Pradėkite nuo „{TEST_NAME}“</h2>
           <p className="text-base text-slate-600 mb-10 max-w-xl mx-auto leading-relaxed">
-            Atsakykite į klausimyno teiginius ir gaukite savo profilį bei 3 tinkamiausias kryptis. Jei norėsite aiškaus
-            plano, konsultaciją galėsite užsisakyti bet kada.
+            Atlikite testą, gaukite savo profilį ir tinkamiausias kryptis, o konsultacijoje sudarykite aiškų planą.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button
-              onClick={handleFreeClick}
+              onClick={handleBuyClick}
               className="inline-flex items-center gap-3 text-white px-10 py-4 rounded-xl font-medium text-lg transition-all hover:opacity-90"
               style={{ backgroundColor: BRAND_BLUE }}
             >
-              Atlikti nemokamą testą
-            </button>
-            <button
-              onClick={handleConsultationClick}
-              className="inline-flex items-center gap-3 bg-white border border-slate-300 hover:bg-slate-50 text-slate-700 px-8 py-4 rounded-xl font-medium text-base transition-all"
-            >
-              Užsakyti konsultaciją ({CONSULTATION_PRICE} €)
+              Įsigyti ({PACKAGE_PRICE} €)
             </button>
           </div>
-          <p className="mt-4 text-xs text-slate-400">Testas nemokamas. Konsultacija – vienkartinis {CONSULTATION_PRICE} € mokėjimas.</p>
+          <p className="mt-4 text-xs text-slate-400">Testas ir konsultacija – vienkartinis {PACKAGE_PRICE} € mokėjimas.</p>
         </div>
       </section>
 
