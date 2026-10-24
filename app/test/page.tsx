@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   CheckCircle2,
@@ -1062,6 +1062,93 @@ function StudyBlock({ data, heading }: { data: ResultData; heading?: string }) {
 function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, aptitude, respondentName, dateStr, onRestart }: any) {
   const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null);
 
+  // --- PDF export ---
+  const reportRef = useRef<HTMLDivElement>(null);
+  const [pdfBusy, setPdfBusy] = useState(false);
+
+  const downloadPdf = async () => {
+    if (!reportRef.current || pdfBusy) return;
+    setPdfBusy(true);
+    try {
+      const [{ default: html2canvas }, { jsPDF }] = await Promise.all([
+        import("html2canvas-pro"),
+        import("jspdf"),
+      ]);
+
+      const pdf = new jsPDF({ unit: "mm", format: "a4" });
+      const pageW = pdf.internal.pageSize.getWidth();
+      const pageH = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const gap = 5;
+      const contentW = pageW - margin * 2;
+      const contentH = pageH - margin * 2;
+
+      // Each block (header + every report section) is rendered separately,
+      // so page breaks fall between sections instead of cutting through text.
+      const blocks = Array.from(
+        reportRef.current.querySelectorAll<HTMLElement>("[data-pdf-header], .report-section")
+      );
+
+      let y = margin;
+      for (const block of blocks) {
+        const canvas = await html2canvas(block, {
+          scale: 2,
+          backgroundColor: "#ffffff",
+          useCORS: true,
+          windowWidth: 1100, // render at desktop width, even on phones
+          ignoreElements: (el) => el.classList?.contains("no-print"),
+        });
+        if (!canvas.width || !canvas.height) continue;
+
+        const blockH = (canvas.height * contentW) / canvas.width;
+
+        if (blockH <= contentH) {
+          if (y + blockH > pageH - margin) {
+            pdf.addPage();
+            y = margin;
+          }
+          pdf.addImage(canvas.toDataURL("image/jpeg", 0.92), "JPEG", margin, y, contentW, blockH);
+          y += blockH + gap;
+        } else {
+          // Block taller than one page: slice it across pages
+          if (y > margin) {
+            pdf.addPage();
+            y = margin;
+          }
+          const sliceHpx = Math.floor((contentH * canvas.width) / contentW);
+          let sy = 0;
+          while (sy < canvas.height) {
+            const h = Math.min(sliceHpx, canvas.height - sy);
+            const slice = document.createElement("canvas");
+            slice.width = canvas.width;
+            slice.height = h;
+            const ctx = slice.getContext("2d");
+            if (!ctx) break;
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, slice.width, slice.height);
+            ctx.drawImage(canvas, 0, sy, canvas.width, h, 0, 0, canvas.width, h);
+            const sliceH = (h * contentW) / canvas.width;
+            pdf.addImage(slice.toDataURL("image/jpeg", 0.92), "JPEG", margin, margin, contentW, sliceH);
+            sy += h;
+            if (sy < canvas.height) {
+              pdf.addPage();
+            } else {
+              y = margin + sliceH + gap;
+            }
+          }
+        }
+      }
+
+      const safeName = (respondentName || "ataskaita").trim().replace(/\s+/g, "-");
+      pdf.save(`karjeros-ataskaita-${safeName}.pdf`);
+    } catch (e) {
+      console.error(e);
+      alert("Nepavyko sugeneruoti PDF. Bandyk dar kartą.");
+    } finally {
+      setPdfBusy(false);
+    }
+  };
+
   const primary: ResultData = result;
   const second: ResultData = secondary;
 
@@ -1159,7 +1246,8 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
         {selectedProfession && <ProfessionModal profession={selectedProfession} onClose={() => setSelectedProfession(null)} />}
       </AnimatePresence>
 
-      <div className="p-6 md:p-12 border-b border-slate-200">
+      <div ref={reportRef}>
+      <div data-pdf-header className="p-6 md:p-12 border-b border-slate-200 bg-white">
         <div className="flex justify-between items-start flex-wrap gap-6 mb-8">
           <div className="flex items-center gap-3">
             <div className="p-2.5 bg-slate-800 rounded-lg text-white">
@@ -1186,7 +1274,7 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
         </p>
       </div>
 
-      <div className="p-6 md:p-12 space-y-2">
+      <div className="p-6 md:p-12 space-y-2 bg-white">
         {/* ---------- LOW MATH ---------- */}
         {lowMath && mathHigh && (
           <div className="report-section mb-10 break-inside-avoid rounded-2xl border-2 border-amber-300 bg-amber-50 p-6 md:p-8">
@@ -1415,13 +1503,18 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
         </ReportSection>
 
         <div className="pt-8 flex flex-wrap justify-center gap-4 no-print">
-          <button onClick={() => window.print()} className="inline-flex items-center gap-2 bg-slate-900 text-white font-bold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors">
-            <Download className="w-5 h-5" /> Atsisiųsti ataskaitą
+          <button
+            onClick={downloadPdf}
+            disabled={pdfBusy}
+            className="inline-flex items-center gap-2 bg-slate-900 text-white font-bold px-6 py-3 rounded-xl hover:bg-slate-800 transition-colors disabled:opacity-60"
+          >
+            <Download className="w-5 h-5" /> {pdfBusy ? "Ruošiama..." : "Atsisiųsti ataskaitą"}
           </button>
           <button onClick={onRestart} className="inline-flex items-center gap-2 text-slate-500 font-bold hover:text-slate-800 transition-colors px-6 py-3 rounded-xl hover:bg-slate-50">
             <RefreshCcw className="w-5 h-5" /> Pradėti iš naujo
           </button>
         </div>
+      </div>
       </div>
     </motion.div>
   );
