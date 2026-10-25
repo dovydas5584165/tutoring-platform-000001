@@ -1380,20 +1380,48 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
         <ReportSection icon={<RadarIcon className="w-5 h-5 text-slate-700" />} title="Asmenybės profilis (visos dešimt krypčių)">
           <p className="text-slate-700 text-sm leading-relaxed mb-4">
             Nors testas nustato pagrindinį ir antrinį profilį, kiekvienas žmogus atsakymuose atspindi visų krypčių
-            elementus skirtingu laipsniu. Diagrama rodo, kokią dalį galimų taškų surinkai kiekvienoje kryptyje (procentais) –
+            elementus skirtingu laipsniu. Diagrama rodo, kokią dalį galimų taškų surinkai kiekvienoje kryptyje (procentais) -
             ryškiausios dvi kryptys sudaro tavo pagrindinį ir antrinį profilį.
           </p>
-          <div className="bg-slate-50 rounded-2xl border border-slate-200 p-4" style={{ height: 400 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart data={radarOrdered} outerRadius="65%">
-                <PolarGrid stroke="#cbd5e1" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: "#334155", fontSize: 11 }} />
-                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fill: "#94a3b8", fontSize: 10 }} tickCount={5} />
-                <Radar name="Rezultatas" dataKey="score" stroke="#1e293b" fill="#1e293b" fillOpacity={0.35} isAnimationActive={false} />
-                <Tooltip formatter={(value: any, _name: any, props: any) => [`${value}%`, props.payload.subject]} />
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
+          {(() => {
+            const maxScore = Math.max(...ranking.map((r: any) => r.pct), 20);
+            // Scale outer ring dynamically (rounded up to nearest 10, min 40, max 100) so differences are visually clear
+            const radarDomainMax = Math.min(100, Math.max(40, Math.ceil((maxScore + 8) / 10) * 10));
+
+            return (
+              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 flex justify-center items-center">
+                <div className="w-full max-w-[560px]" style={{ height: 380 }}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart data={radarOrdered} outerRadius="72%" margin={{ top: 20, right: 40, bottom: 20, left: 40 }}>
+                      <PolarGrid stroke="#cbd5e1" strokeDasharray="3 3" />
+                      <PolarAngleAxis
+                        dataKey="subject"
+                        tick={{ fill: "#1e293b", fontSize: 12, fontWeight: 600 }}
+                      />
+                      <PolarRadiusAxis
+                        angle={90}
+                        domain={[0, radarDomainMax]}
+                        tick={{ fill: "#64748b", fontSize: 10 }}
+                        tickCount={5}
+                        tickFormatter={(v) => `${v}%`}
+                      />
+                      <Radar
+                        name="Rezultatas"
+                        dataKey="score"
+                        stroke="#0f172a"
+                        strokeWidth={2.5}
+                        fill="#334155"
+                        fillOpacity={0.28}
+                        dot={{ r: 4, fill: "#0f172a", strokeWidth: 2, stroke: "#ffffff" }}
+                        isAnimationActive={false}
+                      />
+                      <Tooltip formatter={(value: any, _name: any, props: any) => [`${value}%`, props.payload.subject]} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            );
+          })()}
           <div className="mt-4 grid grid-cols-2 sm:grid-cols-5 gap-3">
             {ranking.map((r: { key: TypeKey; pct: number }) => {
               const isPrimary = r.key === resultKey;
