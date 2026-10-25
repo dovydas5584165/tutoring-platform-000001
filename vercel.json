@@ -2,11 +2,11 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm ci --include=dev",
+  "installCommand": "npm install --include=dev",
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
     }
   },
   "regions": ["iad1"]
-} 
+}
