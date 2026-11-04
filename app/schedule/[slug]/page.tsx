@@ -619,7 +619,25 @@ export default function ScheduleLanding() {
           className="w-full flex flex-col justify-center items-center bg-white snap-start px-6 py-16 mb-8"
         >
           <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center">Mūsų Mokytojai</h2>
-
+          
+          <div className="flex gap-8 justify-center flex-wrap max-w-6xl mx-auto">
+            {[
+              {
+                name: "Karolina Kuncevičiūtė",
+                subject: "Chemija ir Biologija",
+                experience: "5 metai",
+                description:
+                  "Studijuoju biologiją VU Gyvybės mokslų centre. Lengvai randu kalbą su jaunimu ir padedu mokiniams užpildyti chemijos bei biologijos spragas, žinau būdų, kaip teisingai motyvuoti ir užtikrinti, kad klysti nėra taip baisu:)",
+                img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/884478047_2087940021906681_146320583796691306_n.webp",
+              },
+              {
+                name: "Katia",
+                subject: "Prancūzų",
+                experience: "3 metai",
+                description:
+                  "Currently pursuing a Master’s degree in Didactics of French as a Foreign Language (FLE) and holding a Bachelor’s degree in Language Sciences and French Literature, I offer tailored French lessons for all learning levels. Backed by a full year of classroom teaching experience alongside hands-on work with international university students and adult learners, my teaching focus is built on communicative and practical methods. Through custom-designed, interactive learning materials, I provide personalized instruction aimed at building your speaking confidence, improving reading and writing skills, and achieving your language goals at your own pace",
+                img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/katia.jpg",
+              },
           <div className="flex gap-8 justify-center flex-wrap max-w-6xl mx-auto">
             {[
               {
