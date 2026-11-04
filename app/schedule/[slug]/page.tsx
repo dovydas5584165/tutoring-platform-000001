@@ -621,7 +621,7 @@ export default function ScheduleLanding() {
           <h2 className="text-4xl md:text-5xl font-extrabold mb-12 text-center">Mūsų Mokytojai</h2>
           
           <div className="flex gap-8 justify-center flex-wrap max-w-6xl mx-auto">
-            {[
+            {
               {
                 name: "Karolina Kuncevičiūtė",
                 subject: "Chemija ir Biologija",
@@ -639,7 +639,7 @@ export default function ScheduleLanding() {
                 img: "https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/katia.jpg",
               },
           <div className="flex gap-8 justify-center flex-wrap max-w-6xl mx-auto">
-            {[
+            {
               {
                 name: "Aleksandras Šileika",
                 subject: "Matematika",
