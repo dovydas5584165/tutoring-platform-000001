@@ -300,6 +300,175 @@ const VehicleArt = ({ v, h = 'h-24' }: { v: Vehicle; h?: string }) => (
   </svg>
 );
 
+/* ---------- Crew: the three people behind the wheel ---------- */
+interface CrewMember { name: string; age: number; role: string; bio: string; line: string }
+const CREW: Record<string, CrewMember> = {
+  fire: {
+    name: 'Jonah', age: 35, role: 'Firefighter',
+    bio: 'Single father of two. The kids are asleep at the neighbour\'s and he promised to be home before breakfast.',
+    line: '"Engine 7 rolling. Nobody stays inside that building."',
+  },
+  ambulance: {
+    name: 'Nadir', age: 19, role: 'Paramedic',
+    bio: 'Lives with his mom, who waits up every night until she hears his key in the door. Third week on the job.',
+    line: '"Hold on. I\'m coming, just hold on."',
+  },
+  police: {
+    name: 'Lisa', age: 65, role: 'Police Officer',
+    bio: 'Forty years in uniform and still the first one out of the station when the radio goes off.',
+    line: '"Dispatch, show me en route. I know these roads."',
+  },
+};
+
+/* ---------- Crew portraits ---------- */
+const Face = ({ skin, line }: { skin: string; line: string }) => (
+  <g>
+    <rect x="52" y="74" width="16" height="20" rx="4" fill={skin} />
+    <rect x="52" y="82" width="16" height="6" fill="#000" opacity="0.15" />
+    <circle cx="37" cy="60" r="5" fill={skin} /><circle cx="83" cy="60" r="5" fill={skin} />
+    <ellipse cx="60" cy="57" rx="22" ry="26" fill={skin} />
+    <circle cx="51" cy="60" r="2.3" fill="#1b1410" /><circle cx="69" cy="60" r="2.3" fill="#1b1410" />
+    <circle cx="51.8" cy="59.2" r="0.7" fill="#fff" /><circle cx="69.8" cy="59.2" r="0.7" fill="#fff" />
+    <path d="M60 61 Q58 69 61 70" fill="none" stroke={line} strokeWidth="1.3" strokeLinecap="round" />
+  </g>
+);
+
+const Portrait = ({ id, className = '' }: { id: string; className?: string }) => {
+  const accent = VEHICLES.find((v) => v.id === id)?.accent ?? '#fff';
+  return (
+    <svg viewBox="0 0 120 130" className={className} aria-label={`${CREW[id].name}, ${CREW[id].role}`}>
+      <defs>
+        <radialGradient id={`pg-${id}`} cx="50%" cy="40%" r="65%">
+          <stop offset="0%" stopColor={accent} stopOpacity="0.55" />
+          <stop offset="100%" stopColor="#05060b" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect width="120" height="130" fill={`url(#pg-${id})`} />
+
+      {id === 'fire' && (<g>
+        {/* turnout coat */}
+        <path d="M10 130 Q14 98 44 90 L76 90 Q106 98 110 130Z" fill="#7d6330" />
+        <path d="M44 90 L52 104 L60 94 L68 104 L76 90 L72 86 L48 86Z" fill="#5f4a22" />
+        <rect x="12" y="112" width="96" height="6" fill="#d8de4c" /><rect x="12" y="114" width="96" height="2" fill="#c9ccd1" />
+        <rect x="58" y="96" width="4" height="34" fill="#3f3116" />
+        <Face skin="#E3B48A" line="#a87650" />
+        {/* hair + stubble + tired eyes */}
+        <path d="M38 52 Q40 40 50 38 L50 46 Q44 48 40 58Z M82 52 Q80 40 70 38 L70 46 Q76 48 80 58Z" fill="#15120f" />
+        <path d="M40 66 Q42 84 60 84 Q78 84 80 66 Q76 78 60 79 Q44 78 40 66Z" fill="#2a2420" opacity="0.35" />
+        <path d="M46 55 L56 54 M64 54 L74 55" stroke="#15120f" strokeWidth="2.2" strokeLinecap="round" />
+        <path d="M47 64 Q51 66 55 64 M65 64 Q69 66 73 64" stroke="#a87650" strokeWidth="0.9" fill="none" />
+        <path d="M53 75 Q60 79 67 74" stroke="#7a4636" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+        {/* helmet */}
+        <path d="M34 48 Q33 18 60 16 Q87 18 86 48Z" fill="#b3161b" />
+        <path d="M60 16 L60 46" stroke="#8a0f13" strokeWidth="3" />
+        <ellipse cx="60" cy="48" rx="34" ry="6" fill="#8a0f13" />
+        <rect x="52" y="24" width="16" height="16" rx="3" fill="#e8c64a" />
+        <text x="60" y="36" fontSize="10" fontWeight="900" fill="#7a0e12" textAnchor="middle" fontFamily="sans-serif">7</text>
+      </g>)}
+
+      {id === 'ambulance' && (<g>
+        {/* paramedic uniform */}
+        <path d="M10 130 Q14 98 44 90 L76 90 Q106 98 110 130Z" fill="#1f4d3a" />
+        <path d="M46 90 L60 104 L74 90" fill="none" stroke="#163a2b" strokeWidth="4" />
+        <rect x="12" y="116" width="96" height="5" fill="#d8de4c" />
+        <rect x="80" y="100" width="14" height="14" rx="2" fill="#f2f4f8" />
+        <path d="M87 102 V112 M82 107 H92" stroke="#e11d2e" strokeWidth="3" />
+        {/* stethoscope */}
+        <path d="M46 90 Q40 110 52 118 Q60 122 66 116" fill="none" stroke="#9aa1ad" strokeWidth="2.2" />
+        <path d="M74 90 Q80 104 70 112" fill="none" stroke="#9aa1ad" strokeWidth="2.2" />
+        <circle cx="67" cy="115" r="3.5" fill="#cfd3da" />
+        <Face skin="#A9714A" line="#7a4c2e" />
+        {/* curly hair */}
+        <g fill="#17100b">
+          <path d="M37 54 Q34 30 60 27 Q86 30 83 54 Q80 42 72 40 Q60 44 48 40 Q40 42 37 54Z" />
+          {[[42, 36], [49, 30], [57, 27], [65, 27], [73, 30], [79, 36], [45, 33], [70, 34], [61, 32], [53, 33]].map(([x, y], i) => (
+            <circle key={i} cx={x} cy={y} r="6" />
+          ))}
+        </g>
+        {/* light beard */}
+        <path d="M39 64 Q40 84 60 85 Q80 84 81 64 Q78 74 72 77 Q66 80 60 80 Q54 80 48 77 Q42 74 39 64Z" fill="#17100b" opacity="0.8" />
+        <path d="M52 73 Q60 71 68 73 Q60 76 52 73Z" fill="#17100b" opacity="0.75" />
+        <path d="M46 54 Q51 51 56 53 M64 53 Q69 51 74 54" stroke="#17100b" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+        <path d="M55 76 Q60 79 65 76" stroke="#5e2e22" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+      </g>)}
+
+      {id === 'police' && (<g>
+        {/* uniform */}
+        <path d="M10 130 Q14 98 44 90 L76 90 Q106 98 110 130Z" fill="#1b2a47" />
+        <path d="M46 90 L60 102 L74 90 L70 87 L50 87Z" fill="#dfe6f2" />
+        <path d="M57 100 L60 130 L63 100 L60 97Z" fill="#0b1220" />
+        <rect x="16" y="94" width="22" height="6" rx="2" fill="#2d4373" transform="rotate(-12 27 97)" />
+        <rect x="82" y="94" width="22" height="6" rx="2" fill="#2d4373" transform="rotate(12 93 97)" />
+        <path d="M84 104 L87 110 L94 110 L88 114 L90 121 L84 117 L78 121 L80 114 L74 110 L81 110Z" fill="#e3b341" />
+        <Face skin="#F1D0BC" line="#c08c74" />
+        {/* silver bob */}
+        <path d="M36 46 Q34 70 40 78 L44 76 Q40 64 41 50Z M84 46 Q86 70 80 78 L76 76 Q80 64 79 50Z" fill="#d3d6dc" />
+        {/* lines of age */}
+        <path d="M42 62 L45 63 M42 65 L45 65 M78 62 L75 63 M78 65 L75 65" stroke="#c08c74" strokeWidth="0.8" />
+        <path d="M52 69 Q50 74 53 77 M68 69 Q70 74 67 77" stroke="#c08c74" strokeWidth="0.9" fill="none" />
+        <path d="M46 55 Q51 53 56 55 M64 55 Q69 53 74 55" stroke="#a9adb5" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+        {/* glasses */}
+        <g fill="none" stroke="#b9a37a" strokeWidth="1.4"><circle cx="51" cy="60" r="6" /><circle cx="69" cy="60" r="6" /><path d="M57 60 H63" /></g>
+        <path d="M54 76 Q60 79 66 76" stroke="#9c4a4a" strokeWidth="1.6" fill="none" strokeLinecap="round" />
+        {/* cap */}
+        <path d="M33 40 Q34 22 60 21 Q86 22 87 40 L84 46 L36 46Z" fill="#14213d" />
+        <path d="M35 44 H85 L88 50 Q60 56 32 50Z" fill="#05070c" />
+        <rect x="34" y="40" width="52" height="5" fill="#0b1220" />
+        <path d="M54 27 L60 24 L66 27 L65 36 L60 39 L55 36Z" fill="#e3b341" />
+      </g>)}
+    </svg>
+  );
+};
+
+/* ---------- Opening scene: the town, the forest road, the fire ---------- */
+const SceneBanner = ({ className = '' }: { className?: string }) => {
+  const win = Array.from({ length: 70 }, (_, i) => ({ x: (i * 97) % 1180 + 10, y: 120 + ((i * 53) % 80), on: (i * 7) % 3 === 0 }));
+  return (
+    <svg viewBox="0 0 1200 260" preserveAspectRatio="xMidYMid slice" className={className} aria-hidden="true">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#04050a" /><stop offset="70%" stopColor="#1a1630" /><stop offset="100%" stopColor="#3a1d1a" />
+        </linearGradient>
+        <radialGradient id="fireglow" cx="78%" cy="70%" r="35%">
+          <stop offset="0%" stopColor="#ff7a1a" stopOpacity="0.6" /><stop offset="100%" stopColor="#ff7a1a" stopOpacity="0" />
+        </radialGradient>
+        <linearGradient id="road" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#14151b" /><stop offset="100%" stopColor="#262833" />
+        </linearGradient>
+      </defs>
+      <rect width="1200" height="260" fill="url(#sky)" />
+      <rect width="1200" height="260" fill="url(#fireglow)" />
+      {Array.from({ length: 40 }, (_, i) => (
+        <circle key={i} cx={(i * 131) % 1200} cy={(i * 37) % 110} r={i % 5 === 0 ? 1.4 : 0.8} fill="#fff" opacity={0.3 + (i % 4) * 0.15} />
+      ))}
+      <circle cx="170" cy="58" r="26" fill="#e9e4d4" opacity="0.9" />
+      <circle cx="182" cy="52" r="24" fill="#0a0a14" opacity="0.85" />
+      {/* skyline */}
+      <path d="M0 210 V150 H40 V128 H70 V160 H110 V118 H150 V170 H190 V140 H240 V110 H270 V150 H320 V132 H360 V175 H420 V124 H470 V160 H520 V140 H560 V115 H600 V165 H650 V135 H700 V150 H740 V120 H780 V160 H820 V100 H880 V150 H920 V125 H960 V165 H1010 V138 H1060 V158 H1110 V130 H1160 V170 H1200 V210Z" fill="#0b0c14" />
+      {win.map((w, i) => w.on && <rect key={i} x={w.x} y={w.y} width="5" height="7" fill="#f5c76a" opacity="0.55" />)}
+      {/* the burning building */}
+      <g style={{ transformBox: 'fill-box', transformOrigin: 'bottom', animation: 'flicker 0.9s ease-in-out infinite' }}>
+        <path d="M826 104 Q834 64 850 82 Q856 46 866 78 Q876 58 878 100Z" fill="#ff5a1a" />
+        <path d="M836 104 Q842 80 852 92 Q858 70 864 92 Q872 80 870 104Z" fill="#ffc23a" />
+      </g>
+      <g fill="#555" opacity="0.5">
+        <ellipse cx="860" cy="40" rx="40" ry="14" /><ellipse cx="900" cy="20" rx="50" ry="14" /><ellipse cx="840" cy="62" rx="26" ry="10" />
+      </g>
+      {/* forest + road */}
+      <path d="M0 260 V200 L30 170 L50 196 L80 160 L110 200 L140 176 L170 204 L200 172 L230 210 L260 190 L290 214 L520 214 L600 196 L680 214 L910 214 L940 186 L970 210 L1000 168 L1030 202 L1060 174 L1090 204 L1120 162 L1150 198 L1180 176 L1200 196 V260Z" fill="#05070a" />
+      <path d="M520 260 L590 212 L610 212 L680 260Z" fill="url(#road)" />
+      <path d="M598 214 L600 214 L604 260 L596 260Z" fill="#d8c25a" opacity="0.6" />
+      {/* three sets of lights racing in */}
+      {[[560, '#ff1f1f', '#2a5bff'], [600, '#ff1f1f', '#ffffff'], [640, '#ff1f1f', '#ff8a00']].map(([x, a, b], i) => (
+        <g key={i} transform={`translate(${x as number} ${236 - i * 6})`}>
+          <circle cx="-6" cy="0" r="10" fill={a as string} opacity="0.5" style={{ animation: `sirenA .5s steps(1) infinite ${i * 0.15}s` }} />
+          <circle cx="6" cy="0" r="10" fill={b as string} opacity="0.5" style={{ animation: `sirenB .5s steps(1) infinite ${i * 0.15}s` }} />
+        </g>
+      ))}
+    </svg>
+  );
+};
+
 const StatBar = ({ label, v, color }: { label: string; v: number; color: string }) => (
   <div className="flex items-center gap-2 text-[10px] text-slate-400">
     <span className="w-14">{label}</span>
@@ -1235,6 +1404,8 @@ export default function ForestDeerGame() {
         @keyframes sirenA { 0%,49% { opacity: 1 } 50%,100% { opacity: .12 } }
         @keyframes sirenB { 0%,49% { opacity: .12 } 50%,100% { opacity: 1 } }
         @keyframes roadmove { to { background-position: 0 40px } }
+        @keyframes flicker { 0%,100% { transform: scaleY(1); opacity: .85 } 50% { transform: scaleY(1.18); opacity: 1 } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px) } to { opacity: 1; transform: none } }
       `}</style>
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" style={{ touchAction: 'none', imageRendering: 'pixelated', filter: 'brightness(0.85) contrast(1.15) saturate(0.7)' }} />
       <div className="absolute inset-0 pointer-events-none" style={{ background: 'repeating-linear-gradient(to bottom, rgba(0,0,0,0.2) 0px, rgba(0,0,0,0.2) 1px, transparent 1px, transparent 3px), radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.6) 100%)' }} />
@@ -1244,7 +1415,7 @@ export default function ForestDeerGame() {
           <div className={`absolute top-0 inset-x-0 ${compact ? 'p-2' : 'p-3'} bg-gradient-to-b from-black/80 to-transparent pointer-events-none`}>
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div className="text-xs text-slate-400">
-                <div className="text-sm text-slate-200 mb-1">{selected.mission}</div>
+                <div className="text-sm text-slate-200 mb-1">{CREW[selected.id].name} · {selected.mission}</div>
                 {!isTouch && <><kbd className="px-1 bg-slate-800 rounded">W</kbd> gas <kbd className="px-1 bg-slate-800 rounded">S</kbd> brake <kbd className="px-1 bg-slate-800 rounded">A</kbd>
                 <kbd className="px-1 bg-slate-800 rounded">D</kbd> steer <kbd className="px-1 bg-slate-800 rounded">K</kbd> up <kbd className="px-1 bg-slate-800 rounded">J</kbd> down <kbd className="px-1 bg-sky-700 rounded">N</kbd> nitro</>}
               </div>
@@ -1335,43 +1506,77 @@ export default function ForestDeerGame() {
       )}
 
       {gameState === 'START' && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center overflow-auto"
-          style={{ background: 'radial-gradient(ellipse at 50% 30%, #1a1f33 0%, #05060b 70%)' }}>
-          <h2 className={`${compact ? 'text-2xl' : 'text-4xl'} font-extrabold mb-1 tracking-tight`}>Night Run</h2>
-          <p className={`max-w-xl text-slate-300 text-xs ${compact ? 'mb-2' : 'mb-5'} leading-relaxed`}>
-            Pick your emergency vehicle and reach the scene before the clock runs out. {isTouch ? 'Hold GAS, steer with the arrows, tap K and J to shift, never sit on the redline,' : 'Shift with K and J, never sit on the redline,'} brake for bumps, watch for deer, strangers and traffic on this two-way road, hit N for nitro, and answer calls on the radio while you drive.
-          </p>
-          <div className={`grid grid-cols-1 sm:grid-cols-3 ${compact ? 'gap-2 mb-3' : 'gap-4 mb-6'} w-full max-w-[860px]`}>
-            {VEHICLES.map((c) => {
-              const on = selected.id === c.id;
-              return (
-                <button key={c.id} type="button" onClick={() => setSelected(c)}
-                  className={`relative ${compact ? 'p-2' : 'p-4'} text-left rounded-2xl cursor-pointer overflow-hidden transition-transform duration-200`}
-                  style={{
-                    transform: on ? 'translateY(-6px) scale(1.03)' : 'none',
-                    border: `2px solid ${on ? c.accent : '#2a3042'}`,
-                    boxShadow: on ? `0 0 34px ${c.accent}66, inset 0 0 40px ${c.accent}18` : 'none',
-                    background: `radial-gradient(ellipse at 50% 20%, ${c.accent}30, #080a12 70%)`,
-                  }}>
-                  <div className="absolute inset-x-0 bottom-0 h-20 opacity-40"
-                    style={{ background: 'repeating-linear-gradient(0deg, #14151b 0 20px, #1d1f27 20px 40px)', animation: on ? 'roadmove .5s linear infinite' : 'none' }} />
-                  <div className="relative">
-                    <VehicleArt v={c} h={compact ? 'h-14' : 'h-24'} />
-                    <div className="text-lg font-extrabold mt-1">{c.name}</div>
-                    <div className="text-[11px] text-slate-300 mb-3">{c.mission}</div>
-                    {!compact && <div className="flex flex-col gap-1.5">
-                      <StatBar label="Speed" v={c.maxKmh / 170} color={c.accent} />
-                      <StatBar label="Accel" v={c.accel / 0.0034} color={c.accent} />
-                      <StatBar label="Brakes" v={c.brake / 0.0024} color={c.accent} />
-                      <StatBar label="Handling" v={c.handling / 1.2} color={c.accent} />
-                    </div>}
-                    <div className={`${compact ? 'mt-0' : 'mt-3'} text-[11px] font-bold`} style={{ color: c.accent }}>{c.maxKmh} km/h top speed</div>
-                  </div>
-                </button>
-              );
-            })}
+        <div className="absolute inset-0 overflow-auto" style={{ background: 'radial-gradient(ellipse at 50% 0%, #1a1630 0%, #05060b 65%)' }}>
+          <div className="relative w-full shrink-0">
+            <SceneBanner className={`w-full ${compact ? 'h-24' : 'h-44 sm:h-60'} block`} />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#05060b]" />
+            <div className="absolute inset-x-0 bottom-0 px-4 pb-2 text-center" style={{ animation: 'fadeUp .7s ease-out both' }}>
+              <div className="text-[10px] sm:text-xs tracking-[0.35em] text-red-400 font-bold">23:47 · THREE CALLS AT ONCE</div>
+              <h2 className={`${compact ? 'text-2xl' : 'text-4xl sm:text-5xl'} font-extrabold tracking-tight`} style={{ textShadow: '0 0 24px rgba(255,90,26,0.45)' }}>Night Run</h2>
+            </div>
           </div>
-          <button type="button" onClick={initGame} className="px-10 py-3 rounded-xl bg-red-600 hover:bg-red-500 font-bold cursor-pointer text-lg shrink-0">Start Driving</button>
+
+          <div className="flex flex-col items-center px-4 pb-6 text-center">
+            <p className={`max-w-2xl text-slate-300 text-xs sm:text-sm ${compact ? 'mb-2' : 'mt-2 mb-5'} leading-relaxed`}>
+              A fire on the edge of town. A crash victim bleeding out on the forest road. A hostage whispering into a phone.
+              Only one road leads through the woods tonight, and three people are about to drive it. <b className="text-white">Choose who you ride with.</b>
+            </p>
+
+            <div className={`grid grid-cols-1 sm:grid-cols-3 ${compact ? 'gap-2 mb-3' : 'gap-4 mb-5'} w-full max-w-[920px]`}>
+              {VEHICLES.map((c, idx) => {
+                const on = selected.id === c.id;
+                const p = CREW[c.id];
+                return (
+                  <button key={c.id} type="button" onClick={() => setSelected(c)}
+                    className={`relative ${compact ? 'p-2' : 'p-4'} text-left rounded-2xl cursor-pointer overflow-hidden transition-transform duration-200`}
+                    style={{
+                      transform: on ? 'translateY(-6px) scale(1.02)' : 'none',
+                      border: `2px solid ${on ? c.accent : '#2a3042'}`,
+                      boxShadow: on ? `0 0 34px ${c.accent}66, inset 0 0 40px ${c.accent}18` : 'none',
+                      background: `radial-gradient(ellipse at 50% 0%, ${c.accent}30, #080a12 70%)`,
+                      animation: `fadeUp .6s ease-out ${0.15 + idx * 0.12}s both`,
+                    }}>
+                    <div className="relative">
+                      <div className="flex items-end gap-3">
+                        <div className={`${compact ? 'w-14 h-16' : 'w-24 h-28'} shrink-0 rounded-xl overflow-hidden border border-white/15 bg-black/50`}>
+                          <Portrait id={c.id} className="w-full h-full" />
+                        </div>
+                        <div className="min-w-0 pb-1">
+                          <div className="text-[10px] uppercase tracking-widest font-bold" style={{ color: c.accent }}>{p.role}</div>
+                          <div className={`${compact ? 'text-base' : 'text-2xl'} font-extrabold leading-tight`}>{p.name}, {p.age}</div>
+                          <div className="text-[11px] text-slate-400">{c.name}</div>
+                        </div>
+                      </div>
+                      {!compact && <>
+                        <p className="text-[11px] text-slate-300 mt-3 leading-relaxed min-h-[3.2rem]">{p.bio}</p>
+                        <p className="text-[11px] italic mt-2" style={{ color: c.accent }}>{p.line}</p>
+                      </>}
+                      <div className="relative mt-2">
+                        <div className="absolute inset-x-0 bottom-0 h-8 opacity-40 rounded"
+                          style={{ background: 'repeating-linear-gradient(0deg, #14151b 0 20px, #1d1f27 20px 40px)', animation: on ? 'roadmove .5s linear infinite' : 'none' }} />
+                        <VehicleArt v={c} h={compact ? 'h-10' : 'h-16'} />
+                      </div>
+                      <div className="text-[11px] text-white/90 font-bold mt-1">Mission: {c.mission}</div>
+                      {!compact && <div className="flex flex-col gap-1.5 mt-2">
+                        <StatBar label="Speed" v={c.maxKmh / 170} color={c.accent} />
+                        <StatBar label="Accel" v={c.accel / 0.0034} color={c.accent} />
+                        <StatBar label="Brakes" v={c.brake / 0.0024} color={c.accent} />
+                        <StatBar label="Handling" v={c.handling / 1.2} color={c.accent} />
+                      </div>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            <p className={`max-w-2xl text-slate-500 text-[11px] ${compact ? 'mb-2' : 'mb-4'} leading-relaxed`}>
+              {isTouch ? 'Hold GAS, steer with the arrows, tap K and J to shift, never sit on the redline,' : 'W/S gas and brake, A/D steer, K/J shift, never sit on the redline,'} brake for bumps, watch for deer, strangers and oncoming traffic, hit N for nitro, and answer the radio while you drive.
+            </p>
+            <button type="button" onClick={initGame} className="px-10 py-3 rounded-xl bg-red-600 hover:bg-red-500 font-bold cursor-pointer text-lg shrink-0"
+              style={{ boxShadow: `0 0 30px ${selected.accent}55` }}>
+              Drive with {CREW[selected.id].name}
+            </button>
+          </div>
         </div>
       )}
 
@@ -1382,7 +1587,7 @@ export default function ForestDeerGame() {
           <p className="text-lg text-indigo-400 mb-6">Distance driven: <b>{hud.meters} m</b></p>
           <div className="flex gap-3">
             <button type="button" onClick={initGame} className="px-6 py-2.5 rounded-xl bg-white hover:bg-slate-200 text-slate-950 font-bold cursor-pointer">Try Again</button>
-            <button type="button" onClick={changeVehicle} className="px-6 py-2.5 rounded-xl border-2 border-white/60 hover:bg-white/10 font-bold cursor-pointer">Change Vehicle</button>
+            <button type="button" onClick={changeVehicle} className="px-6 py-2.5 rounded-xl border-2 border-white/60 hover:bg-white/10 font-bold cursor-pointer">Change Crew</button>
           </div>
         </div>
       )}
