@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { FaInstagram, FaFacebook, FaTrophy } from "react-icons/fa";
 import Image from "next/image";
 // Nepamirškite importuoti Users ikonos grupinėms pamokoms
-import { ArrowRight, Compass, Users } from "lucide-react"; 
+import { ArrowRight, Compass, Users, TrendingUp } from "lucide-react"; 
 
 export default function Home() {
   const router = useRouter();
@@ -434,6 +434,15 @@ export default function Home() {
         >
           <Users size={20} className="group-hover:scale-110 transition-transform duration-300" />
           <span>Grupinės pamokos</span>
+        </Link>
+
+        {/* 4. Akcijų biržos žaidimas */}
+        <Link
+          href="/akciju_birza"
+          className="group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
+        >
+          <TrendingUp size={20} className="group-hover:-translate-y-0.5 transition-transform duration-300" />
+          <span>Akcijų biržos žaidimas</span>
         </Link>
       </div>
 
