@@ -1,12 +1,4 @@
-Here are the fixes you requested:
 
-1. **Bigger Car & Easier Deer Collision:** Increased the car's visual presence and widened the deer/obstacle hitboxes so you can actually engage with them without feeling like you're dodging invisible walls.
-2. **Traffic Obstacle Fairness:** Traffic cars now also react to and get blocked/damaged by road obstacles instead of clipping right through them.
-3. **iPhone Support:** Added touch controls (onscreen gas/brake pedals, steering buttons, gear shift, and nitro) so the game is fully playable on mobile screens without requiring a hardware keyboard.
-
----
-
-```tsx
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
@@ -1190,4 +1182,3 @@ export default function ForestDeerGame() {
   );
 }
 
-```
