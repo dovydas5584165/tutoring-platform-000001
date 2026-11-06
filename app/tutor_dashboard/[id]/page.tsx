@@ -5,6 +5,7 @@ import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
 import WeeklyAvailabilitySelector from "@/components/WeeklyAvailabilitySelector";
 import TutorLessonRequests from "@/components/TutorLessonRequests";
+import TutorWorkflowGuide from "@/components/TutorWorkflowGuide";
 
 type AvailabilitySlot = {
   id: string;
@@ -59,12 +60,14 @@ export default function TutorDashboard() {
   
   const [availabilitySlots, setAvailabilitySlots] = useState<AvailabilitySlot[]>([]);
   
+  /* ===== SENA TVARKA (užkomentuota) =====
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [notifLoading, setNotifLoading] = useState(false);
 
   const [orders, setOrders] = useState<Booking[]>([]);
   const [hiddenBookings, setHiddenBookings] = useState<string[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  ===== */
 
   const [groupRegistrations, setGroupRegistrations] = useState<GroupRegistration[]>([]);
   const [selectedRegistrations, setSelectedRegistrations] = useState<string[]>([]);
@@ -137,6 +140,7 @@ export default function TutorDashboard() {
     }
   };
 
+  /* ===== SENA TVARKA (užkomentuota) =====
   const loadNotifications = async () => {
     if (!id) return;
     setNotifLoading(true);
@@ -171,6 +175,7 @@ export default function TutorDashboard() {
     }
     setOrdersLoading(false);
   };
+  ===== */
 
   // --- EVENT HANDLERS ---
   const handleSave = async () => {
@@ -260,6 +265,7 @@ export default function TutorDashboard() {
     }
   };
 
+  /* ===== SENA TVARKA (užkomentuota) =====
   const handleNotificationResponse = async (notification: Notification, isYes: boolean) => {
     if (!id) return;
 
@@ -337,6 +343,7 @@ export default function TutorDashboard() {
       setNotifications((prev) => [notification, ...prev]);
     }
   };
+  ===== */
 
   const acceptTerms = async () => {
     try {
@@ -428,8 +435,8 @@ export default function TutorDashboard() {
         setAvailabilitySlots(data || []);
       });
 
-    loadNotifications();
-    loadOrders();
+    // loadNotifications(); // sena tvarka
+    // loadOrders();        // sena tvarka
     loadGroupRegistrations();
   }, [id]);
 
@@ -481,6 +488,8 @@ export default function TutorDashboard() {
 
         <TutorLessonRequests />
         
+        {/* Pranešimai (užsakymų patvirtinimas) – sena tvarka. Atkuriant viduje „*\/“ pakeiskite į „*“ + „/“. */}
+        {/* ===== SENA TVARKA (užkomentuota) =====
         <section className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-semibold mb-6 border-b pb-3 flex items-center justify-between">
             Pranešimai
@@ -520,6 +529,7 @@ export default function TutorDashboard() {
             </ul>
           )}
         </section>
+        ===== */}
 
         {/* Užsakymų su mokėjimu sąrašas – sena tvarka. Atkuriant viduje „*\/“ pakeiskite į „*“ + „/“. */}
         {/* ===== SENA TVARKA (užkomentuota) =====
@@ -647,19 +657,7 @@ export default function TutorDashboard() {
           )}
         </section>
 
-        <section className="bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Kokybės rodikliai:</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="bg-gray-50 rounded-lg p-6 text-center">
-              <p className="text-3xl font-bold text-blue-600">92%</p>
-              <p className="mt-1 text-sm text-gray-600">Priėmimo procentas, kurio tikimasi</p>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-6 text-center">
-              <p className="text-3xl font-bold text-blue-600">10 min.</p>
-              <p className="mt-1 text-sm text-gray-600">Optimalus atsakymo greitis</p>
-            </div>
-          </div>
-        </section>
+        <TutorWorkflowGuide />
 
         <section className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Prieinamumas</h2>

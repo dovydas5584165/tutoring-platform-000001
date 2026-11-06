@@ -31,5 +31,5 @@ export async function GET(req: NextRequest) {
     .filter((r) => r.slots.length > 0)
     .map(({ email, phone, ...rest }) => rest); // contacts only after claiming
 
-  return NextResponse.json({ open, mine: mineRes.data || [] });
+  return NextResponse.json({ open, mine: mineRes.data || [], me: { name: `${tutor.vardas} ${tutor.pavarde}` } });
 }
