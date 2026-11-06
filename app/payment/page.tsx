@@ -1,5 +1,28 @@
 'use client';
 
+// Mokėjimas internetu išjungtas: pamokos dabar derinamos per užklausas
+// (klientas pažymi bent 5 laikus, mokytojas pasirenka vieną).
+// Senas Stripe mokėjimo puslapis paliktas užkomentuotas žemiau. Norint atkurti:
+// ištrinkite šį naują komponentą, atkomentuokite bloką ir viduje „*\/“ pakeiskite į „*“ + „/“.
+
+import { useRouter } from 'next/navigation';
+
+export default function PaymentPage() {
+  const router = useRouter();
+  return (
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="text-center max-w-md">
+        <h1 className="text-2xl font-bold mb-2">Mokėjimai internetu laikinai išjungti</h1>
+        <p className="text-gray-600 mb-6">Pasirinkite jums tinkamus laikus pamokos puslapyje, o mokytojas su jumis susisieks.</p>
+        <button onClick={() => router.push('/')} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          Grįžti į pradžią
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ===== SENA TVARKA (užkomentuota) =====
 import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
@@ -155,7 +178,7 @@ function PaymentContent() {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          {/* Header */}
+          {/* Header *\/}
           <div className="bg-blue-600 text-white p-6">
             <h1 className="text-2xl font-bold">Saugus mokėjimas</h1>
             <p className="mt-2 opacity-90">Užbaikite savo rezervacijos mokėjimą</p>
@@ -163,7 +186,7 @@ function PaymentContent() {
 
           <div className="p-6">
             <div className="grid md:grid-cols-2 gap-8">
-              {/* Booking Summary */}
+              {/* Booking Summary *\/}
               <div>
                 <h2 className="text-xl font-semibold mb-4">Rezervacijos santrauka</h2>
                 
@@ -218,7 +241,7 @@ function PaymentContent() {
                 </div>
               </div>
 
-              {/* Payment Form */}
+              {/* Payment Form *\/}
               <div>
                 <h2 className="text-xl font-semibold mb-4">Mokėjimo informacija</h2>
                 
@@ -241,3 +264,4 @@ export default function PaymentPage() {
     </Suspense>
   );
 }
+===== */

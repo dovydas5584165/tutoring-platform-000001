@@ -14,15 +14,19 @@ export interface EmailOptions {
   to: string;
   subject: string;
   html: string;
+  replyTo?: string;
+  attachments?: { filename: string; content: string; contentType?: string }[];
 }
 
-export async function sendEmail({ to, subject, html }: EmailOptions) {
+export async function sendEmail({ to, subject, html, replyTo, attachments }: EmailOptions) {
   try {
     const info = await transporter.sendMail({
       from: process.env.EMAIL_FROM,
       to,
       subject,
       html,
+      ...(replyTo ? { replyTo } : {}),
+      ...(attachments?.length ? { attachments } : {}),
     });
 
     console.log('Email sent: %s', info.messageId);
