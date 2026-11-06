@@ -1,132 +1,86 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { motion, animate } from "framer-motion";
-import { supabase } from "../lib/supabaseClient";
-import { Button } from "@/components/ui/button";
-import { FaInstagram, FaFacebook, FaTrophy } from "react-icons/fa";
 import Image from "next/image";
-// Nepamirškite importuoti Users ikonos grupinėms pamokoms
-import { ArrowRight, Compass, Users, TrendingUp, Siren } from "lucide-react"; 
+import { FaInstagram, FaFacebook } from "react-icons/fa";
+import {
+  ArrowRight, Atom, Calculator, CalendarCheck, Check, ChevronDown, Compass, Copy, FlaskConical,
+  Languages, Laptop, Leaf, Mail, Menu, MousePointerClick, Siren, Star, TrendingUp, Users, X,
+} from "lucide-react";
+import { supabase } from "../lib/supabaseClient";
+import { TEACHERS } from "@/lib/teachers";
+
+/* ---------- content ---------- */
+
+const LESSONS = [
+  { name: "Matematika", slug: "matematika", note: "Nuo pagrindų iki VBE", Icon: Calculator },
+  { name: "Fizika", slug: "fizika", note: "Uždaviniai ir egzaminai", Icon: Atom },
+  { name: "Chemija", slug: "chemija", note: "Reakcijos ir skaičiavimai", Icon: FlaskConical },
+  { name: "Biologija", slug: "biologija", note: "Temos ir egzaminai", Icon: Leaf },
+  { name: "IT", slug: "it", note: "Programavimas ir VBE", Icon: Laptop },
+  { name: "Anglų k.", slug: "anglu-k", note: "Kalbėjimas ir gramatika", Icon: Languages },
+];
+
+const STEPS = [
+  { Icon: MousePointerClick, title: "Pasirinkite dalyką", text: "Paspauskite norimą pamoką aukščiau." },
+  { Icon: CalendarCheck, title: "Pažymėkite bent 5 laikus", text: "Kalendoriuje pažymėkite, kada mokiniui patogu mokytis." },
+  { Icon: Mail, title: "Mokytojas susisiekia", text: "Mokytojas pasirenka laiką ir atsiunčia pamokos nuorodą el. paštu." },
+];
+
+const REVIEWS = [
+  { text: "Vaiko pažymiai pagerėjo nuo 7 iki 9.", who: "mama Inga" },
+  { text: "Sūnus gavo 90 iš matematikos VBE.", who: "tėtis Darius" },
+  { text: "Matematikos baimė dingo po kelių pamokų.", who: "mokinys Lukas" },
+  { text: "Mokytoja labai kantri ir motyvuojanti.", who: "mama Lina" },
+  { text: "Chemija tapo suprantama.", who: "mokinė Emilija" },
+  { text: "Vaikas pats noriai jungiasi į pamokas.", who: "mama Jolanta" },
+];
+
+const FAQ = [
+  { q: "Kiek kainuoja pamoka?", a: "Viena individuali pamoka trunka 45 minutes ir kainuoja 25 €." },
+  { q: "Kaip užsisakyti pamoką?", a: "Pasirinkite dalyką ir kalendoriuje pažymėkite bent 5 jums tinkamus laikus. Mokytojas pasirinks vieną iš jų ir el. paštu atsiųs savo kontaktus." },
+  { q: "Kaip vyksta pamokos?", a: "Nuotoliu per Google Meet. Pamokos nuorodą mokytojas atsiųs el. paštu." },
+  { q: "Kokių klasių mokiniams?", a: "1–12 klasių mokiniams, taip pat ruošiantis NMPP, PUPP ir VBE." },
+  { q: "Kaip atsiskaityti?", a: "Bankiniu pavedimu. Rekvizitus rasite skiltyje „Pastoviems klientams“ šio puslapio apačioje." },
+  { q: "Kas, jei mokytojas negali pravesti pamokos?", a: "Mokytojas praneš el. paštu ir pasiūlys naujų laikų. Jei tinkamo laiko nerasite, pamoką perduosime kitam mokytojui." },
+  { q: "Kas, jei vėluosiu?", a: "Mokytojas palauks iki 10 minučių. Jei vėlavimas ilgesnis, pamoka atšaukiama, o pinigai negrąžinami." },
+];
+
+const EXTRAS = [
+  { href: "/career_test", title: "Karjeros testas", text: "Padės pasirinkti egzaminus", Icon: Compass, badge: "Naujiena" },
+  { href: "/grupines", title: "Grupinės pamokos", text: "Mokykitės kartu su kitais", Icon: Users },
+  { href: "/akciju_birza", title: "Akcijų biržos žaidimas", text: "Sudėtinės palūkanos žaidžiant", Icon: TrendingUp },
+  { href: "/games/games_2", title: "Night Run", text: "Lenktynių žaidimas", Icon: Siren },
+];
+
+const NAV = [
+  { href: "#pamokos", label: "Pamokos" },
+  { href: "#kaip", label: "Kaip tai veikia" },
+  { href: "#apie-mus", label: "Apie mus" },
+  { href: "#duk", label: "DUK" },
+];
+
+const IBAN = "LT077300010164121505";
+
+/* ---------- page ---------- */
 
 export default function Home() {
-  const router = useRouter();
-
-  // === State & Refs ===
-  const [showHeader, setShowHeader] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Group Registration State (jei vėliau prireiks formos)
-  const [groupEmail, setGroupEmail] = useState("");
-  const [groupStatus, setGroupStatus] = useState<"idle" | "success" | "error">("idle");
-
-  const lastScrollY = useRef(0);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const teacherRef = useRef<HTMLDivElement>(null);
-  const lessonsRef = useRef<HTMLDivElement>(null);
-  const scrollToLessons = () => lessonsRef.current?.scrollIntoView({ behavior: "smooth" });
-  const [selected, setSelected] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const toggleFAQ = (index: number) => setActiveIndex(activeIndex === index ? null : index);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const [copied, setCopied] = useState(false);
 
-  const faqData = [
-    {
-      question: "Kokia yra pamokos kaina ir trukmė?",
-      answer:
-        "Vienos individualios pamokos trukmė – 45 minutės, o kaina – 25 €. Tai viena geriausių kainų už individualų dėmesį.",
-    },
-    {
-      question: "Kaip vyksta pamokos?",
-      answer: "Pamokos vyksta nuotoliu per Google Meets platformą.",
-    },
-    {
-      question: "Kokių klasių moksleiviams skirtos pamokos?",
-      answer: "Pamokos skirtos 1–12 klasių moksleiviams.",
-    },
-    {
-      question: "Kaip gausiu prisijungimą prie pamokos?",
-      answer: "Mokytojas atsiųs Jums pamokos nuorodą apie 30 min. iki pamokos",
-    },
-    {
-      question: "Kaip galima atsiskaityti už pamokas?",
-      answer: "Galite atsiskaityti Apple Pay, Google Pay ar kortele",
-    },
-    {
-      question: "Kas nutiks, jei mokytojas atšauks pamoką?",
-      answer: "Tokiu atveju pinigai bus grąžinti automatiškai",
-    },
-    {
-      question: "Kas nutiks, jei vėluosiu?",
-      answer:
-        "Mokytojas palauks Jūsų iki 10 minučių. Jei vėlavimas ilgesnis, pamoka atšaukiama ir pinigai nėra grąžinami.",
-    },
-  ];
-
-  // === Scroll header hide/show ===
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowHeader(window.scrollY <= lastScrollY.current || window.scrollY < 10);
-      lastScrollY.current = window.scrollY;
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  // === Video auto play/pause ===
-  useEffect(() => {
-    const videoEl = videoRef.current;
-    if (!videoEl) return;
-
-    // Make sure video is ready to play
-    videoEl.muted = true;
-    videoEl.playsInline = true;
-    videoEl.pause();
-    videoEl.currentTime = 0;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-            videoEl.play().catch(() => {
-              // Autoplay might fail, ignore
-            });
-          } else {
-            videoEl.pause();
-          }
-        });
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(videoEl);
-
-    return () => {
-      observer.disconnect();
-      videoEl.pause();
-    };
-  }, []);
-
-  // === Auth check ===
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const {
-          data: { user },
-          error,
-        } = await supabase.auth.getUser();
+        const { data: { user }, error } = await supabase.auth.getUser();
         if (user && !error) {
           setUser(user);
-          const { data: userData, error: userError } = await supabase
-            .from("users")
-            .select("role, vardas, pavarde")
-            .eq("id", user.id)
-            .single();
-          if (!userError && userData) setUserRole(userData.role);
+          const { data } = await supabase.from("users").select("role").eq("id", user.id).single();
+          if (data) setUserRole(data.role);
         }
       } catch (err) {
         console.error("Error checking auth:", err);
@@ -134,12 +88,8 @@ export default function Home() {
         setLoading(false);
       }
     };
-
     checkAuth();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "SIGNED_IN" && session?.user) {
         setUser(session.user);
         checkAuth();
@@ -148,663 +98,368 @@ export default function Home() {
         setUserRole(null);
       }
     });
-
     return () => subscription.unsubscribe();
   }, []);
 
-  const scrollToTeachers = () => teacherRef.current?.scrollIntoView({ behavior: "smooth" });
+  // lock page scroll while the mobile menu is open
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
-  const handleLogout = async () => {
+  const logout = async () => {
     await supabase.auth.signOut();
     setUser(null);
     setUserRole(null);
   };
 
-  // Handle Group Registration Submit
-  const handleGroupRegistration = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setGroupStatus("idle");
-    
-    if (!groupEmail) return;
-
+  const copyIban = async () => {
     try {
-      // TODO: Pakeiskite šį kodą su savo Supabase logika
-      setTimeout(() => {
-        setGroupStatus("success");
-        setGroupEmail("");
-      }, 500);
-      
-    } catch (error) {
-      console.error("Klaida registruojantis į grupę:", error);
-      setGroupStatus("error");
-    }
+      await navigator.clipboard.writeText(IBAN);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {}
   };
 
-  const lessons = [
-    { name: "IT", slug: "it" },
-    { name: "Matematika", slug: "matematika" },
-    { name: "Fizika", slug: "fizika" },
-    { name: "Biologija", slug: "biologija" },
-    { name: "Chemija", slug: "chemija" },
-    { name: "Anglų k.", slug: "anglu-k" },
-  ];
-
-  const stats = [
-    { icon: "📚", number: 1000, label: "pravestų pamokų" },
-    { icon: "😊", number: 100, label: "laimingų klientų" },
-    { icon: "🔟", number: 10, label: "gerų pažymių lietus" },
-  ];
-  const reviews = [
-    "Vaiko pažymiai pagerėjo nuo 7 iki 9 – mama Inga",
-    "Puikūs mokytojai padėjo pasiruošti egzaminams – tėtis Tomas",
-    "Mokytis tapo įdomu ir smagu – mokinė Greta",
-    "Individualus dėmesys davė puikių rezultatų – mama Asta",
-    "Matematikos baimė dingo po kelių pamokų – mokinys Lukas",
-    "Chemija tapo suprantama – mokinė Emilija",
-    "Sūnus gavo 90 iš matematikos VBE – tėtis Darius",
-    "Mokytoja labai kantri ir motyvuojanti – mama Lina",
-    "Anglų kalbos žinios šoktelėjo aukštyn – mokinė Monika",
-    "Pasitikėjimas savimi išaugo – mama Jurgita",
-    "Fizika pradėjo patikti – mokinys Mantas",
-    "Puiki platforma, paprasta naudotis – mama Rasa",
-    "Matematika dabar atrodo lengva – mokinė Gabija",
-    "Dukros pažymiai pagerėjo per mėnesį – tėtis Paulius",
-    "Vaikas pats noriai jungiasi į pamokas – mama Jolanta",
-    "Sūnus pradėjo mėgti mokslą – mama Kristina",
-    "Biologija tapo mėgstamiausia pamoka – mokinė Austėja",
-    "Chemijos kontroliniai nebebaisu – mokinys Karolis",
-    "Labai rekomenduoju visiems tėvams – tėtis Vytautas",
-    "Tikrai verta – mama Eglė",
-  ];
-
-  function AnimatedNumber({ value }: { value: number }) {
-    const [count, setCount] = useState(0);
-    useEffect(() => {
-      const controls = animate(0, value, {
-        duration: 1.5,
-        onUpdate(latest) {
-          setCount(Math.floor(latest));
-        },
-      });
-      return () => controls.stop();
-    }, [value]);
-    return <div className="text-5xl font-extrabold text-blue-600 select-none">{count}+</div>;
-  }
+  const dashboard = userRole === "tutor" ? "/tutor_dashboard" : userRole === "client" ? "/student_dashboard" : null;
 
   return (
-    <div className="flex flex-col min-h-screen bg-white text-gray-900 font-sans">
-      {/* Header */}
-      <header
-        className={`fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 shadow-sm transition-transform duration-300 ${
-          showHeader ? "translate-y-0" : "-translate-y-full"
-        }`}
-      >
-        <div className="flex justify-between items-center px-4 sm:px-8 py-3">
-          <div className="flex items-center justify-center">
-            <Image
-              src="/logo-removebg-preview.png"
-              alt="Tiksliukai Logo"
-              width={60}
-              height={60}
-              className="rounded-lg"
-            />
-          </div>
-          <nav>
-            {loading ? (
-              <div className="animate-pulse bg-gray-200 h-8 w-24 rounded"></div>
-            ) : user ? (
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600">Hello, {user.email}</span>
-                {userRole === "tutor" && (
-                  <Button
-                    onClick={() => router.push("/tutor_dashboard")}
-                    className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
-                  >
-                    Tutor Dashboard
-                  </Button>
-                )}
-                {userRole === "client" && (
-                  <Button
-                    onClick={() => router.push("/student_dashboard")}
-                    className="bg-green-600 hover:bg-green-700 px-3 py-1 text-sm"
-                  >
-                    Student Dashboard
-                  </Button>
-                )}
-                <Button
-                  onClick={handleLogout}
-                  className="bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-1 text-sm"
-                >
-                  Logout
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2">
-                {/* Log In / Sign Up buttons (desktop + mobile) */}
-                <div className="hidden sm:flex gap-2">
-                  <button onClick={() => router.push("/auth/log-in")} className="text-black px-4 py-2 text-sm">
-                    Log In
-                  </button>
+    <div className="min-h-screen bg-white text-slate-900 font-sans">
+      {/* ================= Header ================= */}
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-slate-100">
+        <div className="max-w-6xl mx-auto flex items-center justify-between gap-4 px-4 sm:px-6 h-16">
+          <Link href="/" className="flex items-center gap-2 shrink-0" aria-label="Tiksliukai.lt">
+            <Image src="/logo-removebg-preview.png" alt="Tiksliukai" width={44} height={44} className="rounded-lg" />
+            <span className="font-extrabold text-lg hidden sm:inline">Tiksliukai.lt</span>
+          </Link>
 
-                  <button onClick={() => router.push("/auth")} className="text-black px-4 py-2 text-sm">
-                    Sign Up
-                  </button>
-                  <a href="#bank-info" className="text-black px-4 py-2 text-sm">
-                    Pastoviems klientams
-                  </a>
-                </div>
-
-                {/* Mobile Hamburger Icon */}
-                <div className="sm:hidden flex flex-col items-end relative">
-                  <button
-                    onClick={() => setMenuOpen(!menuOpen)}
-                    className="text-gray-700 hover:text-blue-600 p-2 rounded-md"
-                  >
-                    {menuOpen ? (
-                      // Close Icon
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                      </svg>
-                    ) : (
-                      // Hamburger Icon
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-6 w-6"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-                      </svg>
-                    )}
-                  </button>
-
-                  {/* Mobile Menu Items */}
-                  {menuOpen && (
-                    <div className="mt-2 flex flex-col bg-white shadow-lg rounded-md w-48 py-4 absolute right-0 z-50">
-                      {/* X Icon Top Right */}
-                      <button
-                        onClick={() => setMenuOpen(false)}
-                        className="absolute top-2 right-2 text-gray-700 hover:text-red-500 p-1"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-5 w-5"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={2}
-                        >
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                      <a href="#bank-info" className="px-4 py-2 hover:bg-blue-100 text-gray-800">
-                        Pastoviems klientams
-                      </a>
-                      <a href="#apie-mus" className="px-4 py-2 hover:bg-blue-100 text-gray-800">
-                        Apie mus
-                      </a>
-                      <a href="#korepetitoriai" className="px-4 py-2 hover:bg-blue-100 text-gray-800">
-                        Korepetitoriai
-                      </a>
-                      <a href="/auth" className="px-4 py-2 hover:bg-blue-100 text-gray-800">
-                        Prisiregistruoti
-                      </a>
-                      <a href="/auth/log-in" className="px-4 py-2 hover:bg-blue-100 text-gray-800">
-                        Prisijungti
-                      </a>
-                      <a href="#pamokos" className="px-4 py-2 hover:bg-blue-100 text-gray-800">
-                        Pamokos
-                      </a>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+            {NAV.map((n) => <a key={n.href} href={n.href} className="hover:text-[#3B65CE]">{n.label}</a>)}
           </nav>
+
+          <div className="flex items-center gap-2">
+            {loading ? (
+              <div className="h-9 w-24 rounded-lg bg-slate-100 animate-pulse" />
+            ) : user ? (
+              <>
+                {dashboard && (
+                  <Link href={dashboard} className="text-sm font-semibold px-3 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700">
+                    Mano paskyra
+                  </Link>
+                )}
+                <button onClick={logout} className="hidden sm:block text-sm px-3 py-2 rounded-lg text-slate-600 hover:bg-slate-100">
+                  Atsijungti
+                </button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/log-in" className="hidden md:block text-sm px-3 py-2 text-slate-600 hover:text-[#3B65CE]">Prisijungti</Link>
+                <a href="#pamokos" className="text-sm font-semibold px-4 py-2 rounded-lg bg-[#3B65CE] text-white hover:bg-[#2f54b3]">
+                  Užsisakyti
+                </a>
+              </>
+            )}
+            <button onClick={() => setMenuOpen(true)} className="md:hidden p-2 -mr-2 text-slate-700" aria-label="Meniu">
+              <Menu size={24} />
+            </button>
+          </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="flex flex-col flex-grow scroll-smooth snap-y snap-mandatory">
-        
-        {/* === Hero / Landing Section === */}
-<section className="relative w-full min-h-screen bg-[#3B65CE] text-white overflow-hidden snap-start flex items-center">
-  <div className="absolute top-0 right-0 w-2/3 h-full bg-white/5 skew-x-12 pointer-events-none" />
-
-  <div className="max-w-7xl mx-auto px-6 py-24 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
-    {/* LEFT SIDE */}
-    <div className="flex flex-col gap-8">
-      {/* Trust */}
-      <div className="inline-flex items-center gap-2 bg-blue-800/30 border border-blue-400/30 px-4 py-2 rounded-full w-fit backdrop-blur-sm">
-        <span className="font-bold text-yellow-400">100+</span>
-        <span className="text-sm text-white/90">pagerintų vidurkių</span>
-      </div>
-
-      {/* Headline */}
-      <h1 className="text-4xl lg:text-6xl font-extrabold leading-[1.1]">
-        Korepetitoriai, kurie{" "}
-        <span className="relative inline-block">
-          <span className="relative z-10 bg-white text-[#3B65CE] px-4 py-1 rounded-xl shadow-xl transform -rotate-2 inline-block">
-            visada padės
-          </span>
-        </span>
-      </h1>
-
-      {/* Subheadline */}
-      <h2 className="text-lg lg:text-xl font-medium text-white/80 max-w-xl leading-relaxed">
-        Individualios pamokos su profesionaliais mokytojais 1–12 klasių mokiniams. Rezervuok pamoką per kelias minutes.
-      </h2>
-
-      {/* CTA BUTTONS GROUP */}
-      <div className="flex flex-col sm:flex-row flex-wrap gap-4 mt-4">
-        {/* 1. Pagrindinis mygtukas (Pamokos) */}
-        <Button
-          onClick={scrollToLessons}
-          className="group px-8 py-4 text-lg font-bold rounded-2xl bg-red-500 text-white hover:bg-red-600 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-red-500/40 flex items-center justify-center gap-3"
-        >
-          Atrask pamokas
-          <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-        </Button>
-
-        {/* 2. Karjeros testas */}
-        <Link
-          href="/career_test"
-          className="relative group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
-        >
-          <span className="absolute -top-2 -right-2 bg-red-500 text-[10px] font-black text-white px-2.5 py-1 rounded-full uppercase tracking-wider z-10 shadow-sm">
-            Naujiena
-          </span>
-          <Compass size={20} className="group-hover:rotate-45 transition-transform duration-500" />
-          <span>Karjeros testas</span>
-        </Link>
-
-        {/* 3. Grupinės pamokos */}
-        <Link
-          href="/grupines"
-          className="group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
-        >
-          <Users size={20} className="group-hover:scale-110 transition-transform duration-300" />
-          <span>Grupinės pamokos</span>
-        </Link>
-
-        {/* 4. Akcijų biržos žaidimas */}
-        <Link
-          href="/akciju_birza"
-          className="group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
-        >
-          <TrendingUp size={20} className="group-hover:-translate-y-0.5 transition-transform duration-300" />
-          <span>Akcijų biržos žaidimas</span>
-        </Link>
-
-        {/* 5. Night Run žaidimas */}
-        <Link
-          href="/games/games_2"
-          className="group px-8 py-4 text-lg font-bold rounded-2xl bg-white text-[#3B65CE] hover:bg-blue-50 transition-all duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-white/20 flex items-center justify-center gap-3 border border-transparent hover:border-blue-100"
-        >
-          <Siren size={20} className="group-hover:scale-110 transition-transform duration-300" />
-          <span>Night Run žaidimas</span>
-        </Link>
-      </div>
-
-      <p className="text-xs text-blue-200 ml-1">* Karjeros testas padės pasirinkti tinkamus egzaminus.</p>
-    </div>
-
-    {/* RIGHT SIDE */}
-    <div className="relative flex justify-center items-center lg:justify-end">
-      <div className="relative w-full max-w-md aspect-[4/5] rounded-[2.5rem] overflow-hidden border-4 border-white/20 shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-700">
-        <img
-          src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/Gemini_Generated_Image_kl5nq3kl5nq3kl5n.png"
-          alt="Student learning"
-          className="w-full h-full object-cover scale-105 hover:scale-110 transition-transform duration-700"
-        />
-
-        <div className="absolute inset-0 bg-gradient-to-t from-[#3B65CE]/80 to-transparent opacity-60"></div>
-
-        {/* Floating Card inside image */}
-        <div className="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-md p-4 rounded-2xl shadow-lg border border-white/50">
-          <div className="flex items-center gap-3">
-            <div className="bg-green-100 p-2 rounded-full">
-              <ArrowRight className="text-green-600 w-5 h-5 -rotate-45" />
-            </div>
-            <div>
-              <p className="text-slate-900 font-bold text-sm">Vidurkis pakilo</p>
-              <p className="text-slate-500 text-xs">nuo 6.2 iki 9.4</p>
-            </div>
+      {/* Mobile menu: full-screen sheet with big tap targets */}
+      {menuOpen && (
+        <div className="fixed inset-0 z-[60] bg-white flex flex-col md:hidden">
+          <div className="flex items-center justify-between px-4 h-16 border-b border-slate-100">
+            <span className="font-extrabold text-lg">Meniu</span>
+            <button onClick={() => setMenuOpen(false)} className="p-2 -mr-2" aria-label="Uždaryti"><X size={24} /></button>
+          </div>
+          <nav className="flex flex-col px-4 py-4 text-lg font-semibold" onClick={() => setMenuOpen(false)}>
+            {[...NAV, { href: "#daugiau", label: "Testai ir žaidimai" }, { href: "#bank-info", label: "Pastoviems klientams" }].map((n) => (
+              <a key={n.href} href={n.href} className="py-4 border-b border-slate-100 flex justify-between items-center">
+                {n.label} <ArrowRight size={18} className="text-slate-300" />
+              </a>
+            ))}
+          </nav>
+          <div className="mt-auto p-4 grid grid-cols-2 gap-3">
+            {user ? (
+              <>
+                {dashboard && <Link href={dashboard} className="py-3 rounded-xl bg-[#3B65CE] text-white text-center font-semibold">Mano paskyra</Link>}
+                <button onClick={() => { logout(); setMenuOpen(false); }} className="py-3 rounded-xl border border-slate-200 font-semibold">Atsijungti</button>
+              </>
+            ) : (
+              <>
+                <Link href="/auth/log-in" className="py-3 rounded-xl border border-slate-200 text-center font-semibold">Prisijungti</Link>
+                <Link href="/auth" className="py-3 rounded-xl bg-[#3B65CE] text-white text-center font-semibold">Registruotis</Link>
+              </>
+            )}
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Floating accents */}
-      <div className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-[#FF8200] blur-[80px] opacity-60" />
-      <div className="absolute top-10 -right-10 w-40 h-40 rounded-full bg-blue-400 blur-[80px] opacity-40" />
-    </div>
-  </div>
-</section>
+      <main>
+        {/* ================= Hero ================= */}
+        <section className="relative overflow-hidden bg-[#3B65CE] text-white">
+          <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-white/10 blur-3xl pointer-events-none" />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12 sm:py-20 grid lg:grid-cols-2 gap-10 items-center relative">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 px-3 py-1.5 rounded-full text-sm mb-5">
+                <Star size={14} className="text-yellow-300 fill-yellow-300" />
+                <span><b className="text-yellow-300">100+</b> pagerintų vidurkių</span>
+              </div>
+              <h1 className="text-[2.1rem] leading-[1.15] sm:text-5xl lg:text-6xl font-extrabold">
+                Korepetitoriai, kurie{" "}
+                <span className="inline-block bg-white text-[#3B65CE] px-3 rounded-xl -rotate-2">visada padės</span>
+              </h1>
+              <p className="mt-5 text-base sm:text-lg text-blue-50/90 max-w-lg leading-relaxed">
+                Individualios nuotolinės pamokos 1–12 klasių mokiniams. Pasirinkite dalyką ir laikus, o mokytojas susisieks pats.
+              </p>
 
-        {/* Section 1: Lessons */}
-        <section
-          id="pamokos"
-          ref={lessonsRef}
-          className="w-full h-[85svh] flex flex-col items-center justify-start snap-start px-4 bg-white relative overflow-hidden"
-          style={{
-            backgroundImage: `
-      linear-gradient(to right, rgba(0,100,255,0.1) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0,100,255,0.1) 1px, transparent 1px)
-    `,
-            backgroundSize: "40px 40px",
-          }}
-        >
-          <div className="h-24"></div> {/* spacer for header */}
-          {/* Section title */}
-          <h1 className="text-5xl font-extrabold mb-2 text-center">Pasirinkite pamoką</h1>
-          {/* Educational project text */}
-          <p className="mt-1 mb-8 text-center text-gray-600 text-lg max-w-xl">
-            Individualios tiksliųjų mokslų pamokos su profesionaliais mokytojais, kurie prisitaiko prie vaiko mokymosi
-            stiliaus.
-          </p>
-          {/* Lessons grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-6 w-full max-w-4xl mb-12">
-            {lessons.map((lesson) => (
-              <Button
-                key={lesson.slug}
-                className="w-full min-w-0 px-4 py-3 text-lg font-semibold rounded-2xl bg-[#3B65CE] text-white hover:bg-[#2C4A8E] transition-shadow duration-300 shadow-md"
-                onClick={() => router.push(`/schedule/${lesson.slug}`)}
-              >
-                {lesson.name}
-              </Button>
-            ))}
-          </div>
-          {/* Reviews carousel */}
-          <div className="w-full h-24 overflow-hidden mb-12 flex items-center">
-            {" "}
-            {/* slim height & vertical center */}
-            <motion.div
-              className="flex gap-4"
-              animate={{ x: ["0%", "-50%"] }} // scroll half width for seamless loop
-              transition={{ repeat: Infinity, duration: 50, ease: "linear" }}
-            >
-              {[...reviews, ...reviews].map((review, i) => (
-                <div
-                  key={i}
-                  className="min-w-[280px] max-w-xs sm:min-w-[300px] sm:max-w-sm p-3 bg-white rounded-2xl shadow-md border border-gray-100 flex items-center justify-center transition-shadow duration-300"
-                >
-                  <p className="text-gray-700 text-sm italic text-center truncate">“{review}”</p>
+              <div className="mt-7 flex flex-col sm:flex-row gap-3">
+                <a href="#pamokos" className="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-2xl bg-white text-[#3B65CE] text-lg font-bold shadow-lg hover:bg-blue-50">
+                  Pasirinkti pamoką <ChevronDown size={20} />
+                </a>
+                <a href="#kaip" className="inline-flex items-center justify-center px-7 py-4 rounded-2xl border border-white/40 font-semibold hover:bg-white/10">
+                  Kaip tai veikia?
+                </a>
+              </div>
+
+              <ul className="mt-8 grid grid-cols-3 gap-2 text-center text-sm">
+                {[["25 €", "už 45 min."], ["Google Meet", "nuotoliu"], ["1–12", "klasės"]].map(([a, b]) => (
+                  <li key={a} className="rounded-xl bg-white/10 py-3 px-1">
+                    <b className="block text-base sm:text-lg">{a}</b>
+                    <span className="text-blue-100 text-xs sm:text-sm">{b}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Photo only on large screens, so phones get straight to the point */}
+            <div className="hidden lg:flex justify-end">
+              <div className="relative w-full max-w-md aspect-[4/5] rounded-[2.5rem] overflow-hidden border-4 border-white/20 shadow-2xl rotate-2">
+                <img
+                  src="https://yabbhnnhnrainsakhuio.supabase.co/storage/v1/object/public/teacher%20photos/Gemini_Generated_Image_kl5nq3kl5nq3kl5n.png"
+                  alt="Mokinys mokosi"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute bottom-6 left-6 right-6 bg-white p-4 rounded-2xl shadow-lg text-slate-900 flex items-center gap-3">
+                  <div className="bg-emerald-100 p-2 rounded-full"><TrendingUp className="text-emerald-600 w-5 h-5" /></div>
+                  <div>
+                    <p className="font-bold text-sm">Vidurkis pakilo</p>
+                    <p className="text-slate-500 text-xs">nuo 6,2 iki 9,4</p>
+                  </div>
                 </div>
-              ))}
-            </motion.div>
+              </div>
+            </div>
           </div>
         </section>
 
-       
-        <motion.section
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="w-full min-h-[85svh] flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20"
-        >
-          <h2 className="text-5xl text-white font-extrabold mb-8 text-center">Kaip veikia sistema?</h2>
-
-          {/* Step List as Tip Boxes with stagger animation */}
-          <motion.div
-            className="max-w-xl flex flex-col gap-6 mb-8"
-            variants={{
-              hidden: {},
-              visible: {
-                transition: {
-                  staggerChildren: 0.3, // each tip appears 0.3s after previous
-                },
-              },
-            }}
-          >
-            {[
-              "Pasirink mokytoją iš mūsų patikrintos komandos.",
-              "Rezervuok pamoką patogiu laiku.",
-              "Apmokėk saugiai per mūsų sistemą.",
-              "Gauk nuorodą el. paštu ir junkis prie pamokos!",
-            ].map((tip, i) => (
-              <motion.div
-                key={i}
-                className={`p-6 rounded-xl shadow-md border-l-4 transition-transform duration-300 hover:scale-105 ${
-                  i % 2 === 0 ? "bg-white border-blue-800" : "bg-white border-yellow-300"
-                }`}
-                variants={{
-                  hidden: { opacity: 0, y: 20 },
-                  visible: { opacity: 1, y: 0 },
-                }}
+        {/* ================= Lessons ================= */}
+        <section id="pamokos" className="scroll-mt-16 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+          <SectionTitle kicker="Pamokos" title="Ką norite mokytis?" text="Paspauskite dalyką ir pasirinkite jums tinkamus laikus." />
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+            {LESSONS.map(({ name, slug, note, Icon }) => (
+              <Link
+                key={slug}
+                href={`/schedule/${slug}`}
+                className="group rounded-2xl border border-slate-200 p-4 sm:p-6 hover:border-[#3B65CE] hover:shadow-lg active:scale-[0.98] transition"
               >
-                <p className="text-gray-800 text-lg">{tip}</p>
-              </motion.div>
+                <div className="w-11 h-11 rounded-xl bg-blue-50 text-[#3B65CE] flex items-center justify-center mb-3 group-hover:bg-[#3B65CE] group-hover:text-white transition">
+                  <Icon size={22} />
+                </div>
+                <p className="font-bold text-lg leading-tight">{name}</p>
+                <p className="text-sm text-slate-500 mt-0.5">{note}</p>
+                <p className="mt-3 text-sm font-semibold text-[#3B65CE] flex items-center gap-1">
+                  Pasirinkti <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
+                </p>
+              </Link>
             ))}
-          </motion.div>
-        </motion.section>
-
-        {/* Section 4: Apie mus */}
-        <motion.section
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="w-full flex flex-col items-center bg-white px-6 py-20"
-          id="apie-mus"
-        >
-          {/* Apie mus */}
-          <div className="text-center max-w-3xl mb-16">
-            <h2 className="text-5xl font-extrabold mb-6">Apie mus</h2>
-            <p className="text-xl text-gray-800 leading-relaxed mb-6 p-6 bg-white rounded-xl shadow-md border-l-4 border-blue-400">
-              Tiksliukai.lt – tai modernus edukacinis projektas. <br />
-              Dirbame tam, kad mokymasis būtų lengvesnis, efektyvesnis ir patogesnis kiekvienam mokiniui Lietuvoje.
-            </p>
-
-            {/* Social links */}
-            <div className="flex justify-center gap-8 text-3xl">
-              <a
-                href="https://www.instagram.com/tiksliukai.lt/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-pink-500 hover:text-pink-600 transition-colors"
-              >
-                <FaInstagram />
-              </a>
-              <a
-                href="https://www.facebook.com/tiksliukai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 transition-colors"
-              >
-                <FaFacebook />
-              </a>
-            </div>
           </div>
+          <p className="text-center text-sm text-slate-500 mt-6">Visos pamokos – <b className="text-slate-700">25 € už 45 min.</b></p>
+        </section>
 
-          {/* FAQ Accordion */}
-          <div className="w-full max-w-3xl space-y-4">
-            <h2 className="text-5xl font-extrabold mb-6 text-center">DUK</h2>
-            {faqData.map((faq, index) => (
-              <div
-                key={index}
-                className={`faq-item bg-white rounded-2xl shadow-md overflow-hidden transition-all duration-300`}
-              >
-                <button
-                  className="w-full flex justify-between items-center p-4 text-left font-semibold text-gray-800 focus:outline-none"
-                  aria-expanded={activeIndex === index}
-                  onClick={() => toggleFAQ(index)}
-                >
-                  <span>{faq.question}</span>
-                  <span className="text-gray-500 text-xl">{activeIndex === index ? "−" : "+"}</span>
-                </button>
-                {activeIndex === index && (
-                  <div className="faq-answer p-4 border-t border-gray-200 text-gray-700">
-                    <p>{faq.answer}</p>
+        {/* ================= How it works ================= */}
+        <section id="kaip" className="scroll-mt-16 bg-slate-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+            <SectionTitle kicker="Kaip tai veikia" title="Trys paprasti žingsniai" />
+            <ol className="grid md:grid-cols-3 gap-3 sm:gap-6">
+              {STEPS.map(({ Icon, title, text }, i) => (
+                <li key={title} className="flex md:flex-col gap-4 bg-white rounded-2xl p-5 sm:p-6 shadow-sm">
+                  <div className="relative shrink-0 w-12 h-12 rounded-full bg-[#3B65CE] text-white flex items-center justify-center">
+                    <Icon size={22} />
+                    <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-yellow-400 text-slate-900 text-xs font-bold flex items-center justify-center">{i + 1}</span>
                   </div>
-                )}
+                  <div>
+                    <p className="font-bold text-lg">{title}</p>
+                    <p className="text-slate-600 mt-1">{text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        {/* ================= About + teachers ================= */}
+        <section id="apie-mus" className="scroll-mt-16 max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+          <SectionTitle
+            kicker="Apie mus"
+            title="Mokytojai, kurie prisitaiko prie mokinio"
+            text="Tiksliukai.lt – edukacinis projektas, kuriuo siekiame, kad kiekvienas mokinys Lietuvoje galėtų mokytis iš gerų mokytojų, nesvarbu, kur gyvena."
+          />
+
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl mx-auto mb-10 text-center">
+            {[["1000+", "pravestų pamokų"], ["100+", "laimingų šeimų"], [`${TEACHERS.length}`, "mokytojai"]].map(([n, l]) => (
+              <div key={l} className="rounded-2xl bg-blue-50 py-4">
+                <p className="text-2xl sm:text-3xl font-extrabold text-[#3B65CE]">{n}</p>
+                <p className="text-xs sm:text-sm text-slate-600">{l}</p>
               </div>
             ))}
           </div>
-        </motion.section>
 
-        {/* Section 5: Misija ir vizija */}
-        <motion.section
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.3 }}
-          transition={{ duration: 0.5, ease: "easeOut" }}
-          className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-6 py-20 overflow-hidden"
-        >
-          {/* Baltic States Map Background */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-10"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 800 1000"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            <path
-              d="M350 50 L420 80 L460 150 L480 250 L470 350 L430 420 L400 500 L380 600 L350 680 L300 750 L250 730 L220 650 L200 550 L210 450 L250 350 L300 250 L320 150 Z"
-              fill="white"
-              fillOpacity="0.15"
-              stroke="white"
-              strokeWidth="2"
-            />
-          </svg>
-
-          {/* Content */}
-          <h2 className="relative z-10 text-5xl font-extrabold mb-8 text-center text-white">Mūsų misija ir vizija</h2>
-          <p className="relative z-10 max-w-3xl text-xl text-white leading-relaxed text-center">
-            <span className="font-bold text-yellow-400">Mūsų misija</span> – suteikti kiekvienam vaikui galimybę
-            mokytis iš geriausių mokytojų, nepriklausomai nuo jų gyvenamos vietos ar galimybių.
-            <br />
-            <span className="font-bold text-yellow-400">Vizija</span> – būti Nr. 1 korepetitorių platforma Baltijos
-            šalyse.
-          </p>
-
-          {/* BIG ICON BELOW */}
-          <motion.div
-            initial={{ scale: 0 }}
-            whileInView={{ scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.7, ease: "easeOut" }}
-            className="relative z-10 mt-12 text-yellow-400"
-          >
-            <FaTrophy className="w-24 h-24 md:w-32 md:h-32" />
-          </motion.div>
-        </motion.section>
-
-        {/* Section 6: Statistika */}
-        <motion.section
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="w-full min-h-[50vh] flex flex-col justify-center items-center bg-white snap-start px-6 py-20"
-        >
-          <h2 className="text-4xl font-extrabold mb-12 text-center">Statistika</h2>
-          <div className="flex flex-col md:flex-row gap-16 justify-center items-center max-w-5xl w-full">
-            {stats.map(({ icon, number, label }) => (
-              <div key={label} className="flex flex-col items-center">
-                <div className="text-7xl mb-4 select-none">{icon}</div>
-                <AnimatedNumber value={number} />
-                <div className="mt-2 text-xl text-gray-700 text-center">{label}</div>
-              </div>
+          <h3 id="korepetitoriai" className="scroll-mt-20 font-bold text-xl mb-4">Mūsų mokytojai</h3>
+          {/* Swipe on phones, grid on desktop */}
+          <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
+            {TEACHERS.map((t) => (
+              <article key={t.name} className="snap-start shrink-0 w-[80%] sm:w-auto rounded-2xl border border-slate-200 p-5">
+                <div className="flex items-center gap-4 mb-3">
+                  <img src={t.img} alt={t.name} className="w-16 h-16 rounded-full object-cover bg-slate-100" loading="lazy" />
+                  <div className="min-w-0">
+                    <p className="font-bold leading-tight">{t.name}</p>
+                    <p className="text-sm text-[#3B65CE] font-medium">{t.subject}</p>
+                    <p className="text-xs text-slate-500">Patirtis: {t.experience}</p>
+                  </div>
+                </div>
+                <p className="text-sm text-slate-600 leading-relaxed line-clamp-4">{t.description}</p>
+              </article>
             ))}
           </div>
-        </motion.section>
+          <p className="sm:hidden text-xs text-slate-400 mt-2 text-center">← Braukite, kad pamatytumėte daugiau →</p>
+        </section>
 
-
-        {/* Section 3: Kam man registruotis */}
-        <motion.section
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#3B65CE] snap-start px-4 py-16 sm:px-6 lg:px-20 overflow-hidden"
-        >
-          {/* Yellow Ribbon */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[250%] h-32 bg-yellow-400 rotate-[-8deg] opacity-70"></div>
-          </div>
-
-          {/* Minimalist Navigation Path */}
-          <svg
-            className="absolute inset-0 w-full h-full pointer-events-none opacity-40"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="none"
-          >
-            {/* Smooth red curved path */}
-            <path
-              d="M 0 400 Q 300 200, 600 400 T 1200 400"
-              stroke="#DC2626"
-              strokeWidth="3"
-              fill="none"
-              strokeLinecap="round"
-              strokeDasharray="10 14"
-            />
-
-            {/* Waypoints */}
-            <circle cx="0" cy="400" r="6" fill="#DC2626" />
-            <circle cx="600" cy="400" r="6" fill="#DC2626" />
-            <circle cx="1200" cy="400" r="6" fill="#DC2626" />
-          </svg>
-
-          {/* Content Card */}
-          <div className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6">
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-center mb-4">Kam man registruotis?</h2>
-            <p className="text-base sm:text-lg text-gray-700 text-center max-w-2xl">
-              Užsiregistravę galėsite stebėti vaiko progresą, pamokų rezultatus ir mokymosi tendencijas.
-            </p>
-          </div>
-        </motion.section>
-        {/* Section: Bank Details */}
-        <motion.section
-          id="bank-info"
-          initial={{ opacity: 0, y: 60 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="relative w-full min-h-screen flex flex-col justify-center items-center bg-[#E2E8F0] snap-start px-4 py-16 sm:px-6 lg:px-20 overflow-hidden"
-        >
-          {/* Decorative background */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-[250%] h-32 bg-[#3B65CE] rotate-[-6deg] opacity-10"></div>
-          </div>
-
-          {/* Content Card */}
-          <div className="relative z-10 w-full max-w-3xl bg-white rounded-3xl shadow-lg p-8 sm:p-12 flex flex-col items-center gap-6 text-center">
-            <h2 className="text-3xl sm:text-5xl font-extrabold mb-4 text-[#3B65CE]">
-              Jei turite pastovius laikus, galite apmokėti paprasčiau.
-            </h2>
-            <p className="text-base sm:text-lg text-gray-700 max-w-2xl">
-              Pamokos kaina yra 25eur. Galite pervesti pinigus už susitartą pamokų skaičių netikrinant naujų laikų.
-            </p>
-
-            {/* Bank Info Placeholder */}
-            <div className="bg-[#F9FAFB] border border-gray-200 rounded-2xl px-6 py-4 text-left w-full max-w-md mt-4">
-              <p className="font-semibold text-gray-800">Vardas, Pavardė:</p>
-              <p className="text-gray-700 mb-3">Dovydas Žilinskas</p>
-
-              <p className="font-semibold text-gray-800">IBAN:</p>
-              <p className="text-gray-700 mb-3">LT077300010164121505</p>
-
-              <p className="font-semibold text-gray-800">Bankas:</p>
-              <p className="text-gray-700">SWEDBANK</p>
+        {/* ================= Reviews ================= */}
+        <section className="bg-slate-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
+            <SectionTitle kicker="Atsiliepimai" title="Ką sako šeimos" />
+            <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex sm:grid sm:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory pb-2">
+              {REVIEWS.map((r) => (
+                <figure key={r.text} className="snap-start shrink-0 w-[75%] sm:w-auto bg-white rounded-2xl p-5 shadow-sm">
+                  <div className="flex gap-0.5 mb-2">
+                    {Array.from({ length: 5 }, (_, i) => <Star key={i} size={14} className="text-yellow-400 fill-yellow-400" />)}
+                  </div>
+                  <blockquote className="text-slate-800">„{r.text}“</blockquote>
+                  <figcaption className="text-sm text-slate-500 mt-2">– {r.who}</figcaption>
+                </figure>
+              ))}
             </div>
-
-            <p className="text-sm text-gray-500 mt-4">*Prašome patikrinti informaciją prieš atlikdami pavedimą.</p>
           </div>
-        </motion.section>
+        </section>
+
+        {/* ================= FAQ ================= */}
+        <section id="duk" className="scroll-mt-16 max-w-3xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+          <SectionTitle kicker="DUK" title="Dažniausi klausimai" />
+          <div className="divide-y divide-slate-200 border-y border-slate-200">
+            {FAQ.map((f, i) => {
+              const open = openFaq === i;
+              return (
+                <div key={f.q}>
+                  <button
+                    onClick={() => setOpenFaq(open ? null : i)}
+                    aria-expanded={open}
+                    className="w-full flex items-center justify-between gap-4 py-4 text-left font-semibold"
+                  >
+                    {f.q}
+                    <ChevronDown size={20} className={`shrink-0 text-slate-400 transition-transform ${open ? "rotate-180" : ""}`} />
+                  </button>
+                  {open && <p className="pb-4 -mt-1 text-slate-600 leading-relaxed">{f.a}</p>}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ================= Closing CTA ================= */}
+        <section className="px-4 sm:px-6 pb-14">
+          <div className="max-w-4xl mx-auto rounded-3xl bg-[#3B65CE] text-white text-center px-6 py-10 sm:py-14">
+            <h2 className="text-2xl sm:text-4xl font-extrabold">Pasiruošę pirmai pamokai?</h2>
+            <p className="mt-2 text-blue-100">Užklausa nemokama ir neįpareigoja.</p>
+            <a href="#pamokos" className="mt-6 inline-flex items-center gap-2 px-7 py-4 rounded-2xl bg-white text-[#3B65CE] font-bold text-lg hover:bg-blue-50">
+              Pasirinkti pamoką <ArrowRight size={20} />
+            </a>
+          </div>
+        </section>
+
+        {/* ================= Extras (kept small) ================= */}
+        <section id="daugiau" className="scroll-mt-16 bg-slate-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+            <h2 className="font-bold text-xl mb-4">Testai ir žaidimai</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {EXTRAS.map(({ href, title, text, Icon, badge }) => (
+                <Link key={href} href={href} className="flex items-center gap-3 bg-white rounded-2xl p-4 border border-slate-200 hover:border-[#3B65CE]">
+                  <div className="w-10 h-10 shrink-0 rounded-xl bg-blue-50 text-[#3B65CE] flex items-center justify-center"><Icon size={20} /></div>
+                  <div className="min-w-0">
+                    <p className="font-semibold leading-tight flex items-center gap-2">
+                      {title}
+                      {badge && <span className="text-[10px] uppercase font-bold bg-red-500 text-white px-1.5 py-0.5 rounded-full">{badge}</span>}
+                    </p>
+                    <p className="text-sm text-slate-500">{text}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ================= Regular clients: bank details ================= */}
+        <section id="bank-info" className="scroll-mt-16 max-w-6xl mx-auto px-4 sm:px-6 py-12">
+          <div className="grid md:grid-cols-2 gap-6 items-center rounded-3xl border border-slate-200 p-6 sm:p-8">
+            <div>
+              <h2 className="font-bold text-xl">Pastoviems klientams</h2>
+              <p className="text-slate-600 mt-2">
+                Jei turite pastovius pamokų laikus, galite iš anksto pervesti už susitartą pamokų skaičių (25 € už pamoką).
+              </p>
+            </div>
+            <dl className="rounded-2xl bg-slate-50 p-5 text-sm space-y-2">
+              <div className="flex justify-between gap-3"><dt className="text-slate-500">Gavėjas</dt><dd className="font-semibold">Dovydas Žilinskas</dd></div>
+              <div className="flex justify-between gap-3 items-center">
+                <dt className="text-slate-500">IBAN</dt>
+                <dd className="font-semibold flex items-center gap-2">
+                  <span className="font-mono text-xs sm:text-sm">{IBAN}</span>
+                  <button onClick={copyIban} className="p-1.5 rounded-lg hover:bg-white" aria-label="Kopijuoti IBAN">
+                    {copied ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                  </button>
+                </dd>
+              </div>
+              <div className="flex justify-between gap-3"><dt className="text-slate-500">Bankas</dt><dd className="font-semibold">Swedbank</dd></div>
+            </dl>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="text-center py-6 text-sm text-gray-500 border-t border-gray-200">
-        © 2025 Tiksliukai.lt
+      {/* ================= Footer ================= */}
+      <footer className="border-t border-slate-200">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+          <div className="flex items-center gap-2">
+            <Image src="/logo-removebg-preview.png" alt="" width={28} height={28} />
+            <span>© {new Date().getFullYear()} Tiksliukai.lt</span>
+          </div>
+          <a href="mailto:info.tiksliukai@gmail.com" className="hover:text-[#3B65CE] flex items-center gap-1.5">
+            <Mail size={16} /> info.tiksliukai@gmail.com
+          </a>
+          <div className="flex gap-4 text-2xl">
+            <a href="https://www.instagram.com/tiksliukai.lt/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-pink-500 hover:text-pink-600"><FaInstagram /></a>
+            <a href="https://www.facebook.com/tiksliukai" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-blue-600 hover:text-blue-700"><FaFacebook /></a>
+          </div>
+        </div>
       </footer>
+    </div>
+  );
+}
+
+function SectionTitle({ kicker, title, text }: { kicker: string; title: string; text?: string }) {
+  return (
+    <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">
+      <p className="text-sm font-bold uppercase tracking-widest text-[#3B65CE]">{kicker}</p>
+      <h2 className="mt-2 text-2xl sm:text-4xl font-extrabold leading-tight">{title}</h2>
+      {text && <p className="mt-3 text-slate-600 leading-relaxed">{text}</p>}
     </div>
   );
 }
