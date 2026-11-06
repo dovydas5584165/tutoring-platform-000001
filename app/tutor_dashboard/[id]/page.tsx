@@ -262,9 +262,7 @@ export default function TutorDashboard() {
   const handleNotificationResponse = async (notification: Notification, isYes: boolean) => {
     if (!id) return;
 
-    setNotifications((prev) =>
-      prev.filter((n) => n.id !== notification.id && (!notification.booking_id || n.booking_id !== notification.booking_id))
-    );
+    setNotifications((prev) => prev.filter((n) => n.id !== notification.id));
 
     try {
       const { error: updateError } = await supabase

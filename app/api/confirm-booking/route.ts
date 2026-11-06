@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../lib/supabaseClient';
 import { sendEmail } from '../../../lib/email';
-import { closeBookingNotifications } from '../../../lib/bookingNotification';
 
 export async function POST(request: NextRequest) {
   try {
@@ -42,23 +41,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Booking is already confirmed' }, { status: 400 });
     }
 
-    // A cancelled/refunded or unpaid booking must never be confirmed
-    if (booking.payment_status !== 'paid') {
-      await closeBookingNotifications(bookingId);
-      return NextResponse.json(
-        { error: `Booking cannot be confirmed (status: ${booking.payment_status})` },
-        { status: 400 }
-      );
-    }
-
-    // Conditional update: only one request can flip it, so the email goes out once
-    const { data: updated, error: updateError } = await supabase
+    // Update booking to confirmed
+    const { error: updateError } = await supabase
       .from('bookings')
       .update({ confirmed_by_tutor: true })
-      .eq('id', bookingId)
-      .eq('payment_status', 'paid')
-      .or('confirmed_by_tutor.is.null,confirmed_by_tutor.eq.false')
-      .select('id');
+      .eq('id', bookingId);
 
     if (updateError) {
       console.error('❌ Error updating booking:', updateError);
@@ -67,12 +54,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-
-    if (!updated || updated.length === 0) {
-      return NextResponse.json({ error: 'Booking is already confirmed or cancelled' }, { status: 400 });
-    }
-
-    await closeBookingNotifications(bookingId);
 
     console.log('✅ Booking confirmed');
 

@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../lib/supabaseClient';
 import { getServerStripe } from '../../../lib/stripe';
 import { sendEmail, generatePaymentSuccessEmail, generateTutorOrderEmail } from '../../../lib/email';
-import { ensureBookingNotification } from '../../../lib/bookingNotification';
 
 export async function POST(request: NextRequest) {
   try {
@@ -78,9 +77,6 @@ export async function POST(request: NextRequest) {
       console.error('Klaida gaunant laikus:', slotsError);
       return NextResponse.json({ error: 'Nepavyko gauti rezervacijos detalių' }, { status: 500 });
     }
-
-    // Tutor's accept/decline notification (no-op if the webhook already created it)
-    await ensureBookingNotification(booking, slots || []);
 
     // Siųsti mokėjimo patvirtinimą studentui
     const tutorName = booking.users ? `${booking.users.vardas} ${booking.users.pavarde}` : 'Nežinomas';
