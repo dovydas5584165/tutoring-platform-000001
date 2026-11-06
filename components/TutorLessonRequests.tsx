@@ -5,6 +5,7 @@ import { format } from "date-fns";
 import { lt } from "date-fns/locale";
 import { CalendarCheck, Loader2, Mail, Phone, RefreshCw } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
+import { fmtLessonTime, mailtoLink, templates } from "@/lib/tutorEmailTemplates";
 
 type OpenRequest = {
   id: string;
@@ -47,6 +48,7 @@ export default function TutorLessonRequests() {
   const [picked, setPicked] = useState<{ id: string; slot: string } | null>(null);
   const [claiming, setClaiming] = useState(false);
   const [flash, setFlash] = useState("");
+  const [me, setMe] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -57,6 +59,7 @@ export default function TutorLessonRequests() {
       if (!res.ok) throw new Error(data.error || "Nepavyko gauti užklausų");
       setOpen(data.open || []);
       setMine(data.mine || []);
+      setMe(data.me?.name || "");
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -193,6 +196,19 @@ export default function TutorLessonRequests() {
                   <p className="text-sm text-gray-700">
                     {m.student_name} ({m.grade}){m.topic ? ` · „${m.topic}“` : ""}
                   </p>
+                </div>
+                <div className="w-full flex flex-wrap gap-2 order-last">
+                  {templates({ student: m.student_name, subject: m.subject, when: fmtLessonTime(m.chosen_slot), tutor: me || "[jūsų vardas]" }, m.email).map((t, i) => (
+                    <a
+                      key={t.id}
+                      href={mailtoLink(t, m.email)}
+                      className={`text-xs font-semibold px-3 py-1.5 rounded-lg border ${
+                        i === 0 ? "bg-[#3B65CE] text-white border-[#3B65CE] hover:bg-[#2f54b3]" : "bg-white border-gray-300 hover:border-[#3B65CE]"
+                      }`}
+                    >
+                      {i === 0 ? "✉️ Rašyti mokiniui" : i === 1 ? "Atšaukti / perkelti" : "Administracijai"}
+                    </a>
+                  ))}
                 </div>
                 <div className="flex flex-col text-sm gap-1">
                   <a href={`mailto:${m.email}`} className="flex items-center gap-1.5 text-[#3B65CE] hover:underline">
