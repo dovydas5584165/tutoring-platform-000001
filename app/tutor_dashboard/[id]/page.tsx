@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
 import WeeklyAvailabilitySelector from "@/components/WeeklyAvailabilitySelector";
+import TutorLessonRequests from "@/components/TutorLessonRequests";
+import { BOOKING_PAYMENTS_ENABLED } from "@/lib/features";
 
 type AvailabilitySlot = {
   id: string;
@@ -477,6 +479,8 @@ export default function TutorDashboard() {
       </header>
 
       <main className="flex-grow container mx-auto px-6 sm:px-10 py-10 space-y-10 max-w-7xl">
+
+        <TutorLessonRequests />
         
         <section className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-semibold mb-6 border-b pb-3 flex items-center justify-between">
@@ -518,6 +522,8 @@ export default function TutorDashboard() {
           )}
         </section>
 
+        {/* Old paid bookings list, switched off: see lib/features.ts */}
+        {BOOKING_PAYMENTS_ENABLED && (
         <section className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Užsakymai</h2>
           {ordersLoading ? (
@@ -570,6 +576,7 @@ export default function TutorDashboard() {
             </ul>
           )}
         </section>
+        )}
 
         <section className="bg-white rounded-xl shadow-lg p-8 border-l-4 border-blue-500">
           <div className="flex justify-between items-center mb-6 border-b pb-3">

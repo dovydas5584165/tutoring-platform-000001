@@ -5,11 +5,12 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '../../components/CheckoutForm';
+import { BOOKING_PAYMENTS_ENABLED } from '../../lib/features';
 import { supabase } from '../../lib/supabaseClient';
 import { format, parseISO } from 'date-fns';
 import { lt } from 'date-fns/locale';
 
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+const stripePromise = BOOKING_PAYMENTS_ENABLED ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!) : null;
 
 interface BookingDetails {
   id: string;
@@ -43,6 +44,7 @@ function PaymentContent() {
   const [error, setError] = useState<string>('');
 
   useEffect(() => {
+    if (!BOOKING_PAYMENTS_ENABLED) return; // payment form switched off: see lib/features.ts
     if (!bookingId) {
       setError('Rezervacijos ID yra būtinas');
       setLoading(false);
@@ -111,6 +113,20 @@ function PaymentContent() {
     theme: 'stripe' as const,
     variables: { colorPrimary: '#2563eb' },
   };
+
+  if (!BOOKING_PAYMENTS_ENABLED) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="text-center max-w-md">
+          <h1 className="text-2xl font-bold mb-2">Mokėjimai internetu laikinai išjungti</h1>
+          <p className="text-gray-600 mb-6">Pasirinkite jums tinkamus laikus pamokos puslapyje, o mokytojas su jumis susisieks.</p>
+          <button onClick={() => router.push('/')} className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+            Grįžti į pradžią
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (

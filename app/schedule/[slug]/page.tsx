@@ -23,6 +23,8 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import LessonRequestForm from "@/components/LessonRequestForm";
+import { BOOKING_PAYMENTS_ENABLED } from "@/lib/features";
 
 // ---------- TYPES ----------
 
@@ -388,6 +390,7 @@ export default function ScheduleLanding() {
 
   useEffect(() => {
     const fetchAvailability = async () => {
+      if (!BOOKING_PAYMENTS_ENABLED) return; // old booking flow is switched off
       if (!selectedTeacher && teachers.length === 0) return;
 
       setLoading(true);
@@ -671,6 +674,8 @@ export default function ScheduleLanding() {
 
         <h1 className="text-3xl font-bold mb-4 capitalize">Pamokos: {slug}</h1>
 
+        {/* Old booking flow (tutor picker), switched off: see lib/features.ts */}
+        {BOOKING_PAYMENTS_ENABLED && (
         <div className="mb-8 max-w-md relative">
           <select
             id="teacher-select"
@@ -695,8 +700,15 @@ export default function ScheduleLanding() {
             )}
           </select>
         </div>
+        )}
       </header>
 
+      {/* NEW: client picks 5+ times, a tutor claims one of them */}
+      <LessonRequestForm subject={slug} />
+
+      {/* Old booking flow (availability calendar + "Jūsų pasirinktos pamokos" + payment), switched off: see lib/features.ts */}
+      {BOOKING_PAYMENTS_ENABLED && (
+      <>
       {/* --- IMPROVED SPLIT-VIEW SCHEDULING SECTION --- */}
       <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 flex flex-col md:flex-row min-h-[500px] mb-8">
         {/* LEFT COLUMN: Calendar Sidebar */}
@@ -850,6 +862,8 @@ export default function ScheduleLanding() {
           </>
         )}
       </div>
+      </>
+      )}
 
       {/* --- NEW REGISTRATION SECTION (REUSED FROM GRUPINES PAMOKOS) --- */}
       <motion.section
@@ -1254,7 +1268,7 @@ export default function ScheduleLanding() {
         </div>
       </motion.section>
 
-      {showBookingModal && (
+      {BOOKING_PAYMENTS_ENABLED && showBookingModal && (
         <BookingInfoModal
           slots={selectedSlots}
           totalPrice={totalPrice}
