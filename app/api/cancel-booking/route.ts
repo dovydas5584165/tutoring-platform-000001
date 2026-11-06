@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerStripe } from '../../../lib/stripe';
 import { supabase } from '../../../lib/supabaseClient';
 import { sendEmail, generateCancellationEmail } from '../../../lib/email';
+import { closeBookingNotifications } from '../../../lib/bookingNotification';
 
 const isProduction = process.env.NODE_ENV === 'production';
 const allowDevRefundSimulation = process.env.ALLOW_DEV_REFUND_SIMULATION === 'true';
@@ -148,6 +149,9 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ Booking status updated');
+
+    // Remove any other open accept/decline prompt for this booking
+    await closeBookingNotifications(bookingId);
 
     // Free up the availability slots
     const { error: slotsError } = await supabase

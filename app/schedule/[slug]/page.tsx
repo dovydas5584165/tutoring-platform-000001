@@ -496,21 +496,8 @@ export default function ScheduleLanding() {
 
       if (error || !bookingData) throw error || new Error("Nepavyko sukurti užsakymo");
 
-      const notificationsData = selectedSlots.map((slot) => ({
-        user_id: slot.user_id,
-        message: `Ar sutinki vesti pamoką ${slug} ${format(
-          parseISO(slot.start_time),
-          "yyyy-MM-dd HH:mm"
-        )}?${info.topic ? ` Tema: "${info.topic}"` : ""}`,
-        is_read: false,
-        booking_id: bookingData.id,
-      }));
-
-      const { error: notifError } = await supabase.from("notifications").insert(notificationsData);
-
-      if (notifError) {
-        console.error("Notification insert failed:", notifError);
-      }
+      // The tutor's notification is created only after payment succeeds
+      // (Stripe webhook / send-invoice), so the tutor gets exactly one per booking.
 
       setShowBookingModal(false);
       setSelectedSlots([]);
