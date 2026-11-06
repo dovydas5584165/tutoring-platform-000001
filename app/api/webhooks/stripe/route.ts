@@ -6,8 +6,7 @@ import {
   generatePaymentSuccessEmail,
   generateTutorOrderEmail,
 } from "../../../../lib/email";
-import { format, parseISO } from "date-fns";
-import { lt } from "date-fns/locale";
+import { ensureBookingNotification } from "../../../../lib/bookingNotification";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -175,21 +174,8 @@ async function handlePaymentSucceeded(paymentIntent: any) {
     );
   }
 
-  // --- Tutor notification ---
-const { error: notifError } = await supabase.from("notifications").insert({
-  user_id: booking.tutor_id,
-  booking_id: booking.id,
-  is_read: false,
-  message: `Ar sutinki vesti pamoką "${booking.lesson_slug}" ${
-    slots && slots[0]
-      ? format(parseISO(slots[0].start_time), "PPP 'd.' p", { locale: lt })
-      : "nenurodytą datą"
-  }${booking.topic ? `? Tema: "${booking.topic}"` : "?"}`,
-});
-
-  if (notifError) {
-    console.error("Error creating tutor notification:", notifError);
-  }
+  // --- Tutor notification (once per booking) ---
+  await ensureBookingNotification(booking, slots || []);
 
   console.log(`Payment succeeded for booking ${bookingId}`);
 }
