@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
-import WeeklyAvailabilitySelector from "@/components/WeeklyAvailabilitySelector";
+// import WeeklyAvailabilitySelector from "@/components/WeeklyAvailabilitySelector"; // prieinamumas – sena tvarka
 import TutorLessonRequests from "@/components/TutorLessonRequests";
 import TutorWorkflowGuide from "@/components/TutorWorkflowGuide";
 
@@ -58,7 +58,7 @@ export default function TutorDashboard() {
   const [showTerms, setShowTerms] = useState(false);
   const [userFlags, setUserFlags] = useState<UserFlags | null>(null);
   
-  const [availabilitySlots, setAvailabilitySlots] = useState<AvailabilitySlot[]>([]);
+  // const [availabilitySlots, setAvailabilitySlots] = useState<AvailabilitySlot[]>([]); // prieinamumas – sena tvarka
   
   /* ===== SENA TVARKA (užkomentuota) =====
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -178,6 +178,7 @@ export default function TutorDashboard() {
   ===== */
 
   // --- EVENT HANDLERS ---
+  /* ===== SENA TVARKA (užkomentuota) =====
   const handleSave = async () => {
     if (!id) return;
     const { data, error } = await supabase.from("availability").select("*").eq("user_id", id);
@@ -187,6 +188,7 @@ export default function TutorDashboard() {
     }
     setAvailabilitySlots(data || []);
   };
+  ===== */
 
   const toggleRegistrationSelection = (registrationId: string) => {
     setSelectedRegistrations((prev) =>
@@ -422,6 +424,7 @@ export default function TutorDashboard() {
   useEffect(() => {
     if (!id) return;
     
+    /* ===== SENA TVARKA (užkomentuota) =====
     // Load availability
     supabase
       .from("availability")
@@ -434,6 +437,7 @@ export default function TutorDashboard() {
         }
         setAvailabilitySlots(data || []);
       });
+    ===== */
 
     // loadNotifications(); // sena tvarka
     // loadOrders();        // sena tvarka
@@ -659,12 +663,15 @@ export default function TutorDashboard() {
 
         <TutorWorkflowGuide />
 
+        {/* Prieinamumas – nebereikalingas: laikus dabar renkasi mokiniai. Atkuriant viduje „*\/“ pakeiskite į „*“ + „/“. */}
+        {/* ===== SENA TVARKA (užkomentuota) =====
         <section className="bg-white rounded-xl shadow-lg p-8">
           <h2 className="text-2xl font-semibold mb-6 border-b pb-3">Prieinamumas</h2>
           <WeeklyAvailabilitySelector
             userId={id}
           />
         </section>
+        ===== */}
       </main>
     </div>
   );
