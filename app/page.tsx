@@ -3,24 +3,19 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { FaInstagram, FaFacebook } from "react-icons/fa";
 import {
   ArrowRight, Atom, Calculator, CalendarCheck, Check, ChevronDown, Compass, Copy, FlaskConical,
   Languages, Laptop, Leaf, Mail, Menu, MousePointerClick, Siren, Star, TrendingUp, Users, X,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { TEACHERS } from "@/lib/teachers";
+import { SUBJECTS } from "@/lib/subjects";
+import SiteFooter from "@/components/SiteFooter";
 
 /* ---------- content ---------- */
 
-const LESSONS = [
-  { name: "Matematika", slug: "matematika", note: "Nuo pagrindų iki VBE", Icon: Calculator },
-  { name: "Fizika", slug: "fizika", note: "Uždaviniai ir egzaminai", Icon: Atom },
-  { name: "Chemija", slug: "chemija", note: "Reakcijos ir skaičiavimai", Icon: FlaskConical },
-  { name: "Biologija", slug: "biologija", note: "Temos ir egzaminai", Icon: Leaf },
-  { name: "IT", slug: "it", note: "Programavimas ir VBE", Icon: Laptop },
-  { name: "Anglų k.", slug: "anglu-k", note: "Kalbėjimas ir gramatika", Icon: Languages },
-];
+const ICONS = { matematika: Calculator, fizika: Atom, chemija: FlaskConical, biologija: Leaf, it: Laptop, "anglu-k": Languages } as const;
+const LESSONS = SUBJECTS.map((s) => ({ ...s, Icon: ICONS[s.slug] }));
 
 const STEPS = [
   { Icon: MousePointerClick, title: "Pasirinkite dalyką", text: "Paspauskite norimą pamoką aukščiau." },
@@ -434,22 +429,7 @@ export default function Home() {
         </section>
       </main>
 
-      {/* ================= Footer ================= */}
-      <footer className="border-t border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
-          <div className="flex items-center gap-2">
-            <Image src="/logo-removebg-preview.png" alt="" width={28} height={28} />
-            <span>© {new Date().getFullYear()} Tiksliukai.lt</span>
-          </div>
-          <a href="mailto:info.tiksliukai@gmail.com" className="hover:text-[#3B65CE] flex items-center gap-1.5">
-            <Mail size={16} /> info.tiksliukai@gmail.com
-          </a>
-          <div className="flex gap-4 text-2xl">
-            <a href="https://www.instagram.com/tiksliukai.lt/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-pink-500 hover:text-pink-600"><FaInstagram /></a>
-            <a href="https://www.facebook.com/tiksliukai" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-blue-600 hover:text-blue-700"><FaFacebook /></a>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }
