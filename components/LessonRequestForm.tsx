@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { lt } from "date-fns/locale";
 import { CalendarCheck, CheckCircle2, Loader2, AlertCircle, Mail, Phone, User, GraduationCap } from "lucide-react";
@@ -22,6 +24,7 @@ export default function LessonRequestForm({ subject }: { subject: string }) {
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [updated, setUpdated] = useState(false);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,6 +45,11 @@ export default function LessonRequestForm({ subject }: { subject: string }) {
       if (!res.ok) throw new Error(data.error || "Nepavyko išsiųsti užklausos.");
       setUpdated(Boolean(data.updated));
       setStatus("done");
+      // Thank-you page (also a clean conversion URL for analytics). The summary stays in this tab only.
+      try {
+        sessionStorage.setItem("tk-last-request", JSON.stringify({ subject, email: email.trim(), slots, updated: Boolean(data.updated) }));
+      } catch {}
+      router.push(`/aciu?dalykas=${encodeURIComponent(subject)}`);
     } catch (err: any) {
       setError(err.message);
       setStatus("idle");
@@ -140,6 +148,10 @@ export default function LessonRequestForm({ subject }: { subject: string }) {
               : `Siųsti užklausą · ${slots.length}`}
           </button>
           <p className="text-xs text-slate-400 text-center">Užklausa nemokama ir neįpareigoja. Pamokos kaina – 25 €.</p>
+          <p className="text-xs text-slate-400 text-center -mt-2">
+            Siųsdami sutinkate su <Link href="/taisykles" className="underline">taisyklėmis</Link> ir{" "}
+            <Link href="/privatumo-politika" className="underline">privatumo politika</Link>.
+          </p>
         </div>
       </form>
     </section>

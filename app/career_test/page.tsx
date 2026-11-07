@@ -742,10 +742,10 @@ export default function KarjerosPristatymas() {
             <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-slate-900 transition-colors">
               {CONTACT_EMAIL}
             </a>
-            <Link href="#" className="hover:text-slate-900 transition-colors">
+            <Link href="/taisykles" className="hover:text-slate-900 transition-colors">
               Naudojimo taisyklės
             </Link>
-            <Link href="#" className="hover:text-slate-900 transition-colors">
+            <Link href="/privatumo-politika" className="hover:text-slate-900 transition-colors">
               Privatumo politika
             </Link>
           </div>

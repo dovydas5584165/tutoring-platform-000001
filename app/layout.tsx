@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
+import CookieConsent from "@/components/CookieConsent";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext"],
 });
 
 const geistMono = Geist_Mono({
@@ -13,94 +14,42 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const DESCRIPTION =
+  "Individualios nuotolinės matematikos, fizikos, chemijos, biologijos, IT ir anglų kalbos pamokos 1–12 klasių mokiniams. 25 € už 45 min.";
+
 export const metadata: Metadata = {
-  title: "Tiksliukai.lt",
-  description: "Aiškiau. Tiksliau. Suprantamiau",
-  icons: {
-    icon: "/favicon.ico",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "Tiksliukai.lt – korepetitoriai 1–12 klasių mokiniams",
+    template: "%s | Tiksliukai.lt",
   },
+  description: DESCRIPTION,
+  applicationName: SITE_NAME,
+  openGraph: {
+    type: "website",
+    locale: "lt_LT",
+    siteName: SITE_NAME,
+    title: "Tiksliukai.lt – korepetitoriai, kurie visada padės",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tiksliukai.lt – korepetitoriai, kurie visada padės",
+    description: DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#3B65CE",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="lt">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        {/* Google Analytics */}
-        <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-CP50RV65SV"
-        />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-CP50RV65SV');
-            `,
-          }}
-        />
-
-        {/* Google Tag Manager */}
-        <Script
-          id="gtm-script"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function(w,d,s,l,i){
-                w[l]=w[l]||[];
-                w[l].push({'gtm.start': new Date().getTime(), event:'gtm.js'});
-                var f=d.getElementsByTagName(s)[0],
-                j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
-                j.async=true; j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-                f.parentNode.insertBefore(j,f);
-              })(window,document,'script','dataLayer','GTM-PCFWWKBF');
-            `,
-          }}
-        />
-        <noscript>
-          <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-PCFWWKBF"
-            height="0"
-            width="0"
-            style={{ display: "none", visibility: "hidden" }}
-            title="GTM"
-          />
-        </noscript>
-
-        {/* Facebook Pixel - NEW ID ONLY (1256062859918317) */}
-        <Script
-          id="facebook-pixel"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              !function(f,b,e,v,n,t,s)
-              {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-              n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-              if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-              n.queue=[];t=b.createElement(e);t.async=!0;
-              t.src=v;s=b.getElementsByTagName(e)[0];
-              s.parentNode.insertBefore(t,s)}(window, document,'script',
-              'https://connect.facebook.net/en_US/fbevents.js');
-              
-              fbq('init', '1256062859918317');
-              fbq('track', 'PageView');
-            `,
-          }}
-        />
-        <noscript>
-          <img
-            height="1"
-            width="1"
-            style={{ display: "none" }}
-            src="https://www.facebook.com/tr?id=1256062859918317&ev=PageView&noscript=1"
-            alt="facebook pixel"
-          />
-        </noscript>
-
         {children}
+        {/* Google Analytics, Tag Manager and the Meta Pixel load only after consent */}
+        <CookieConsent />
       </body>
     </html>
   );
