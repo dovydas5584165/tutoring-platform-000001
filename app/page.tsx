@@ -5,8 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import {
   ArrowRight, Atom, Calculator, Check, ChevronDown, Compass, Copy, FlaskConical,
-  Languages, Laptop, Leaf, Menu, Siren, Star, TrendingUp, Users, X,
+  Languages, Laptop, Leaf, Menu, Siren, TrendingUp, Users, X,
 } from "lucide-react";
+import { FaInstagram } from "react-icons/fa";
 import { supabase } from "../lib/supabaseClient";
 import { useTeachers } from "@/lib/useTeachers";
 import { SUBJECTS } from "@/lib/subjects";
@@ -23,14 +24,17 @@ const STEPS = [
   { title: "Mokytojas susisiekia", text: "Mokytojas pasirenka laiką ir atsiunčia pamokos nuorodą el. paštu." },
 ];
 
+/** Real messages from parents and students, saved from the Instagram "Atsiliepimai" highlight. */
 const REVIEWS = [
-  { text: "Vaiko pažymiai pagerėjo nuo 7 iki 9.", who: "mama Inga" },
-  { text: "Sūnus gavo 90 iš matematikos VBE.", who: "tėtis Darius" },
-  { text: "Matematikos baimė dingo po kelių pamokų.", who: "mokinys Lukas" },
-  { text: "Mokytoja labai kantri ir motyvuojanti.", who: "mama Lina" },
-  { text: "Chemija tapo suprantama.", who: "mokinė Emilija" },
-  { text: "Vaikas pats noriai jungiasi į pamokas.", who: "mama Jolanta" },
+  { src: "/reviews/atsiliepimas-1.webp", w: 880, h: 1000, alt: "TAMO dienyno ekrano nuotrauka su matematikos pažymiu 9 ir žinute: „Geriausia savaitgalio pradžia ever.“" },
+  { src: "/reviews/atsiliepimas-3.webp", w: 860, h: 660, alt: "„Labai patiko, sakė, kad labai gerai išaiškinote.“ ir „Sveiki, sūnaus draugas Jus rekomendavo. Kai paklausiau, ką geriausiai paaiškina, sako viską!!“" },
+  { src: "/reviews/atsiliepimas-2.webp", w: 880, h: 280, alt: "„Laba diena, labai dėkoju už operatyvumą ir nuostabaus mokytojo priskyrimą.“" },
+  { src: "/reviews/atsiliepimas-5.webp", w: 880, h: 270, alt: "„Beje, konsultavosi gal su 3 korepetitoriais, Kajus liko pirmoje vietoje.“" },
+  { src: "/reviews/atsiliepimas-4.webp", w: 880, h: 270, alt: "„Na panelė mano labai patenkinta pamoka. Susirašiau su jos mokytoju, atsiųs man kontrolinį darbą.“" },
 ];
+
+const INSTAGRAM = "https://www.instagram.com/tiksliukai.lt/";
+
 
 const FAQ = [
   { q: "Kiek kainuoja pamoka?", a: "Viena individuali pamoka trunka 45 minutes ir kainuoja 25 €." },
@@ -361,20 +365,19 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ================= Reviews ================= */}
+        {/* ================= Reviews: real Instagram messages ================= */}
         <section className="max-w-6xl mx-auto px-4 sm:px-6 py-14 sm:py-16">
-          <SectionTitle title="Ką sako tėvai ir mokiniai" />
-          <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex sm:grid sm:grid-cols-3 gap-3 overflow-x-auto snap-x snap-mandatory pb-2">
+          <SectionTitle title="Ką rašo tėvai ir mokiniai" text="Tikros žinutės, kurias gavome po pamokų." />
+          <div className="-mx-4 px-4 sm:mx-0 sm:px-0 flex items-start sm:block sm:columns-2 lg:columns-3 gap-3 sm:gap-4 overflow-x-auto snap-x snap-mandatory pb-2">
             {REVIEWS.map((r) => (
-              <figure key={r.text} className="snap-start shrink-0 w-[75%] sm:w-auto rounded-2xl border border-slate-200 p-5">
-                <div className="flex gap-0.5 mb-2" aria-label="5 iš 5">
-                  {Array.from({ length: 5 }, (_, i) => <Star key={i} size={14} className="text-highlight fill-highlight" />)}
-                </div>
-                <blockquote className="text-slate-800">„{r.text}“</blockquote>
-                <figcaption className="text-sm text-slate-500 mt-2">– {r.who}</figcaption>
+              <figure key={r.src} className="snap-start shrink-0 w-[80%] sm:w-auto sm:mb-4 break-inside-avoid rounded-2xl overflow-hidden bg-black">
+                <Image src={r.src} alt={r.alt} width={r.w} height={r.h} sizes="(min-width: 1024px) 360px, (min-width: 640px) 50vw, 80vw" className="w-full h-auto" />
               </figure>
             ))}
           </div>
+          <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer" className="mt-6 mx-auto w-fit flex items-center gap-2 text-sm font-semibold text-brand hover:underline underline-offset-4">
+            <FaInstagram size={18} /> Daugiau atsiliepimų mūsų Instagram <ArrowRight size={16} />
+          </a>
         </section>
 
         {/* ================= FAQ ================= */}
