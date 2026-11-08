@@ -1,6 +1,8 @@
-// Mokytojų kortelės: naudojamos pradiniame ir pamokos puslapiuose.
-// Tikri duomenys dabar laikomi DB lentelėje `teacher_profiles` (redaguojami /admin_tutors ir mokytojo paskyroje).
-// Šis sąrašas naudojamas tik kaip atsarginis, jei DB nepasiekiama.
+/**
+ * Built-in tutor cards, used only as a fallback when the teacher_profiles table can't be reached.
+ * The real cards live in the DB and are edited at /admin_tutors and in the tutor dashboard.
+ */
+
 export type TeacherCard = { name: string; subject: string; experience: string; description: string; img: string };
 
 export const FALLBACK_TEACHERS: TeacherCard[] = [

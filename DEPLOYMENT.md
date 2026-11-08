@@ -30,12 +30,6 @@ EMAIL_PASS=your-app-password
 EMAIL_FROM=your-email@gmail.com
 ```
 
-### NextAuth.js
-```
-NEXTAUTH_SECRET=your-random-secret-key
-NEXTAUTH_URL=https://your-vercel-domain.vercel.app
-```
-
 ### Optional
 ```
 NEXT_PUBLIC_APP_URL=https://your-vercel-domain.vercel.app

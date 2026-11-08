@@ -1,7 +1,12 @@
+/**
+ * sitemap.xml with the public pages.
+ */
+
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 import { SUBJECTS } from "@/lib/subjects";
 
+/** Served as /sitemap.xml. */
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const page = (path: string, priority: number, changeFrequency: "weekly" | "monthly" | "yearly" = "monthly") =>

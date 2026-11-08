@@ -1,4 +1,6 @@
-// Shared server-side helpers for tutor cards (table: teacher_profiles).
+/**
+ * Server-side helpers for tutor cards (table: teacher_profiles): types, photo limits and field whitelists.
+ */
 
 export type TeacherProfile = {
   id: string;

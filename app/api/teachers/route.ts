@@ -1,3 +1,7 @@
+/**
+ * Tutor cards API: public list of visible cards, plus admin create / edit / delete.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { isAdmin } from "../../../lib/accessCodes";
@@ -60,6 +64,7 @@ export async function DELETE(req: NextRequest) {
   return NextResponse.json({ success: true });
 }
 
+/** Turns DB errors into a message the admin understands. */
 function friendly(error: { code?: string; message: string }) {
   return error.code === "23505" ? "Ši mokytojo paskyra jau susieta su kita kortele" : error.message;
 }

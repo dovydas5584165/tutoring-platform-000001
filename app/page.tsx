@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Landing page: subject picker, featured offers, how it works, tutors, reviews, FAQ.
+ */
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -69,6 +73,7 @@ const IBAN = "LT077300010164121505";
 
 /* ---------- page ---------- */
 
+/** Landing page component. */
 export default function Home() {
   const { teachers: TEACHERS, loading: teachersLoading } = useTeachers();
   const [user, setUser] = useState<any>(null);
@@ -475,6 +480,7 @@ export default function Home() {
   );
 }
 
+/** Centered section heading with optional subtitle. */
 function SectionTitle({ title, text }: { title: string; text?: string }) {
   return (
     <div className="text-center max-w-2xl mx-auto mb-8 sm:mb-12">

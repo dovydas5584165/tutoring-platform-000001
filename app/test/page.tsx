@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * The career test itself: questions, scoring by career dimension and the PDF result.
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -943,12 +947,14 @@ function getRanking(scores: Record<TypeKey, number>) {
   })).sort((a, b) => b.pct - a.pct || TYPES.indexOf(a.key) - TYPES.indexOf(b.key));
 }
 
+/** Label, colour and explanation for an aptitude score (%). */
 function getAptitudeBand(pct: number) {
   if (pct >= 75) return { label: "Aukštas", color: "#166534", text: "Stiprūs analitiniai gebėjimai. Puikiai tvarkotės su logika ir skaičiais." };
   if (pct >= 45) return { label: "Vidutinis", color: "#92400e", text: "Vidutiniai analitiniai gebėjimai. Dalis užduočių įveikta sėkmingai, tačiau loginėms grandinėms gali reikėti daugiau praktikos." };
   return { label: "Pradinis", color: "#7f1d1d", text: "Šįkart užduotys pasirodė sudėtingesnės. Tai puiki proga pasipraktikuoti loginio mąstymo ir matematikos sferoje." };
 }
 
+/** Paragraph describing the strengths and growth areas of the main (and secondary) profile. */
 function buildTraitNarrative(result: ResultData, secondary?: ResultData) {
   const pos = result.positives.join(", ");
   const neg = result.negatives.join(", ");
@@ -962,6 +968,7 @@ function buildTraitNarrative(result: ResultData, secondary?: ResultData) {
 // COMPONENTS
 // ============================================================================
 
+/** Popup with details about one profession. */
 function ProfessionModal({ profession, onClose }: { profession: Profession | null, onClose: () => void }) {
   if (!profession) return null;
   return (
@@ -1003,6 +1010,7 @@ function ProfessionModal({ profession, onClose }: { profession: Profession | nul
   );
 }
 
+/** Titled section of the results report. */
 function ReportSection({ icon, title, children }: { icon: any, title: string, children: React.ReactNode }) {
   return (
     <div className="report-section mb-10 break-inside-avoid">
@@ -1059,6 +1067,7 @@ function StudyBlock({ data, heading }: { data: ResultData; heading?: string }) {
   );
 }
 
+/** Full results report with ranking, aptitude, professions and PDF download. */
 function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, aptitude, respondentName, dateStr, onRestart }: any) {
   const [selectedProfession, setSelectedProfession] = useState<Profession | null>(null);
 
@@ -1554,6 +1563,7 @@ function ResultsView({ result, secondary, resultKey, secondaryKey, ranking, apti
 
 const EMPTY_SCORES: Record<TypeKey, number> = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, H: 0, I: 0, J: 0 };
 
+/** Runs the test step by step and shows the results at the end. */
 export default function CareerQuiz() {
   const [gameState, setGameState] = useState("intro");
   const [respondentName, setRespondentName] = useState("");

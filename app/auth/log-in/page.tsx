@@ -1,9 +1,14 @@
 'use client';
 
+/**
+ * Login page: signs in with Supabase and redirects by role (tutor / client).
+ */
+
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../../lib/supabaseClient'; // Correct relative path to lib
 
+/** Email + password login form. */
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

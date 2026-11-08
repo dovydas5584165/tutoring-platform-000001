@@ -1,10 +1,15 @@
 "use client";
 
+/**
+ * Admin finance calculator: tutor payouts, editable income/expense rows and profit (sample data, not from the DB).
+ */
+
 import React, { useState } from "react";
 import { Trash2 } from "lucide-react";
 
 type Row = { id: number; category: string; amount: number };
 
+/** Finance calculator page. */
 export default function FinanceDashboard() {
   /* ------------ Mokytojai (“detailed” lentelė viršuje) ------------ */
   const tutors = [

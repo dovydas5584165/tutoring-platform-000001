@@ -1,3 +1,7 @@
+/**
+ * Creates a tutor or client account (Supabase Auth user + profile and lessons).
+ */
+
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
@@ -16,6 +20,7 @@ const payloadSchema = z.object({
   pamokos: z.array(z.string()).min(1, "Reikia pasirinkti bent vieną pamoką"),
 });
 
+/** Validates the form, creates the auth user and profile; rolls back the auth user on failure. */
 export async function POST(req: Request) {
   try {
     const json = await req.json();

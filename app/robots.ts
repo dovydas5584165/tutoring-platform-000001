@@ -1,6 +1,11 @@
+/**
+ * robots.txt: keeps private pages and the API out of search engines.
+ */
+
 import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/site";
 
+/** Served as /robots.txt. */
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {

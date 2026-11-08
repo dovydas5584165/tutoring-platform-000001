@@ -1,3 +1,7 @@
+/**
+ * Tutor "accept this lesson?" notifications for paid bookings (idempotent create + close).
+ */
+
 import { format, parseISO } from "date-fns";
 import { lt } from "date-fns/locale";
 import { supabase } from "./supabaseClient";

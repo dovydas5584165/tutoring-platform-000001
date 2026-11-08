@@ -1,3 +1,7 @@
+/**
+ * Site footer: contacts, socials and legal links.
+ */
+
 import Link from "next/link";
 import Image from "next/image";
 import { Mail } from "lucide-react";

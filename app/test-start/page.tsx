@@ -1,9 +1,14 @@
 'use client';
 
+/**
+ * Bridge after payment: verifies the payment, waits for the session cookie, then opens /test.
+ */
+
 import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, AlertCircle, Sparkles, Lock, Copy } from 'lucide-react';
 
+/** Verifies the payment from the URL, then redirects to /test once the cookie is set. */
 function TestStartLogic() {
   const searchParams = useSearchParams();
   const paymentIntentId = searchParams.get('payment_intent'); 
@@ -103,6 +108,7 @@ function TestStartLogic() {
   );
 }
 
+/** Wraps the logic in Suspense (needed for useSearchParams). */
 export default function TestStartPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center">Kraunama...</div>}>

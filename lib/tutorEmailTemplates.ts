@@ -1,4 +1,7 @@
-// Email templates for tutors. Client-safe: no server imports.
+/**
+ * Copy-ready email templates for tutors (to students and to the admin). Client-safe: no server imports.
+ */
+
 import { format } from "date-fns";
 import { lt } from "date-fns/locale";
 
@@ -21,8 +24,10 @@ export const PLACEHOLDERS: TemplateLesson = {
   tutor: "[jūsų vardas]",
 };
 
+/** Lesson time as e.g. "lapkričio 8 d. (šeštadienis) 14:00". */
 export const fmtLessonTime = (iso: string) => format(new Date(iso), "MMMM d 'd.' (cccc) HH:mm", { locale: lt });
 
+/** All email templates filled in for one lesson. */
 export function templates(l: TemplateLesson, studentEmail = "[mokinio el. paštas]"): EmailTemplate[] {
   return [
     {

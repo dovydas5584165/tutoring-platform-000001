@@ -1,9 +1,14 @@
 'use client';
 
+/**
+ * Redirects /student_dashboard to the logged-in client's own dashboard (or by role elsewhere).
+ */
+
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 
+/** Checks the session and role, then redirects. */
 export default function StudentDashboardRedirect() {
   const router = useRouter();
 

@@ -1,9 +1,14 @@
 "use client";
 
+/**
+ * Registration page for tutors (invite code) and clients.
+ */
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+/** Registration form; tutors also choose subjects and enter the invite code. */
 export default function RegistracijaPage() {
   const [vardas, setVardas] = useState("");
   const [pavarde, setPavarde] = useState("");

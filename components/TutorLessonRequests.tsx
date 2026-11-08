@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Tutor dashboard panel: open client requests and lessons the tutor already picked.
+ */
+
 import { useCallback, useEffect, useState } from "react";
 import { format } from "date-fns";
 import { lt } from "date-fns/locale";
@@ -23,6 +27,7 @@ const fmtDay = (d: Date) => cap(format(d, "cccc, MMMM d", { locale: lt }));
 const fmtFull = (d: Date) => format(d, "EEEE, MMMM d 'd.' HH:mm", { locale: lt });
 const fmtTime = (d: Date) => format(d, "HH:mm");
 
+/** Groups ISO times by calendar day, sorted by date. */
 function byDay(slots: string[]) {
   const groups = new Map<string, Date[]>();
   for (const s of slots) {
@@ -33,6 +38,7 @@ function byDay(slots: string[]) {
   return [...groups.entries()].sort(([a], [b]) => a.localeCompare(b));
 }
 
+/** Bearer token of the logged-in tutor for API calls. */
 async function authHeaders(): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;

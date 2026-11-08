@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Week grid where a client toggles the 45-minute times they can study.
+ */
+
 import { useEffect, useRef, useState } from "react";
 import { addDays, addWeeks, format, isSameDay, startOfWeek } from "date-fns";
 import { lt } from "date-fns/locale";

@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Thank-you page shown after a lesson request is sent (also a clean conversion URL for analytics).
+ */
+
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -11,6 +15,7 @@ import { subjectOf } from "@/lib/subjects";
 
 type Summary = { subject: string; email: string; slots: string[]; updated: boolean };
 
+/** Reads the request summary saved in this tab and shows what was sent. */
 function ThankYou() {
   const params = useSearchParams();
   const subject = params.get("dalykas") || "";
@@ -78,6 +83,7 @@ function ThankYou() {
   );
 }
 
+/** Wraps the thank-you content in Suspense (needed for useSearchParams). */
 export default function Page() {
   return (
     <div className="min-h-screen flex flex-col bg-white text-slate-900">

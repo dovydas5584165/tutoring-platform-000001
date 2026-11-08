@@ -1,3 +1,7 @@
+/**
+ * Privacy policy (GDPR).
+ */
+
 import LegalPage from "@/components/LegalPage";
 import { CookieSettingsButton } from "@/components/CookieConsent";
 import { pageMeta, SELLER } from "@/lib/site";
@@ -8,6 +12,7 @@ export const metadata = pageMeta({
   path: "/privatumo-politika",
 });
 
+/** Privacy policy text. */
 export default function PrivacyPolicy() {
   return (
     <LegalPage title="Privatumo politika" updated="2026 m. lapkričio 8 d.">

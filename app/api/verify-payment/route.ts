@@ -1,8 +1,13 @@
+/**
+ * Checks a booking's PaymentIntent with Stripe and updates the booking's payment status.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerStripe } from '../../../lib/stripe';
 import { supabase } from '../../../lib/supabaseClient';
 import { sendEmail, generateInvoiceEmail } from '../../../lib/email';
 
+/** Body: { bookingId, paymentIntentId? }. Returns the current payment status. */
 export async function POST(request: NextRequest) {
   try {
     const { bookingId, paymentIntentId } = await request.json();

@@ -1,3 +1,7 @@
+/**
+ * Root layout: fonts, global metadata, cookie consent banner.
+ */
+
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";

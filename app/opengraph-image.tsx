@@ -1,12 +1,16 @@
+/**
+ * Generated share preview image (Facebook, Messenger, WhatsApp, LinkedIn…). Inherited by every page.
+ */
+
 import { ImageResponse } from "next/og";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-// Share preview for Facebook, Messenger, WhatsApp, LinkedIn etc. Inherited by every page.
 export const alt = "Tiksliukai.lt – korepetitoriai, kurie visada padės";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+/** Renders the 1200×630 PNG with the logo and tagline. */
 export default async function Image() {
   const logo = await readFile(join(process.cwd(), "public/logo-removebg-preview.png"));
   const logoSrc = `data:image/png;base64,${logo.toString("base64")}`;

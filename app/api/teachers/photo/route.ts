@@ -1,3 +1,7 @@
+/**
+ * Uploads a tutor card photo to Supabase Storage and returns its public URL.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
 import { isAdmin } from "../../../../lib/accessCodes";

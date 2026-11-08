@@ -1,3 +1,7 @@
+/**
+ * Public endpoint where a client submits (or updates) a lesson request with 5+ possible times.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { sendEmail } from "../../../lib/email";

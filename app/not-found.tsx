@@ -1,3 +1,7 @@
+/**
+ * Custom 404 page.
+ */
+
 import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
@@ -8,6 +12,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
+/** Shown for any unknown URL. */
 export default function NotFound() {
   return (
     <main className="min-h-screen flex items-center justify-center px-4 py-16 bg-white text-slate-900">

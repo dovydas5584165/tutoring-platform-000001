@@ -1,9 +1,14 @@
 'use client';
 
+/**
+ * Redirects /tutor_dashboard to the logged-in tutor's own dashboard (or by role elsewhere).
+ */
+
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
 
+/** Checks the session and role, then redirects. */
 export default function TutorDashboardRedirect() {
   const router = useRouter();
 

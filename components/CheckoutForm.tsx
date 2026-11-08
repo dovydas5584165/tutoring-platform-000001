@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Stripe payment form (PaymentElement) for the career test or a lesson booking.
+ */
+
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
@@ -18,6 +22,7 @@ interface CheckoutFormProps {
   amount?: number; // Optional: Overrides both defaults if provided
 }
 
+/** Must be rendered inside Stripe <Elements>. Price: `amount`, else lesson price with `bookingId`, else test price. */
 export default function CheckoutForm({ bookingId, returnUrl, amount }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();

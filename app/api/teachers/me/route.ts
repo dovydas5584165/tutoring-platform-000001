@@ -1,3 +1,7 @@
+/**
+ * Logged-in tutor reads and saves their own tutor card.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
 import { tutorFromRequest } from "../../../../lib/lessonRequests";

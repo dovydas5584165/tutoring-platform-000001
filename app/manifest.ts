@@ -1,5 +1,10 @@
+/**
+ * Web app manifest (name, icons, colours).
+ */
+
 import type { MetadataRoute } from "next";
 
+/** Served as /manifest.webmanifest. */
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Tiksliukai.lt – korepetitoriai",

@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Tutor dashboard panel: how a lesson works, work rules and copyable email templates.
+ */
+
 import { useState } from "react";
 import { ClipboardList, Copy, Check } from "lucide-react";
 import { ADMIN_EMAIL, PLACEHOLDERS, templates } from "@/lib/tutorEmailTemplates";
