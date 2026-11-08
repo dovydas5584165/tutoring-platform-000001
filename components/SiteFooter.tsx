@@ -28,6 +28,7 @@ export default function SiteFooter() {
           </div>
         </div>
         <nav className="flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-2 border-t border-slate-100 pt-4">
+          <Link href="/dienynas" className="font-semibold text-slate-700 hover:text-brand">El. dienynas mokykloms</Link>
           <Link href="/privatumo-politika" className="hover:text-brand">Privatumo politika</Link>
           <Link href="/taisykles" className="hover:text-brand">Naudojimosi taisyklės</Link>
           <Link href="/sutarties-atsisakymas" className="hover:text-brand">Atsisakyti sutarties</Link>

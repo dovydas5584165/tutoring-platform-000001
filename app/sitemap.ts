@@ -17,6 +17,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...SUBJECTS.map((s) => page(`/schedule/${s.slug}`, 0.9, "weekly")),
     page("/grupines", 0.7),
     page("/career_test", 0.7),
+    page("/dienynas", 0.7),
     page("/akciju_birza", 0.4),
     page("/games/games_2", 0.3),
     page("/privatumo-politika", 0.2, "yearly"),
