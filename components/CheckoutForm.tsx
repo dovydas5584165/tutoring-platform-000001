@@ -9,7 +9,7 @@ import {
 } from '@stripe/react-stripe-js';
 
 // --- CONFIGURATION ---
-const TEST_PRICE = 65;   // Default price for Career Test
+const TEST_PRICE = 119;  // Career Test (must match TEST_PRICE_CENTS in /api/create-payment-intent)
 const LESSON_PRICE = 25; // Default price for Lessons (if bookingId exists)
 
 interface CheckoutFormProps {
@@ -29,7 +29,7 @@ export default function CheckoutForm({ bookingId, returnUrl, amount }: CheckoutF
   // LOGIC: 
   // 1. If 'amount' prop is passed, use that.
   // 2. Else if 'bookingId' exists, use LESSON_PRICE (25).
-  // 3. Else use TEST_PRICE (14).
+  // 3. Else use TEST_PRICE.
   const priceToDisplay = amount || (bookingId ? LESSON_PRICE : TEST_PRICE);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,9 +55,9 @@ export default function CheckoutForm({ bookingId, returnUrl, amount }: CheckoutF
 
     if (error) {
       if (error.type === "card_error" || error.type === "validation_error") {
-        setMessage(error.message || 'An unexpected error occurred.');
+        setMessage(error.message || 'Įvyko klaida. Bandykite dar kartą.');
       } else {
-        setMessage("An unexpected error occurred.");
+        setMessage("Įvyko klaida. Bandykite dar kartą.");
       }
     }
 
@@ -89,18 +89,17 @@ export default function CheckoutForm({ bookingId, returnUrl, amount }: CheckoutF
           {isLoading ? (
             <div className="flex items-center justify-center">
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-              Processing...
+              Apdorojama...
             </div>
           ) : (
-            // Always shows the calculated price (14 € or 25 €)
-            `Pay ${priceToDisplay.toFixed(2)} €`
+            // EU law: the order button must say clearly that clicking it means paying.
+            `Pirkti ir sumokėti ${priceToDisplay.toFixed(2).replace('.', ',')} €`
           )}
         </span>
       </button>
 
       <div className="text-xs text-gray-500 text-center">
-        <p>🔒 Your payment information is encrypted and secure</p>
-        <p className="mt-1">Powered by Stripe</p>
+        <p>🔒 Mokėjimo duomenys šifruojami, juos tvarko „Stripe“</p>
       </div>
     </form>
   );

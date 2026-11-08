@@ -5,8 +5,9 @@ import Script from "next/script";
 import Link from "next/link";
 
 /*
- * Cookie consent (GDPR). Google Analytics, Google Tag Manager and the Meta (Facebook) Pixel
- * load ONLY after the visitor clicks "Sutinku". Essential storage (login session, this choice) always works.
+ * Cookie consent (GDPR + Lithuanian Law on Electronic Communications, Art. 61).
+ * Per category: Google Analytics + Tag Manager load only with "statistics" consent,
+ * the Meta (Facebook) Pixel only with "marketing" consent. Essential storage always works.
  * Anywhere on the site, call openCookieSettings() to show the banner again.
  */
 
@@ -16,7 +17,7 @@ const GA_ID = "G-CP50RV65SV";
 const GTM_ID = "GTM-PCFWWKBF";
 const FB_PIXEL_ID = "1256062859918317";
 
-type Choice = "granted" | "denied";
+type Choice = { analytics: boolean; marketing: boolean };
 
 export function openCookieSettings() {
   window.dispatchEvent(new Event(EVENT));
@@ -25,7 +26,14 @@ export function openCookieSettings() {
 function readChoice(): Choice | null {
   try {
     const v = JSON.parse(localStorage.getItem(KEY) || "null");
-    return v?.value === "granted" || v?.value === "denied" ? v.value : null;
+    if (!v) return null;
+    // Older saved format: { value: "granted" | "denied" }
+    if (v.value === "granted") return { analytics: true, marketing: true };
+    if (v.value === "denied") return { analytics: false, marketing: false };
+    if (typeof v.analytics === "boolean" && typeof v.marketing === "boolean") {
+      return { analytics: v.analytics, marketing: v.marketing };
+    }
+    return null;
   } catch {
     return null;
   }
@@ -34,30 +42,44 @@ function readChoice(): Choice | null {
 export default function CookieConsent() {
   const [choice, setChoice] = useState<Choice | null>(null);
   const [open, setOpen] = useState(false);
+  const [details, setDetails] = useState(false);
+  const [analytics, setAnalytics] = useState(false);
+  const [marketing, setMarketing] = useState(false);
 
   useEffect(() => {
     const c = readChoice();
     setChoice(c);
+    setAnalytics(c?.analytics ?? false);
+    setMarketing(c?.marketing ?? false);
     setOpen(c === null);
-    const reopen = () => setOpen(true);
+    const reopen = () => {
+      const cur = readChoice();
+      setAnalytics(cur?.analytics ?? false);
+      setMarketing(cur?.marketing ?? false);
+      setDetails(true);
+      setOpen(true);
+    };
     window.addEventListener(EVENT, reopen);
     return () => window.removeEventListener(EVENT, reopen);
   }, []);
 
   const save = (value: Choice) => {
     try {
-      localStorage.setItem(KEY, JSON.stringify({ value, date: new Date().toISOString() }));
+      localStorage.setItem(KEY, JSON.stringify({ ...value, date: new Date().toISOString() }));
     } catch {}
-    const withdrawing = choice === "granted" && value === "denied";
+    const withdrawing = (choice?.analytics && !value.analytics) || (choice?.marketing && !value.marketing);
     setChoice(value);
     setOpen(false);
     // Already-loaded trackers can't be unloaded; a reload starts the page without them.
     if (withdrawing) window.location.reload();
   };
 
+  const btn = "py-2.5 rounded-xl font-semibold text-sm";
+
   return (
     <>
-      {choice === "granted" && <Trackers />}
+      {choice?.analytics && <AnalyticsTrackers />}
+      {choice?.marketing && <MarketingTrackers />}
 
       {open && (
         <div
@@ -69,17 +91,45 @@ export default function CookieConsent() {
           <div className="m-3 sm:m-0 rounded-2xl bg-white text-slate-800 shadow-2xl ring-1 ring-black/10 p-5">
             <p className="font-bold text-slate-900 mb-1">🍪 Slapukai</p>
             <p className="text-sm leading-relaxed text-slate-600">
-              Būtinieji slapukai reikalingi svetainei veikti. Jei sutiksite, naudosime ir statistikos bei rinkodaros slapukus
-              (Google Analytics, Meta), kad žinotume, kaip lankytojai naudojasi svetaine.{" "}
+              Būtinieji slapukai reikalingi svetainei veikti. Jūsų sutikimu naudosime ir statistikos (Google Analytics)
+              bei rinkodaros (Meta) slapukus. Sutikimą bet kada galite atšaukti.{" "}
               <Link href="/privatumo-politika#slapukai" className="underline text-[#3B65CE]">Daugiau</Link>
             </p>
+
+            {details && (
+              <div className="mt-3 space-y-2 text-sm">
+                <label className="flex items-start gap-3">
+                  <input type="checkbox" checked disabled className="mt-0.5 h-4 w-4" />
+                  <span><b>Būtinieji</b> – prisijungimas, jūsų pasirinkimai. Visada įjungti.</span>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" checked={analytics} onChange={(e) => setAnalytics(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#3B65CE]" />
+                  <span><b>Statistikos</b> – lankomumo matavimas (Google Analytics, Google Tag Manager).</span>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" checked={marketing} onChange={(e) => setMarketing(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#3B65CE]" />
+                  <span><b>Rinkodaros</b> – reklamos efektyvumo matavimas (Meta Pixel).</span>
+                </label>
+              </div>
+            )}
+
+            {/* "Reject" is as easy and as visible as "Accept" */}
             <div className="mt-4 grid grid-cols-2 gap-2">
-              <button onClick={() => save("denied")} className="py-2.5 rounded-xl border border-slate-300 font-semibold text-sm hover:bg-slate-50">
+              <button onClick={() => save({ analytics: false, marketing: false })} className={`${btn} border border-slate-300 hover:bg-slate-50`}>
                 Tik būtini
               </button>
-              <button onClick={() => save("granted")} className="py-2.5 rounded-xl bg-[#3B65CE] text-white font-semibold text-sm hover:bg-[#2f54b3]">
-                Sutinku
+              <button onClick={() => save({ analytics: true, marketing: true })} className={`${btn} border border-slate-300 hover:bg-slate-50`}>
+                Sutinku su visais
               </button>
+              {details ? (
+                <button onClick={() => save({ analytics, marketing })} className={`${btn} col-span-2 bg-[#3B65CE] text-white hover:bg-[#2f54b3]`}>
+                  Išsaugoti pasirinkimą
+                </button>
+              ) : (
+                <button onClick={() => setDetails(true)} className={`${btn} col-span-2 text-[#3B65CE] hover:bg-blue-50`}>
+                  Pasirinkti pagal kategorijas
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -88,7 +138,7 @@ export default function CookieConsent() {
   );
 }
 
-function Trackers() {
+function AnalyticsTrackers() {
   return (
     <>
       {/* Google Analytics */}
@@ -122,6 +172,13 @@ function Trackers() {
           `,
         }}
       />
+    </>
+  );
+}
+
+function MarketingTrackers() {
+  return (
+    <>
       {/* Meta (Facebook) Pixel */}
       <Script
         id="facebook-pixel"

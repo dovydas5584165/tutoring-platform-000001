@@ -26,3 +26,16 @@ export function pageMeta({ title, description, path, noindex = false }: {
 
 /** For private pages (dashboards, payment, auth helpers): keep them out of search results. */
 export const PRIVATE_PAGE: Metadata = { robots: { index: false, follow: false } };
+
+/**
+ * Who legally provides the services (required by the Lithuanian Law on Information Society Services
+ * and consumer law). TODO before going live: replace every "[ĮRAŠYKITE …]" with the real details.
+ */
+export const SELLER = {
+  name: "[ĮRAŠYKITE: vardas, pavardė arba įmonės pavadinimas]",
+  legalForm: "[ĮRAŠYKITE: pvz. individuali veikla pagal pažymą / MB / UAB]",
+  code: "[ĮRAŠYKITE: individualios veiklos pažymos nr. arba įmonės kodas]",
+  vatCode: "", // PVM mokėtojo kodas, jei esate PVM mokėtojas
+  address: "[ĮRAŠYKITE: buveinės / veiklos adresas]",
+  email: CONTACT_EMAIL,
+};

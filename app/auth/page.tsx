@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function RegistracijaPage() {
   const [vardas, setVardas] = useState("");
@@ -12,6 +13,8 @@ export default function RegistracijaPage() {
   const [email, setEmail] = useState("");
   const [slaptazodis, setSlaptazodis] = useState("");
   const [repeatSlaptazodis, setRepeatSlaptazodis] = useState("");
+  const [inviteCode, setInviteCode] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const router = useRouter();
@@ -51,6 +54,9 @@ export default function RegistracijaPage() {
       return setErrorMsg("Slaptažodžiai nesutampa");
     if (pamokos.length === 0)
       return setErrorMsg("Prašome pasirinkti bent vieną pamoką.");
+    if (role === "tutor" && !inviteCode.trim())
+      return setErrorMsg("Įveskite mokytojo kvietimo kodą.");
+    if (!agreed) return setErrorMsg("Pažymėkite patvirtinimo varnelę.");
 
     const body = JSON.stringify({
       vardas,
@@ -59,7 +65,9 @@ export default function RegistracijaPage() {
       role,
       email,
       slaptazodis,
+      agreed,
       ...(role === "client" && { vaikoVardas }),
+      ...(role === "tutor" && { inviteCode }),
     });
 
     try {
@@ -117,6 +125,18 @@ export default function RegistracijaPage() {
               placeholder="Vaiko vardas"
               value={vaikoVardas}
               onChange={(e) => setVaikoVardas(e.target.value)}
+              required
+              autoComplete="off"
+            />
+          )}
+
+          {role === "tutor" && (
+            <input
+              className="border border-blue-300 rounded-lg px-4 py-3 text-lg placeholder-black focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              type="text"
+              placeholder="Mokytojo kvietimo kodas"
+              value={inviteCode}
+              onChange={(e) => setInviteCode(e.target.value)}
               required
               autoComplete="off"
             />
@@ -194,6 +214,21 @@ export default function RegistracijaPage() {
             required
             autoComplete="new-password"
           />
+
+          <label className="flex items-start gap-3 text-sm leading-relaxed cursor-pointer">
+            <input
+              type="checkbox"
+              checked={agreed}
+              onChange={(e) => setAgreed(e.target.checked)}
+              className="mt-1 h-5 w-5 shrink-0"
+            />
+            <span>
+              Esu pilnametis, mokinio tėvas ar globėjas arba turiu jų sutikimą (jei mokiniui nėra 14 m., registruoja
+              tėvai). Sutinku su{" "}
+              <Link href="/taisykles" className="underline" target="_blank">taisyklėmis</Link> ir susipažinau su{" "}
+              <Link href="/privatumo-politika" className="underline" target="_blank">privatumo politika</Link>.
+            </span>
+          </label>
 
           <button
             type="submit"
