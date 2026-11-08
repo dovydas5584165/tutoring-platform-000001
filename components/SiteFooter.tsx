@@ -15,7 +15,7 @@ export default function SiteFooter() {
             <Image src="/logo-removebg-preview.png" alt="" width={28} height={28} />
             <span>© {new Date().getFullYear()} Tiksliukai.lt</span>
           </div>
-          <a href="mailto:info.tiksliukai@gmail.com" className="hover:text-[#3B65CE] flex items-center gap-1.5">
+          <a href="mailto:info.tiksliukai@gmail.com" className="hover:text-brand flex items-center gap-1.5">
             <Mail size={16} /> info.tiksliukai@gmail.com
           </a>
           <div className="flex gap-4 text-2xl">
@@ -24,10 +24,10 @@ export default function SiteFooter() {
           </div>
         </div>
         <nav className="flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-2 border-t border-slate-100 pt-4">
-          <Link href="/privatumo-politika" className="hover:text-[#3B65CE]">Privatumo politika</Link>
-          <Link href="/taisykles" className="hover:text-[#3B65CE]">Naudojimosi taisyklės</Link>
-          <Link href="/sutarties-atsisakymas" className="hover:text-[#3B65CE]">Atsisakyti sutarties</Link>
-          <CookieSettingsButton className="hover:text-[#3B65CE]" />
+          <Link href="/privatumo-politika" className="hover:text-brand">Privatumo politika</Link>
+          <Link href="/taisykles" className="hover:text-brand">Naudojimosi taisyklės</Link>
+          <Link href="/sutarties-atsisakymas" className="hover:text-brand">Atsisakyti sutarties</Link>
+          <CookieSettingsButton className="hover:text-brand" />
         </nav>
         <p className="text-xs text-slate-400 text-center sm:text-left">
           Paslaugas teikia {SELLER.name}, {SELLER.legalForm}{SELLER.code ? `, pažymos nr. ${SELLER.code}` : ""}
