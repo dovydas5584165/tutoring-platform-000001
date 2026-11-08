@@ -5,12 +5,15 @@
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 import { signTestSession, testCookieOptions, TEST_SESSION_SECONDS as SESSION_SECONDS } from '../../../lib/testSession';
-import { clientIp, rateLimit, tooMany } from '../../../lib/security';
+import { clientIp, rateLimit, tooMany, underLimit } from '../../../lib/security';
 
 /** Body: { code }. Sets the test session cookie if the code exists, is active and hasn't expired. */
 export async function POST(req: Request) {
-  // Codes are guessable words, so limit guesses per IP
-  if (!rateLimit(`redeem:${clientIp(req)}`, 10, 15 * 60_000)) return tooMany();
+  // Codes are guessable words, so limit WRONG guesses per IP. Correct codes are never limited:
+  // a whole company may redeem from one office IP.
+  const failKey = `redeem-fail:${clientIp(req)}`;
+  const countFailure = () => rateLimit(failKey, 10, 15 * 60_000);
+  if (!underLimit(failKey, 10, 15 * 60_000)) return tooMany();
   let code = '';
   try {
     const body = await req.json();
@@ -18,7 +21,7 @@ export async function POST(req: Request) {
   } catch {
     return NextResponse.json({ error: 'Bad request' }, { status: 400 });
   }
-  if (!code) return NextResponse.json({ error: 'Neteisingas kodas.' }, { status: 401 });
+  if (!code) { countFailure(); return NextResponse.json({ error: 'Neteisingas kodas.' }, { status: 401 }); }
 
   const { data: row, error } = await supabaseAdmin
     .from('access_codes')
@@ -31,6 +34,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Nepavyko patikrinti kodo.' }, { status: 500 });
   }
   if (!row || !row.active) {
+    countFailure();
     return NextResponse.json({ error: 'Neteisingas kodas.' }, { status: 401 });
   }
 
