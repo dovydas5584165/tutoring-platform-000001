@@ -6,6 +6,7 @@ import { supabase } from "../../../lib/supabaseClient";
 // import WeeklyAvailabilitySelector from "@/components/WeeklyAvailabilitySelector"; // prieinamumas – sena tvarka
 import TutorLessonRequests from "@/components/TutorLessonRequests";
 import TutorWorkflowGuide from "@/components/TutorWorkflowGuide";
+import TutorProfileEditor from "@/components/TutorProfileEditor";
 
 type AvailabilitySlot = {
   id: string;
@@ -491,6 +492,8 @@ export default function TutorDashboard() {
       <main className="flex-grow container mx-auto px-6 sm:px-10 py-10 space-y-10 max-w-7xl">
 
         <TutorLessonRequests />
+
+        <TutorProfileEditor />
         
         {/* Pranešimai (užsakymų patvirtinimas) – sena tvarka. Atkuriant viduje „*\/“ pakeiskite į „*“ + „/“. */}
         {/* ===== SENA TVARKA (užkomentuota) =====

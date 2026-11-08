@@ -8,7 +8,7 @@
 import { useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import LessonRequestForm from "@/components/LessonRequestForm";
-import { TEACHERS } from "@/lib/teachers";
+import { useTeachers } from "@/lib/useTeachers";
 
 /* ===== SENA TVARKA (užkomentuota) =====
 import { useEffect, useState } from "react";
@@ -156,6 +156,7 @@ function BookingInfoModal({
 export default function ScheduleLanding() {
   const params = useParams();
   const slug = decodeURIComponent(params.slug as string);
+  const { teachers: TEACHERS } = useTeachers();
 
   /* ===== SENA TVARKA (užkomentuota) =====
   const router = useRouter();
