@@ -9,7 +9,6 @@ import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
 
 // --- IMPORT CHECKOUT FORM (Up 2 levels) ---
 import CheckoutForm from '../../components/CheckoutForm';
@@ -76,31 +75,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
       const data = await res.json();
       if (data.error) throw new Error(data.error);
 
-      // Extract the Payment Intent ID directly from the clientSecret
-      // (e.g., "pi_12345_secret_abc" -> "pi_12345")
-      const intentId = data.paymentIntentId || data.clientSecret.split('_secret')[0];
-
-      // 2. Save phone number, payment_intent_id, and amount to Supabase
-      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
-      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
-
-      if (supabaseUrl && supabaseKey) {
-        const supabase = createClient(supabaseUrl, supabaseKey);
-        const { error: supabaseError } = await supabase.from('purchases').insert([
-          {
-            number: phoneNumber,
-            payment_intent_id: intentId,
-            status: 'pending',
-            amount: PACKAGE_PRICE,
-          },
-        ]);
-
-        if (supabaseError) {
-          console.error('Supabase insert error:', supabaseError);
-        }
-      } else {
-        console.warn('Supabase credentials not found.');
-      }
+      // The server records the purchase (phone + payment intent); the browser never writes to the database
 
       setClientSecret(data.clientSecret);
       setIsPhoneSubmitted(true);

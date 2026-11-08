@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { sendEmail } from "../../../lib/email";
+import { clientIp, rateLimit, tooMany } from "../../../lib/security";
 import {
   MIN_SLOTS, MAX_SLOTS, cleanSlots, tutorsForSubject, likeExact,
   requestReceivedEmail, newRequestTutorEmail, type LessonRequestRow,
@@ -15,6 +16,8 @@ const str = (v: unknown, max: number) => String(v ?? "").trim().slice(0, max);
 
 /** Client submits a lesson request with 5+ possible times. Public endpoint. */
 export async function POST(req: NextRequest) {
+  // Sends emails, so cap submissions per IP (spam / email bombing)
+  if (!rateLimit(`lesson-req:${clientIp(req)}`, 5, 10 * 60_000)) return tooMany();
   try {
     const body = await req.json();
 

@@ -49,6 +49,10 @@ export default function UpdatePasswordPage() {
 
   const handleUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password.length < 8) {
+      setStatus("Slaptažodis turi būti bent 8 simbolių.");
+      return;
+    }
     const { error } = await supabase.auth.updateUser({ password });
     if (error) {
       setStatus("Klaida: " + error.message);
@@ -68,6 +72,7 @@ export default function UpdatePasswordPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            minLength={8}
             style={{ padding: 10 }}
           />
           <button type="submit" style={{ padding: 10, backgroundColor: "#0070f3", color: "#fff", border: "none" }}>

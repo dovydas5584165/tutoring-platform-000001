@@ -85,18 +85,8 @@ export default function RegistracijaPage() {
 
       if (!res.ok) return setErrorMsg(data.message ?? "Registracijos klaida");
 
-      setSuccessMsg("Registracija sėkminga! Nukreipiame...");
-      setTimeout(() => {
-        if (data.userId) {
-          router.push(
-            role === "tutor"
-              ? `/tutor_dashboard/${data.userId}`
-              : `/student_dashboard/${data.userId}`
-          );
-        } else {
-          router.push("/auth/log-in");
-        }
-      }, 2000);
+      // The account must be confirmed from the email before logging in
+      setSuccessMsg(data.message ?? "Patikrinkite el. paštą ir patvirtinkite registraciją.");
     } catch {
       setErrorMsg("Serverio klaida");
     }

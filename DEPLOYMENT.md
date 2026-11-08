@@ -30,6 +30,14 @@ EMAIL_PASS=your-app-password
 EMAIL_FROM=your-email@gmail.com
 ```
 
+### Security
+```
+ADMIN_SECRET=at-least-16-random-characters
+TEST_SESSION_SECRET=random-32-plus-characters   # openssl rand -hex 32
+TUTOR_INVITE_CODE=code-you-give-to-approved-tutors
+```
+See SECURITY.md (also: run supabase/security_hardening.sql once).
+
 ### Optional
 ```
 NEXT_PUBLIC_APP_URL=https://your-vercel-domain.vercel.app
