@@ -9,7 +9,7 @@ How each common web-app vulnerability is handled in this project. "Code" = fixed
 | 2 | `.git` folder | Code: middleware returns 404 for `/.git/*` and `/.env*`. Vercel never deploys `.git` anyway. |
 | 3 | Supabase storage | `supabase/storage_privacy.sql`: `invoices` private; `teacher photos` public on purpose. Photo uploads go through the API with server-chosen file names. |
 | 4 | Price from the browser | Code: all Stripe amounts come from the server. Bookings are only marked paid if the PaymentIntent was created *for that booking* and covers its `total_price` (`paymentCoversBooking`). Career test requires a `career_test` PaymentIntent for the full price. |
-| 5 | Credential stuffing | Code: rate limits on registration, admin password, access codes; min password 8. **Dashboard:** Supabase → Auth → enable CAPTCHA (Turnstile) and "Leaked password protection"; keep Auth rate limits on. |
+| 5 | Credential stuffing | Code: rate limits on registration, admin password, access codes; min password 8. Supabase Auth has built-in rate limits for login. Do NOT enable Supabase CAPTCHA until the login/forgot-password pages send a captcha token (they don't yet; enabling it would block all logins). "Leaked password protection" needs a paid Supabase plan. |
 | 6 | Open database | Code: browser no longer writes `bookings` / `purchases`; server uses the service-role key. **Run `supabase/security_hardening.sql`** and drop any permissive write policy it lists. |
 | 7 | Polyfill.io | Not used. Only third-party script is Google Analytics, loaded after cookie consent. |
 | 8 | SMS pumping | Not applicable (no SMS sent). Email-sending forms are rate limited. |
@@ -37,7 +37,8 @@ Generate one with: `openssl rand -hex 32`
 
 - Auth → Providers → Email: **Confirm email = ON** (registration relies on it).
 - Auth → URL Configuration → Redirect URLs: include `https://www.tiksliukai.lt/auth/log-in` and `https://tiksliukai.lt/atnaujinti_slaptazodi`.
-- Auth → Attack protection: CAPTCHA + leaked password protection.
+- Auth → Emails → SMTP Settings: use your own SMTP (same as the `EMAIL_*` vars). The built-in sender only allows a few emails per hour, which limits password resets.
+- Auth → Attack Protection: leave CAPTCHA OFF for now (see #5).
 
 ## Limits
 
