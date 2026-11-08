@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
@@ -27,7 +26,6 @@ const TEST_START_PATH = '/test-start';
 
 // --- PAYMENT MODAL ---
 function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const router = useRouter();
 
   const [clientSecret, setClientSecret] = useState('');
   const [error, setError] = useState('');
@@ -127,11 +125,11 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
       const data = await res.json();
 
       if (!res.ok || !data.url) {
-        setCodeError('Neteisingas kodas.');
+        setCodeError(data.error || 'Neteisingas kodas.');
         return;
       }
 
-      router.push(data.url);
+      window.location.href = data.url;
     } catch (err) {
       console.error(err);
       setCodeError('Nepavyko patikrinti kodo. Bandykite dar kartą.');
