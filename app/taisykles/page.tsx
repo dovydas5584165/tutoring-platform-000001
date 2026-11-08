@@ -20,7 +20,8 @@ export default function Terms() {
       <h2>1. Paslaugų teikėjas</h2>
       <ul>
         <li><b>Teikėjas:</b> {SELLER.name}, {SELLER.legalForm}</li>
-        <li><b>Kodas:</b> {SELLER.code}{SELLER.vatCode ? `, PVM mokėtojo kodas ${SELLER.vatCode}` : ""}</li>
+        {SELLER.code && <li><b>Individualios veiklos pažymos nr.:</b> {SELLER.code}</li>}
+        {SELLER.vatCode && <li><b>PVM mokėtojo kodas:</b> {SELLER.vatCode}</li>}
         <li><b>Adresas:</b> {SELLER.address}</li>
         <li><b>El. paštas:</b> <a href={`mailto:${SELLER.email}`}>{SELLER.email}</a></li>
       </ul>

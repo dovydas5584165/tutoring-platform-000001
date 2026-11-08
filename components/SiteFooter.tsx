@@ -30,7 +30,7 @@ export default function SiteFooter() {
           <CookieSettingsButton className="hover:text-[#3B65CE]" />
         </nav>
         <p className="text-xs text-slate-400 text-center sm:text-left">
-          Paslaugas teikia {SELLER.name}, {SELLER.legalForm}, kodas {SELLER.code}
+          Paslaugas teikia {SELLER.name}, {SELLER.legalForm}{SELLER.code ? `, pažymos nr. ${SELLER.code}` : ""}
           {SELLER.vatCode ? `, PVM kodas ${SELLER.vatCode}` : ""}, {SELLER.address}.
         </p>
       </div>

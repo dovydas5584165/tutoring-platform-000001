@@ -19,7 +19,7 @@ export default function PrivacyPolicy() {
 
       <h2>1. Duomenų valdytojas ir kaip su mumis susisiekti</h2>
       <p>
-        Duomenų valdytojas: <b>{SELLER.name}</b>, {SELLER.legalForm}, kodas {SELLER.code}, {SELLER.address}.
+        Duomenų valdytojas: <b>{SELLER.name}</b>, {SELLER.legalForm}{SELLER.code ? `, pažymos nr. ${SELLER.code}` : ""}, {SELLER.address}.
       </p>
       <p>
         Visais su asmens duomenimis susijusiais klausimais rašykite{" "}

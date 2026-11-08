@@ -29,13 +29,13 @@ export const PRIVATE_PAGE: Metadata = { robots: { index: false, follow: false } 
 
 /**
  * Who legally provides the services (required by the Lithuanian Law on Information Society Services
- * and consumer law). TODO before going live: replace every "[ĮRAŠYKITE …]" with the real details.
+ * and consumer law). `code` is optional: add the individual activity certificate number here if needed.
  */
 export const SELLER = {
-  name: "[ĮRAŠYKITE: vardas, pavardė arba įmonės pavadinimas]",
-  legalForm: "[ĮRAŠYKITE: pvz. individuali veikla pagal pažymą / MB / UAB]",
-  code: "[ĮRAŠYKITE: individualios veiklos pažymos nr. arba įmonės kodas]",
+  name: "Dovydas Žilinskas",
+  legalForm: "individuali veikla",
+  code: "", // individualios veiklos pažymos nr. (neprivaloma rodyti čia)
   vatCode: "", // PVM mokėtojo kodas, jei esate PVM mokėtojas
-  address: "[ĮRAŠYKITE: buveinės / veiklos adresas]",
+  address: "Saulėtekio al. 4, Vilnius",
   email: CONTACT_EMAIL,
 };
