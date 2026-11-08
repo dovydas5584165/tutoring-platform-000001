@@ -26,3 +26,16 @@ export function pageMeta({ title, description, path, noindex = false }: {
 
 /** For private pages (dashboards, payment, auth helpers): keep them out of search results. */
 export const PRIVATE_PAGE: Metadata = { robots: { index: false, follow: false } };
+
+/**
+ * Who legally provides the services (required by the Lithuanian Law on Information Society Services
+ * and consumer law). `code` is optional: add the individual activity certificate number here if needed.
+ */
+export const SELLER = {
+  name: "Dovydas Žilinskas",
+  legalForm: "individuali veikla",
+  code: "", // individualios veiklos pažymos nr. (neprivaloma rodyti čia)
+  vatCode: "", // PVM mokėtojo kodas, jei esate PVM mokėtojas
+  address: "Saulėtekio al. 4, Vilnius",
+  email: CONTACT_EMAIL,
+};

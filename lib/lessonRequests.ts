@@ -131,7 +131,8 @@ export function requestReceivedEmail(r: LessonRequestRow) {
     `<p>Sveiki, <b>${esc(r.student_name)}</b>!</p>
      <p>Jūsų <b>${esc(r.subject)}</b> pamokos užklausa perduota mūsų mokytojams. Kai vienas iš jų pasirinks laiką, gausite laišką su mokytojo kontaktais.</p>
      <p>Jūsų pasirinkti laikai:</p>${slotList(r.slots)}
-     <p style="color:#64748b;font-size:13px">Norite pakeisti laikus? Tiesiog užpildykite formą dar kartą tuo pačiu el. paštu – užklausa bus atnaujinta.</p>`);
+     <p style="color:#64748b;font-size:13px">Norite pakeisti laikus? Tiesiog užpildykite formą dar kartą tuo pačiu el. paštu – užklausa bus atnaujinta.</p>
+     <p style="color:#64748b;font-size:13px">Pateikdami užklausą patvirtinote, kad esate pilnametis, mokinio tėvas ar globėjas arba turite jų sutikimą, kad sutinkate su <a href="${SITE_URL}/taisykles">taisyklėmis</a> ir prašote pamokas pradėti dar per 14 dienų atsisakymo terminą.</p>`);
 }
 
 export function newRequestTutorEmail(r: LessonRequestRow, tutorId: string) {
@@ -151,7 +152,10 @@ export function claimedStudentEmail(r: LessonRequestRow, tutor: { vardas: string
      <p><b>Jūsų mokytojas:</b> ${esc(name)}<br><b>El. paštas:</b> <a href="mailto:${esc(tutor.email)}">${esc(tutor.email)}</a></p>
      <p>Mokytojas susisieks dėl pamokos detalių. Galite tiesiog <b>atsakyti į šį laišką</b> – jis pateks tiesiai mokytojui.</p>
      <p>${button(google, "Pridėti į Google kalendorių")}</p>
-     <p style="color:#64748b;font-size:13px">Prisegtas failas <i>pamoka.ics</i> – atidarykite jį, kad pamoka atsirastų jūsų kalendoriuje.</p>`);
+     <p style="color:#64748b;font-size:13px">Prisegtas failas <i>pamoka.ics</i> – atidarykite jį, kad pamoka atsirastų jūsų kalendoriuje.</p>
+     <p style="color:#64748b;font-size:13px">Pamokos kaina – 25 € už 45 min., jei nesusitarta kitaip. Taikomos <a href="${SITE_URL}/taisykles">naudojimosi taisyklės</a>.
+     Per 14 dienų galite atsisakyti sutarties nenurodydami priežasties – <a href="${SITE_URL}/sutarties-atsisakymas">sutarties atsisakymo forma</a>.
+     Įvykusios pamokos atsisakyti nebegalima, nes prašėte jas pradėti per šį terminą.</p>`);
 }
 
 export function claimedTutorEmail(r: LessonRequestRow, tutorName: string, google: string) {

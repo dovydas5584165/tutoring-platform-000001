@@ -22,6 +22,7 @@ import {
   Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import SiteFooter from "@/components/SiteFooter";
 
 // Importuojame jūsų Supabase klientą
 import { supabase } from "../../lib/supabaseClient";
@@ -160,6 +161,7 @@ export default function GrupinesPamokos() {
   const [phone, setPhone] = useState("");
   const [subject, setSubject] = useState("");
   const [phrase, setPhrase] = useState(""); // Patvirtinimo frazė
+  const [agreed, setAgreed] = useState(false);
   const [honeypot, setHoneypot] = useState(""); // bot trap, real users never see it
   const [errors, setErrors] = useState<FormErrors>({});
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "duplicate">("idle");
@@ -181,7 +183,7 @@ export default function GrupinesPamokos() {
       return;
     }
 
-    if (!phraseOk) return;
+    if (!phraseOk || !agreed) return;
 
     const newErrors: FormErrors = {};
     if (!ALLOWED_SUBJECTS.includes(subject)) newErrors.subject = "Prašome pasirinkti dominančią programą.";
@@ -212,6 +214,7 @@ export default function GrupinesPamokos() {
       setPhone("");
       setSubject("");
       setPhrase("");
+      setAgreed(false);
       setErrors({});
     } catch (error) {
       // 23505 = unique violation (same email already registered for this group)
@@ -671,6 +674,22 @@ export default function GrupinesPamokos() {
                     </div>
                   </div>
 
+                  <label className="flex items-start gap-3 text-xs text-slate-600 leading-relaxed cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agreed}
+                      onChange={(e) => setAgreed(e.target.checked)}
+                      disabled={isLoading}
+                      className="mt-0.5 h-5 w-5 shrink-0 accent-[#3B65CE]"
+                    />
+                    <span>
+                      Esu pilnametis, mokinio tėvas ar globėjas arba turiu jų sutikimą (jei mokiniui nėra 14 m., registruoja
+                      tėvai). Sutinku su{" "}
+                      <Link href="/taisykles" className="underline" target="_blank">taisyklėmis</Link> ir susipažinau su{" "}
+                      <Link href="/privatumo-politika" className="underline" target="_blank">privatumo politika</Link>.
+                    </span>
+                  </label>
+
                   {/* Būsenos pranešimai */}
                   <AnimatePresence>
                     {status === "duplicate" && (
@@ -702,7 +721,7 @@ export default function GrupinesPamokos() {
                   {/* Mygtukas aktyvus TIK TADA, kai frazė teisinga */}
                   <Button
                     type="submit"
-                    disabled={isLoading || !phraseOk}
+                    disabled={isLoading || !phraseOk || !agreed}
                     className="w-full h-14 rounded-2xl bg-[#3B65CE] hover:bg-[#2f54b3] text-white text-base font-bold shadow-lg shadow-blue-500/25 transition-all hover:-translate-y-0.5 disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:translate-y-0 disabled:cursor-not-allowed"
                   >
                     {isLoading ? (
@@ -715,9 +734,9 @@ export default function GrupinesPamokos() {
                     )}
                   </Button>
 
-                  {!phraseOk && (
+                  {(!phraseOk || !agreed) && (
                     <p className="text-center text-xs text-slate-400 -mt-3">
-                      Mygtukas taps aktyvus, kai įvesite patvirtinimo frazę.
+                      Mygtukas taps aktyvus, kai įvesite patvirtinimo frazę ir pažymėsite varnelę.
                     </p>
                   )}
                 </motion.form>
@@ -728,9 +747,9 @@ export default function GrupinesPamokos() {
       </main>
 
       {/* FOOTER */}
-      <footer className="text-center py-8 text-sm text-gray-500 border-t border-gray-200 bg-white">
-        © {new Date().getFullYear()} Tiksliukai.lt. Visos teisės saugomos.
-      </footer>
+      <div className="bg-white">
+        <SiteFooter />
+      </div>
     </div>
   );
 }

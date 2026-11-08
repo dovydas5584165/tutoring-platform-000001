@@ -20,6 +20,7 @@ export default function LessonRequestForm({ subject }: { subject: string }) {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [topic, setTopic] = useState("");
+  const [agreed, setAgreed] = useState(false);
   const [website, setWebsite] = useState(""); // honeypot
   const [status, setStatus] = useState<"idle" | "sending" | "done">("idle");
   const [updated, setUpdated] = useState(false);
@@ -33,13 +34,14 @@ export default function LessonRequestForm({ subject }: { subject: string }) {
     if (name.trim().length < 3) return setError("Įveskite vardą ir pavardę.");
     if (!grade) return setError("Pasirinkite klasę.");
     if (!EMAIL_RE.test(email.trim())) return setError("Įveskite teisingą el. paštą.");
+    if (!agreed) return setError("Pažymėkite patvirtinimo varnelę.");
 
     setStatus("sending");
     try {
       const res = await fetch("/api/lesson-requests", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, grade, subject, email, phone, topic, slots, website }),
+        body: JSON.stringify({ name, grade, subject, email, phone, topic, slots, website, agreed }),
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || "Nepavyko išsiųsti užklausos.");
@@ -131,6 +133,19 @@ export default function LessonRequestForm({ subject }: { subject: string }) {
             rows={3} placeholder="Ką norėtumėte išmokti? (neprivaloma)" value={topic} onChange={(e) => setTopic(e.target.value)} disabled={busy}
           />
 
+          <label className="flex items-start gap-3 text-xs text-slate-600 leading-relaxed cursor-pointer">
+            <input
+              type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} disabled={busy}
+              className="mt-0.5 h-5 w-5 shrink-0 rounded border-slate-300 accent-[#3B65CE]"
+            />
+            <span>
+              Esu pilnametis, mokinio tėvas ar globėjas arba turiu jų sutikimą (jei mokiniui nėra 14 m., pildo tėvai).
+              Sutinku su <Link href="/taisykles" className="underline" target="_blank">taisyklėmis</Link>, susipažinau su{" "}
+              <Link href="/privatumo-politika" className="underline" target="_blank">privatumo politika</Link> ir prašau
+              pamokas pradėti per 14 d. atsisakymo terminą (įvykusios pamokos atsisakyti negalima).
+            </span>
+          </label>
+
           {error && (
             <p role="alert" className="flex items-start gap-2 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm p-3">
               <AlertCircle size={18} className="mt-0.5 shrink-0" />
@@ -148,10 +163,6 @@ export default function LessonRequestForm({ subject }: { subject: string }) {
               : `Siųsti užklausą · ${slots.length}`}
           </button>
           <p className="text-xs text-slate-400 text-center">Užklausa nemokama ir neįpareigoja. Pamokos kaina – 25 €.</p>
-          <p className="text-xs text-slate-400 text-center -mt-2">
-            Siųsdami sutinkate su <Link href="/taisykles" className="underline">taisyklėmis</Link> ir{" "}
-            <Link href="/privatumo-politika" className="underline">privatumo politika</Link>.
-          </p>
         </div>
       </form>
     </section>

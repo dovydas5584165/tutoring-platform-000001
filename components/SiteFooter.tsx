@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Mail } from "lucide-react";
 import { FaInstagram, FaFacebook } from "react-icons/fa";
 import { CookieSettingsButton } from "./CookieConsent";
+import { SELLER } from "@/lib/site";
 
 /** Shared footer: contacts, socials and legal links. */
 export default function SiteFooter() {
@@ -25,8 +26,13 @@ export default function SiteFooter() {
         <nav className="flex flex-wrap justify-center sm:justify-start gap-x-5 gap-y-2 border-t border-slate-100 pt-4">
           <Link href="/privatumo-politika" className="hover:text-[#3B65CE]">Privatumo politika</Link>
           <Link href="/taisykles" className="hover:text-[#3B65CE]">Naudojimosi taisyklės</Link>
+          <Link href="/sutarties-atsisakymas" className="hover:text-[#3B65CE]">Atsisakyti sutarties</Link>
           <CookieSettingsButton className="hover:text-[#3B65CE]" />
         </nav>
+        <p className="text-xs text-slate-400 text-center sm:text-left">
+          Paslaugas teikia {SELLER.name}, {SELLER.legalForm}{SELLER.code ? `, pažymos nr. ${SELLER.code}` : ""}
+          {SELLER.vatCode ? `, PVM kodas ${SELLER.vatCode}` : ""}, {SELLER.address}.
+        </p>
       </div>
     </footer>
   );

@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
     const phone = str(body.phone, 30) || null;
     const slots = cleanSlots(body.slots);
 
+    if (body.agreed !== true) return bad("Pažymėkite patvirtinimo varnelę.");
     if (student_name.length < 3) return bad("Įveskite vardą ir pavardę.");
     if (!grade) return bad("Pasirinkite klasę.");
     if (!subject) return bad("Nenurodytas dalykas.");

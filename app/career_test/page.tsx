@@ -10,6 +10,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // --- IMPORT CHECKOUT FORM (Up 2 levels) ---
 import CheckoutForm from '../../components/CheckoutForm';
+import SiteFooter from '../../components/SiteFooter';
 
 // Initialize Stripe
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
@@ -36,6 +37,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isPhoneSubmitted, setIsPhoneSubmitted] = useState(false);
   const [isLoadingPayment, setIsLoadingPayment] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   // Access code states
   const [showCode, setShowCode] = useState(false);
@@ -53,6 +55,10 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!phoneNumber) return;
+    if (!agreed) {
+      setError('Pažymėkite patvirtinimo varnelę.');
+      return;
+    }
 
     setIsLoadingPayment(true);
     setError('');
@@ -256,9 +262,25 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                       Reikalingas norint sklandžiai susisiekti ir suderinti konsultacijos laiką.
                     </p>
                   </div>
+                  {/* Digital content: express consent to immediate access + acknowledgement of losing the
+                      14-day withdrawal right (Civil Code / Consumer Rights Directive Art. 16(m)). */}
+                  <label className="flex items-start gap-3 text-xs text-slate-600 leading-relaxed cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agreed}
+                      onChange={(e) => setAgreed(e.target.checked)}
+                      className="mt-0.5 h-5 w-5 shrink-0 accent-[#5170FF]"
+                    />
+                    <span>
+                      Esu pilnametis arba perku su tėvų (globėjų) sutikimu. Sutinku su{' '}
+                      <Link href="/taisykles" target="_blank" className="underline">taisyklėmis</Link> ir prašau suteikti
+                      prieigą prie testo iškart po apmokėjimo. Suprantu, kad pradėjus testą prarandu teisę per 14 dienų
+                      atsisakyti testo dalies (konsultacijos, kol ji neįvyko, atsisakyti galiu).
+                    </span>
+                  </label>
                   <button
                     type="submit"
-                    disabled={isLoadingPayment}
+                    disabled={isLoadingPayment || !agreed}
                     className="w-full text-white font-semibold py-3 px-4 rounded-xl hover:opacity-90 transition-all disabled:opacity-70 flex justify-center items-center shadow-md"
                     style={{ backgroundColor: BRAND_BLUE }}
                   >
@@ -328,7 +350,7 @@ function PaymentModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
                 {clientSecret && (
                   <Elements options={{ clientSecret, appearance }} stripe={stripePromise}>
-                    <CheckoutForm returnUrl={returnUrl} />
+                    <CheckoutForm returnUrl={returnUrl} amount={PACKAGE_PRICE} />
                   </Elements>
                 )}
               </div>
@@ -735,22 +757,7 @@ export default function KarjerosPristatymas() {
         </div>
       </section>
 
-      <footer className="py-8 border-t border-slate-200 bg-white">
-        <div className="container mx-auto px-6 text-slate-500 text-xs flex flex-col md:flex-row justify-between items-center gap-4">
-          <p>&copy; {new Date().getFullYear()} Tiksliukai.lt Karjeros Tyrimas. Visos teisės saugomos.</p>
-          <div className="flex gap-6">
-            <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-slate-900 transition-colors">
-              {CONTACT_EMAIL}
-            </a>
-            <Link href="/taisykles" className="hover:text-slate-900 transition-colors">
-              Naudojimo taisyklės
-            </Link>
-            <Link href="/privatumo-politika" className="hover:text-slate-900 transition-colors">
-              Privatumo politika
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

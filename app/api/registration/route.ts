@@ -10,7 +10,9 @@ const payloadSchema = z.object({
   role: z.enum(["tutor", "client"], {
     errorMap: () => ({ message: "Rolė turi būti 'tutor' arba 'client'" }),
   }),
-  vaikovardas: z.string().optional(),
+  vaikoVardas: z.string().optional(),
+  inviteCode: z.string().optional(),
+  agreed: z.literal(true, { errorMap: () => ({ message: "Pažymėkite patvirtinimo varnelę" }) }),
   pamokos: z.array(z.string()).min(1, "Reikia pasirinkti bent vieną pamoką"),
 });
 
@@ -26,7 +28,16 @@ export async function POST(req: Request) {
       );
     }
 
-    const { email, slaptazodis, vardas, pavarde, role, vaikovardas, pamokos } = parsed.data;
+    const { email, slaptazodis, vardas, pavarde, role, vaikoVardas: vaikovardas, pamokos, inviteCode } = parsed.data;
+
+    // Tutors see children's names and contacts, so only invited tutors may register as one.
+    // Set TUTOR_INVITE_CODE in the environment and give the code only to approved tutors.
+    if (role === "tutor") {
+      const expected = process.env.TUTOR_INVITE_CODE;
+      if (!expected || inviteCode?.trim() !== expected) {
+        return NextResponse.json({ message: "Neteisingas mokytojo kvietimo kodas." }, { status: 403 });
+      }
+    }
 
     // 1. Create user in Supabase Auth via Admin API
     const { data: userData, error: authError } = await supabaseAdmin.auth.admin.createUser({
