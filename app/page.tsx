@@ -8,7 +8,7 @@ import {
   Languages, Laptop, Leaf, Mail, Menu, MousePointerClick, Siren, Star, TrendingUp, Users, X,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
-import { TEACHERS } from "@/lib/teachers";
+import { useTeachers } from "@/lib/useTeachers";
 import { SUBJECTS } from "@/lib/subjects";
 import SiteFooter from "@/components/SiteFooter";
 
@@ -61,6 +61,7 @@ const IBAN = "LT077300010164121505";
 /* ---------- page ---------- */
 
 export default function Home() {
+  const { teachers: TEACHERS, loading: teachersLoading } = useTeachers();
   const [user, setUser] = useState<any>(null);
   const [userRole, setUserRole] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -302,7 +303,7 @@ export default function Home() {
           />
 
           <div className="grid grid-cols-3 gap-2 sm:gap-4 max-w-2xl mx-auto mb-10 text-center">
-            {[["1000+", "pravestų pamokų"], ["100+", "laimingų šeimų"], [`${TEACHERS.length}`, "mokytojai"]].map(([n, l]) => (
+            {[["1000+", "pravestų pamokų"], ["100+", "laimingų šeimų"], [teachersLoading ? "…" : `${TEACHERS.length}`, "mokytojai"]].map(([n, l]) => (
               <div key={l} className="rounded-2xl bg-blue-50 py-4">
                 <p className="text-2xl sm:text-3xl font-extrabold text-[#3B65CE]">{n}</p>
                 <p className="text-xs sm:text-sm text-slate-600">{l}</p>

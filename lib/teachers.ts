@@ -1,7 +1,9 @@
 // Mokytojų kortelės: naudojamos pradiniame ir pamokos puslapiuose.
+// Tikri duomenys dabar laikomi DB lentelėje `teacher_profiles` (redaguojami /admin_tutors ir mokytojo paskyroje).
+// Šis sąrašas naudojamas tik kaip atsarginis, jei DB nepasiekiama.
 export type TeacherCard = { name: string; subject: string; experience: string; description: string; img: string };
 
-export const TEACHERS: TeacherCard[] = [
+export const FALLBACK_TEACHERS: TeacherCard[] = [
 {
   name: "Karolina Kuncevičiūtė",
   subject: "Chemija ir Biologija",
