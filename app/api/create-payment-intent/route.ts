@@ -1,8 +1,12 @@
-// app/api/create-payment-intent/route.ts
+/**
+ * Creates Stripe PaymentIntents for a tutoring booking or for the career test.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerStripe } from '../../../lib/stripe'; // Keep your existing helper
 import { supabase } from '../../../lib/supabaseClient';
 
+/** Body: { bookingId } for a lesson booking, or { product_type: 'career_test', phone } for the career test. Returns { clientSecret }. */
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

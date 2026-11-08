@@ -174,7 +174,6 @@ https://yourdomain.com/api/webhooks/stripe
 ├── app/
 │   ├── api/
 │   │   ├── create-payment-intent/route.ts    # Creates Stripe payment intents
-│   │   ├── cancel-booking/route.ts           # Handles cancellations and refunds
 │   │   └── webhooks/stripe/route.ts          # Processes Stripe webhooks
 │   ├── payment/page.tsx                      # Payment page with Stripe Elements
 │   └── payment-success/page.tsx              # Payment confirmation page

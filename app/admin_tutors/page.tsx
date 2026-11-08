@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Admin page for adding, editing, ordering and linking tutor cards (password protected).
+ */
+
 import React, { useCallback, useEffect, useState } from "react";
 import { ArrowDown, ArrowUp, Eye, EyeOff, KeyRound, Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import TeacherProfileForm, { EMPTY_TEACHER, type TeacherFormValues } from "@/components/TeacherProfileForm";
@@ -9,6 +13,7 @@ type TutorAccount = { id: string; vardas: string | null; pavarde: string | null;
 
 const STORAGE_KEY = "admin_secret"; // shared with /admin_access_codes
 
+/** Asks for the admin password, then manages the tutor cards. */
 export default function TutorsAdmin() {
   const [secret, setSecret] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);

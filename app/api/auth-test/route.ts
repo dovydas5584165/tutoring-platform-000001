@@ -1,3 +1,7 @@
+/**
+ * Career test: verifies a succeeded Stripe payment, records it and sets the `test_session_token` cookie.
+ */
+
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { supabase } from '../../../lib/supabaseClient';
@@ -6,6 +10,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-01-27.acacia',
 });
 
+/** Body: { paymentIntentId }. Grants a 4-hour test session cookie if the payment succeeded. */
 export async function POST(req: Request) {
   try {
     const body = await req.json();

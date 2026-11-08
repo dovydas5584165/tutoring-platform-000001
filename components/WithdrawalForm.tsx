@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Two-step contract withdrawal form (fill in, then confirm).
+ */
+
 import { useState } from "react";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

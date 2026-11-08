@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * React hook that loads the visible tutor cards from /api/teachers.
+ */
+
 import { useEffect, useState } from "react";
 import { FALLBACK_TEACHERS, type TeacherCard } from "./teachers";
 

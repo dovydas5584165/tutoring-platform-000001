@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * "Night Run" racing game.
+ */
+
 import React, { useEffect, useRef, useState } from 'react';
 
 /* ---------- Types ---------- */

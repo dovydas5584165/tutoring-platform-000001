@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Mini-game: sort numbers into folders (each fits by chance); filling all folders wins a free-lesson code.
+ */
+
 import React, { useState, useEffect } from 'react';
 
 // ---- Nustatymai, kuriuos galite keisti ----
@@ -18,6 +22,7 @@ const ORGANISER = 'tiksliukai.lt';
 
 const newNumber = () => Math.floor(Math.random() * 99) + 1;
 
+/** True with probability `p` (uses crypto randomness when available). */
 function chance(p: number): boolean {
   if (typeof window !== 'undefined' && window.crypto) {
     const a = new Uint32Array(1);
@@ -27,6 +32,7 @@ function chance(p: number): boolean {
   return Math.random() < p;
 }
 
+/** Random reward code like "TIK-FREE-AB12CD" (no look-alike characters). */
 function makeCode(prefix: string): string {
   const c = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let s = prefix + '-';
@@ -36,6 +42,7 @@ function makeCode(prefix: string): string {
   return s;
 }
 
+/** Game page: pick a number, drop it into a folder, fill every folder to win. */
 export default function SortNumbersGame() {
   const [chips, setChips] = useState<number[]>([]);
   const [files, setFiles] = useState<number[]>(() => BUCKETS.map(() => 0));

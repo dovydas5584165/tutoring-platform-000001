@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Student dashboard: grades, upcoming lessons and tutor notes.
+ */
+
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../../../lib/supabaseClient";
@@ -54,6 +58,7 @@ interface Note {
   created_at: string;
 }
 
+/** Loads and shows the student's grades, lessons and notes. */
 export default function StudentDashboard() {
   const router = useRouter();
 

@@ -1,4 +1,7 @@
-// Shared by the browser (calendar, dashboard) and the API routes. No server imports here.
+/**
+ * Lesson-request limits (slot counts, notice, calendar hours). Shared by the browser and the API routes, so no server imports here.
+ */
+
 export const MIN_SLOTS = 5;
 export const MAX_SLOTS = 30;
 export const LESSON_MINUTES = 45;

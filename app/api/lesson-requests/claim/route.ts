@@ -1,3 +1,7 @@
+/**
+ * Tutor claims an open lesson request by picking one of the client's times.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
 import { sendEmail } from "../../../../lib/email";

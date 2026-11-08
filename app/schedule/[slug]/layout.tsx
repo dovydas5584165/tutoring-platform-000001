@@ -1,3 +1,7 @@
+/**
+ * Per-subject metadata for /schedule/[slug].
+ */
+
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/site";
 import { subjectName, subjectOf } from "@/lib/subjects";

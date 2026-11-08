@@ -1,9 +1,14 @@
+/**
+ * After a booking payment (non-webhook flow): marks it paid if needed and emails the student and the tutor.
+ */
+
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '../../../lib/supabaseClient';
 import { getServerStripe } from '../../../lib/stripe';
 import { sendEmail, generatePaymentSuccessEmail, generateTutorOrderEmail } from '../../../lib/email';
 import { ensureBookingNotification } from '../../../lib/bookingNotification';
 
+/** Body: { bookingId }. Sends the payment confirmation to the student and the order email to the tutor. */
 export async function POST(request: NextRequest) {
   try {
     const { bookingId } = await request.json();
@@ -156,7 +161,7 @@ export async function POST(request: NextRequest) {
 }
 
 // --------- generateInvoiceEmail funkcija ---------
-export function generateInvoiceEmail(
+function generateInvoiceEmail(
   studentName: string,
   bookingId: string | number,
   totalPrice: number,

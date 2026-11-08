@@ -1,3 +1,7 @@
+/**
+ * Consumer withdrawal from a distance contract: emails the request and an acknowledgement.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "../../../lib/email";
 import { CONTACT_EMAIL } from "../../../lib/site";

@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Edit form for one tutor card with photo upload and live preview.
+ */
+
 import React, { useRef, useState } from "react";
 import { Camera, Loader2, Trash2, UserRound } from "lucide-react";
 

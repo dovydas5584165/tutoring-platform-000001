@@ -1,3 +1,7 @@
+/**
+ * Admin API for career-test access codes: list, create, enable/disable and extend.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { isAdmin, generateCode } from "../../../lib/accessCodes";

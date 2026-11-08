@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Stock market game: simulated candles teach compound interest and risk.
+ */
+
 import React, { useEffect, useState } from "react";
 
 /**
@@ -102,6 +106,7 @@ const eur0 = new Intl.NumberFormat("lt-LT", { style: "currency", currency: "EUR"
 const round2 = (n: number) => Math.round(n * 100) / 100;
 const pctFmt = (n: number, d = 1) => `${n >= 0 ? "+" : "−"}${Math.abs(n * 100).toFixed(d)} %`;
 
+/** Standard normal random number (Box–Muller). */
 function gauss(): number {
   let u = 0;
   let v = 0;
@@ -110,6 +115,7 @@ function gauss(): number {
   return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
 }
 
+/** Standard normal cumulative distribution function (erf approximation). */
 function normCdf(x: number): number {
   const t = 1 / (1 + (0.3275911 * Math.abs(x)) / Math.SQRT2);
   const a = [0.254829592, -0.284496736, 1.421413741, -1.453152027, 1.061405429];
@@ -159,6 +165,7 @@ function simulate(p0: number, s: Stock, years: number, candles: number, sub: num
 const genHistory = (s: Stock) =>
   simulate(s.basePrice * (0.8 + Math.random() * 0.4), s, HISTORY_DAYS / 252, HISTORY_DAYS, 4, null);
 
+/** Randomly decides whether a crisis happens during the holding period (~5 % per year) and when. */
 function pickCrisis(hold: Hold, forced: boolean): Crisis | null {
   const chance = 1 - Math.exp(-0.05 * hold.years); // ~5 % per metus
   if (!forced && Math.random() > chance) return null;
@@ -168,6 +175,7 @@ function pickCrisis(hold: Hold, forced: boolean): Crisis | null {
   return { tpl, start };
 }
 
+/** Largest fall from a peak, as a fraction (0.3 = −30 %). */
 function maxDrawdown(c: Candle[]): number {
   let peak = c[0].o;
   let dd = 0;
@@ -178,6 +186,7 @@ function maxDrawdown(c: Candle[]): number {
   return dd;
 }
 
+/** Formats a number of years as "X m. Y mėn.". */
 function fmtElapsed(y: number): string {
   let yrs = Math.floor(y + 1e-9);
   let m = Math.round((y - yrs) * 12);
@@ -192,6 +201,7 @@ const sigmaLabel = (s: number) => (s < 0.15 ? "maži" : s < 0.3 ? "vidutiniai" :
 
 /* ---------- žvakių grafikas ---------- */
 
+/** SVG candlestick chart of the simulated price. */
 function CandleChart({
   candles,
   shown,
@@ -295,6 +305,7 @@ function CandleChart({
 
 /* ---------- žvakės paaiškinimas ---------- */
 
+/** Short explanation of how to read a candle. */
 function CandleGuide() {
   const lbl = { fontSize: 11, fill: MUTED } as const;
   return (
@@ -330,6 +341,7 @@ function CandleGuide() {
 
 /* ---------- pagrindinis komponentas ---------- */
 
+/** Game page: pick a stock and holding period, then watch the simulated result. */
 export default function AkcijuBirzosZaidimas() {
   const [balance, setBalance] = useState(START_BALANCE);
   const [stockId, setStockId] = useState(STOCKS[0].id);

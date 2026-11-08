@@ -1,8 +1,13 @@
 "use client";
 
+/**
+ * Forgot password: sends a Supabase reset-password email.
+ */
+
 import { useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
+/** Email form that requests a password reset link. */
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState({ type: "", message: "" });

@@ -1,3 +1,7 @@
+/**
+ * Site-wide constants and SEO helpers: URL, name, contacts, page metadata and legal seller details.
+ */
+
 import type { Metadata } from "next";
 
 export const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.tiksliukai.lt").replace(/\/$/, "");
@@ -5,9 +9,10 @@ export const SITE_NAME = "Tiksliukai.lt";
 export const CONTACT_EMAIL = "info.tiksliukai@gmail.com";
 
 
-/** Title, description, canonical URL and share preview for one page. */
+/** Default share preview image (see app/opengraph-image.tsx). */
 const OG_IMAGE = { url: "/opengraph-image", width: 1200, height: 630, alt: "Tiksliukai.lt – korepetitoriai, kurie visada padės" };
 
+/** Title, description, canonical URL and share preview for one page. */
 export function pageMeta({ title, description, path, noindex = false }: {
   title: string;
   description: string;

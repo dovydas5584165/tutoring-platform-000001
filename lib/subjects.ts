@@ -1,4 +1,7 @@
-// The six lesson subjects. `slug` matches lessons.name in Supabase and the /schedule/[slug] URL.
+/**
+ * The six lesson subjects. `slug` matches lessons.name in Supabase and the /schedule/[slug] URL.
+ */
+
 export const SUBJECTS = [
   { slug: "matematika", name: "Matematika", of: "matematikos", note: "Nuo pagrindų iki VBE" },
   { slug: "fizika", name: "Fizika", of: "fizikos", note: "Uždaviniai ir egzaminai" },
@@ -11,5 +14,6 @@ export const SUBJECTS = [
 /** Genitive form for phrases like "fizikos pamokos". */
 export const subjectOf = (slug: string) => SUBJECTS.find((s) => s.slug === slug)?.of ?? slug;
 
+/** Display name for a subject slug. */
 export const subjectName = (slug: string) =>
   SUBJECTS.find((s) => s.slug === slug)?.name ?? slug.charAt(0).toUpperCase() + slug.slice(1);

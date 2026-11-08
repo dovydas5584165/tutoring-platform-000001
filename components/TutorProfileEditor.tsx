@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Tutor dashboard panel: edit your own card shown on the website.
+ */
+
 import { useEffect, useState } from "react";
 import { Eye, EyeOff, Loader2, Pencil, UserRound } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
@@ -7,6 +11,7 @@ import TeacherProfileForm, { EMPTY_TEACHER, type TeacherFormValues } from "./Tea
 
 type Profile = TeacherFormValues & { id: string; visible: boolean };
 
+/** Bearer token of the logged-in tutor for API calls. */
 async function authHeaders(): Promise<Record<string, string>> {
   const { data } = await supabase.auth.getSession();
   const token = data.session?.access_token;

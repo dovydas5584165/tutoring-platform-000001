@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Group lessons: info and registration form (validated email/phone).
+ */
+
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -65,6 +69,7 @@ const ALLOWED_EMAIL_DOMAINS = [
 
 const EMAIL_REGEX = /^[a-z0-9]+([._+-][a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)+$/;
 
+/** Returns an error message, or null if the email is valid and from an allowed provider. */
 function validateEmail(raw: string): string | null {
   const value = raw.trim().toLowerCase();
   if (!value) return "Įveskite el. pašto adresą.";
@@ -95,6 +100,7 @@ function normalizeLtPhone(raw: string): string | null {
   return /^\+3706\d{7}$/.test(digits) ? digits : null;
 }
 
+/** Returns an error message, or null if the phone is a valid Lithuanian mobile number. */
 function validatePhone(raw: string): string | null {
   const value = raw.trim();
   if (!value) return "Įveskite telefono numerį.";
@@ -117,6 +123,7 @@ type FormErrors = { subject?: string; email?: string; phone?: string };
 
 // ---------- SMALL UI PIECES ----------
 
+/** Red error text under a form field. */
 function FieldError({ message }: { message?: string }) {
   return (
     <AnimatePresence initial={false}>
@@ -156,6 +163,7 @@ function PricingBlock() {
   );
 }
 
+/** Group lessons page with the registration form. */
 export default function GrupinesPamokos() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");

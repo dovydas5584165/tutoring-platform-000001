@@ -1,3 +1,7 @@
+/**
+ * Terms of service.
+ */
+
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
 import { pageMeta, SELLER } from "@/lib/site";
@@ -8,6 +12,7 @@ export const metadata = pageMeta({
   path: "/taisykles",
 });
 
+/** Terms of service text. */
 export default function Terms() {
   return (
     <LegalPage title="Naudojimosi taisyklės" updated="2026 m. lapkričio 8 d.">

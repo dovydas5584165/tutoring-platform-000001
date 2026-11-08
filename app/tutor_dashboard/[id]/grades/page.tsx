@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Tutor form for adding a student's grade or notes.
+ */
+
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
@@ -16,6 +20,7 @@ type Lesson = {
   name: string;
 };
 
+/** Two forms: add a grade, add notes for a student. */
 export default function GradeAndNotesForm() {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUserId, setSelectedUserId] = useState<string>("");

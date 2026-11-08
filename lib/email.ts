@@ -1,3 +1,7 @@
+/**
+ * SMTP email sending (nodemailer) and the HTML email templates for invoices, cancellations and payments.
+ */
+
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
@@ -18,6 +22,7 @@ export interface EmailOptions {
   attachments?: { filename: string; content: string; contentType?: string }[];
 }
 
+/** Sends one email via SMTP. Returns { success, messageId } or { success: false, error }. */
 export async function sendEmail({ to, subject, html, replyTo, attachments }: EmailOptions) {
   try {
     const info = await transporter.sendMail({
@@ -37,6 +42,7 @@ export async function sendEmail({ to, subject, html, replyTo, attachments }: Ema
   }
 }
 
+/** HTML invoice email for a booking. */
 export function generateInvoiceEmail(
   studentName: string,
   bookingId: string,
@@ -115,6 +121,7 @@ export function generateInvoiceEmail(
   `;
 }
 
+/** HTML email telling the student a booking was cancelled. */
 export function generateCancellationEmail(
   studentName: string,
   bookingId: string,
@@ -174,6 +181,7 @@ export function generateCancellationEmail(
   `;
 } 
 
+/** HTML payment confirmation email for the student. */
 export function generatePaymentSuccessEmail(
   studentName: string,
   bookingId: string,
@@ -240,6 +248,7 @@ export function generatePaymentSuccessEmail(
   `;
 }
 
+/** HTML email telling the tutor about a new paid booking. */
 export function generateTutorOrderEmail(
   tutorName: string,
   studentName: string,

@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Stripe return page: confirms the booking payment and triggers confirmation emails.
+ */
+
 import { Suspense, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '../../lib/supabaseClient';
@@ -26,6 +30,7 @@ interface SlotDetails {
   end_time: string;
 }
 
+/** Polls/verifies the booking payment, then shows the booked lessons and sends emails as a fallback. */
 function PaymentSuccessContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -396,6 +401,7 @@ function PaymentSuccessContent() {
   );
 }
 
+/** Wraps the content in Suspense (needed for useSearchParams). */
 export default function PaymentSuccessPage() {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><p>Kraunama...</p></div>}>

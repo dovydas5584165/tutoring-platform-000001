@@ -1,6 +1,11 @@
+/**
+ * Edge middleware: /test is only reachable with a `test_session_token` cookie (paid or redeemed code).
+ */
+
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+/** Redirects to /career_test when the test session cookie is missing. */
 export function middleware(request: NextRequest) {
   // Protect the /test route
   if (request.nextUrl.pathname.startsWith('/test')) {

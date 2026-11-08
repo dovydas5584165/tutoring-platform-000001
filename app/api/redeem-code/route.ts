@@ -1,9 +1,13 @@
-// app/api/redeem-code/route.ts
+/**
+ * Career test: redeems a company access code and sets the `test_session_token` cookie.
+ */
+
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
 
 const SESSION_SECONDS = 60 * 60 * 4; // same as a paid session
 
+/** Body: { code }. Sets the test session cookie if the code exists, is active and hasn't expired. */
 export async function POST(req: Request) {
   let code = '';
   try {

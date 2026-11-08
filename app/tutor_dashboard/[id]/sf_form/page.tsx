@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Tutor invoice generator: fills in lesson data and exports a PDF invoice.
+ */
+
 import React, { useState, useRef, useEffect } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";

@@ -1,3 +1,7 @@
+/**
+ * Shared layout for legal pages (privacy policy, terms, withdrawal).
+ */
+
 import Link from "next/link";
 import Image from "next/image";
 import SiteFooter from "./SiteFooter";

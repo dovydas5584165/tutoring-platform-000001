@@ -1,3 +1,7 @@
+/**
+ * Contract withdrawal page (14-day right of withdrawal) with the withdrawal form.
+ */
+
 import Link from "next/link";
 import LegalPage from "@/components/LegalPage";
 import WithdrawalForm from "@/components/WithdrawalForm";

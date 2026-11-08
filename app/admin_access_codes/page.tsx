@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Admin page for managing career-test access codes (password protected).
+ */
+
 import React, { useCallback, useEffect, useState } from "react";
 import { Copy, Check, KeyRound, Plus, RefreshCw } from "lucide-react";
 
@@ -15,6 +19,7 @@ type AccessCode = {
 const STORAGE_KEY = "admin_secret";
 const fmt = (d: string) => new Date(d).toLocaleDateString("lt-LT");
 
+/** Asks for the admin password, then lists codes and lets the admin create, toggle and extend them. */
 export default function AccessCodesAdmin() {
   const [secret, setSecret] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);

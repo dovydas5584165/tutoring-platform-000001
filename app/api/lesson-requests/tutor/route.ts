@@ -1,3 +1,7 @@
+/**
+ * Logged-in tutor's lesson requests: open ones in their subjects and the ones they claimed.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
 import { subjectsForTutor, tutorFromRequest, type LessonRequestRow } from "../../../../lib/lessonRequests";

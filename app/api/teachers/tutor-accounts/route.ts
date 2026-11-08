@@ -1,3 +1,7 @@
+/**
+ * Admin: lists tutor accounts so a card can be linked to the tutor who may edit it.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
 import { isAdmin } from "../../../../lib/accessCodes";

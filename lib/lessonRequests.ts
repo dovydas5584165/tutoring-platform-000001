@@ -1,3 +1,7 @@
+/**
+ * Server-side helpers for lesson requests: slot cleaning/formatting and tutor ↔ subject lookups.
+ */
+
 import { supabaseAdmin } from "./supabaseAdmin";
 
 /* ---------- shared rules (used by the page, the API and the dashboard) ---------- */
@@ -39,8 +43,10 @@ export function cleanSlots(input: unknown): string[] {
   return [...seen].sort((a, b) => a - b).map((t) => new Date(t).toISOString());
 }
 
+/** True if two ISO strings are the same moment. */
 export const sameInstant = (a: string, b: string) => new Date(a).getTime() === new Date(b).getTime();
 
+/** Human-readable Lithuanian date and time in Vilnius time. */
 export function fmtSlot(iso: string) {
   return new Date(iso).toLocaleString("lt-LT", {
     timeZone: TZ, weekday: "long", month: "long", day: "numeric", hour: "2-digit", minute: "2-digit",
@@ -91,6 +97,7 @@ export async function tutorFromRequest(req: Request) {
 const icsDate = (d: Date) => d.toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
 const icsText = (s: string) => s.replace(/\\/g, "\\\\").replace(/;/g, "\;").replace(/,/g, "\\,").replace(/\n/g, "\\n");
 
+/** Calendar event for a claimed lesson: .ics file content and a Google Calendar link. */
 export function lessonCalendar(r: LessonRequestRow, tutorName: string) {
   const start = new Date(r.chosen_slot!);
   const end = new Date(start.getTime() + LESSON_MINUTES * 60_000);
@@ -126,6 +133,7 @@ const slotList = (slots: string[]) =>
 const button = (href: string, label: string) =>
   `<a href="${href}" style="display:inline-block;background:#3B65CE;color:#fff;text-decoration:none;padding:10px 18px;border-radius:10px;font-weight:bold">${label}</a>`;
 
+/** Email to the client: request received, with their chosen times. */
 export function requestReceivedEmail(r: LessonRequestRow) {
   return wrap("Gavome jūsų užklausą",
     `<p>Sveiki, <b>${esc(r.student_name)}</b>!</p>
@@ -135,6 +143,7 @@ export function requestReceivedEmail(r: LessonRequestRow) {
      <p style="color:#64748b;font-size:13px">Pateikdami užklausą patvirtinote, kad esate pilnametis, mokinio tėvas ar globėjas arba turite jų sutikimą, kad sutinkate su <a href="${SITE_URL}/taisykles">taisyklėmis</a> ir prašote pamokas pradėti dar per 14 dienų atsisakymo terminą.</p>`);
 }
 
+/** Email to a matching tutor about a new request. */
 export function newRequestTutorEmail(r: LessonRequestRow, tutorId: string) {
   return wrap("Nauja pamokos užklausa",
     `<p><b>${esc(r.student_name)}</b> (${esc(r.grade)}) ieško mokytojo: <b>${esc(r.subject)}</b>${r.topic ? `, tema: „${esc(r.topic)}“` : ""}.</p>
@@ -143,6 +152,7 @@ export function newRequestTutorEmail(r: LessonRequestRow, tutorId: string) {
      <p>${button(`${SITE_URL}/tutor_dashboard/${tutorId}`, "Pasirinkti laiką")}</p>`);
 }
 
+/** Email to the client: lesson time confirmed, with the tutor's contacts. */
 export function claimedStudentEmail(r: LessonRequestRow, tutor: { vardas: string; pavarde: string; email: string }, google: string) {
   const name = `${tutor.vardas} ${tutor.pavarde}`;
   return wrap("Jūsų pamoka suderinta! 🎉",
@@ -158,6 +168,7 @@ export function claimedStudentEmail(r: LessonRequestRow, tutor: { vardas: string
      Įvykusios pamokos atsisakyti nebegalima, nes prašėte jas pradėti per šį terminą.</p>`);
 }
 
+/** Email to the tutor who claimed the lesson, with the client's contacts. */
 export function claimedTutorEmail(r: LessonRequestRow, tutorName: string, google: string) {
   return wrap("Pamoka jūsų kalendoriuje",
     `<p>Sveiki, <b>${esc(tutorName)}</b>!</p>

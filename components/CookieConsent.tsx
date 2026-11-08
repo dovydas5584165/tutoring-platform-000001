@@ -1,5 +1,9 @@
 "use client";
 
+/**
+ * Cookie consent banner and settings; loads analytics/marketing trackers only after consent.
+ */
+
 import { useEffect, useState } from "react";
 import Script from "next/script";
 import Link from "next/link";
@@ -19,10 +23,12 @@ const FB_PIXEL_ID = "1256062859918317";
 
 type Choice = { analytics: boolean; marketing: boolean };
 
+/** Re-opens the cookie settings dialog (e.g. from a footer link). */
 export function openCookieSettings() {
   window.dispatchEvent(new Event(EVENT));
 }
 
+/** Saved consent choice from localStorage, or null if the visitor hasn't chosen yet. */
 function readChoice(): Choice | null {
   try {
     const v = JSON.parse(localStorage.getItem(KEY) || "null");
@@ -39,6 +45,7 @@ function readChoice(): Choice | null {
   }
 }
 
+/** Banner + settings dialog; renders trackers only for the categories the visitor accepted. */
 export default function CookieConsent() {
   const [choice, setChoice] = useState<Choice | null>(null);
   const [open, setOpen] = useState(false);
@@ -138,6 +145,7 @@ export default function CookieConsent() {
   );
 }
 
+/** Google Analytics / Tag Manager scripts. */
 function AnalyticsTrackers() {
   return (
     <>
@@ -176,6 +184,7 @@ function AnalyticsTrackers() {
   );
 }
 
+/** Facebook Pixel script. */
 function MarketingTrackers() {
   return (
     <>

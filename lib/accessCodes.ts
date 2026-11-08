@@ -1,3 +1,7 @@
+/**
+ * Career-test access codes: admin password check and random code generation.
+ */
+
 import { NextRequest } from "next/server";
 
 /** Admin endpoints are protected by a shared password in the ADMIN_SECRET env var. */

@@ -1,3 +1,7 @@
+/**
+ * Route layout: SEO metadata for this page.
+ */
+
 import { pageMeta } from "@/lib/site";
 
 export const metadata = pageMeta({

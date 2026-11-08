@@ -1,8 +1,13 @@
 "use client";
 
+/**
+ * Set a new password after following the Supabase reset-password email link.
+ */
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
 
+/** Waits for the recovery session from the email link, then saves the new password. */
 export default function UpdatePasswordPage() {
   const [password, setPassword] = useState("");
   const [status, setStatus] = useState("");

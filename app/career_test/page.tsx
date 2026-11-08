@@ -1,5 +1,9 @@
 'use client';
 
+/**
+ * Career test sales page: pay with Stripe or redeem a company access code, then start the test.
+ */
+
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { loadStripe } from '@stripe/stripe-js';

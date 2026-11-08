@@ -1,3 +1,7 @@
+/**
+ * Stripe webhook: on payment success/failure updates the booking, records the payment and sends emails.
+ */
+
 import { NextRequest, NextResponse } from "next/server";
 import { getServerStripe } from "../../../../lib/stripe";
 import { supabase } from "../../../../lib/supabaseClient";
@@ -10,6 +14,7 @@ import { ensureBookingNotification } from "../../../../lib/bookingNotification";
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
+/** Verifies the Stripe signature and dispatches payment_intent events. */
 export async function POST(request: NextRequest) {
   const body = await request.text();
   const signature = request.headers.get("stripe-signature")!;
@@ -47,6 +52,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/** Marks the booking paid, stores the payment once, emails student and tutor, creates the tutor notification. */
 async function handlePaymentSucceeded(paymentIntent: any) {
   const bookingId = paymentIntent.metadata.booking_id;
 
@@ -180,6 +186,7 @@ async function handlePaymentSucceeded(paymentIntent: any) {
   console.log(`Payment succeeded for booking ${bookingId}`);
 }
 
+/** Marks the booking's payment as failed. */
 async function handlePaymentFailed(paymentIntent: any) {
   const bookingId = paymentIntent.metadata.booking_id;
 
