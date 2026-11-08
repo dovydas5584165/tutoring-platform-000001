@@ -4,6 +4,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* ========= Brand tokens (bg-brand, text-brand, bg-brand-soft, text-highlight …) ========= */
+@theme {
+  --color-brand: #3b65ce;
+  --color-brand-strong: #2f54b3;
+  --color-brand-soft: #eef3fc;
+  --color-highlight: #f5b301; /* the one accent: ratings only */
+}
+
 /* ========= Base Variables ========= */
 :root {
   --radius: 0.625rem;
