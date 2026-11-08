@@ -4,7 +4,7 @@
 
 import { format, parseISO } from "date-fns";
 import { lt } from "date-fns/locale";
-import { supabase } from "./supabaseClient";
+import { supabaseAdmin as supabase } from "./supabaseAdmin";
 
 type BookingForNotification = {
   id: string;

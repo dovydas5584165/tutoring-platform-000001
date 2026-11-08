@@ -126,18 +126,10 @@ function PaymentSuccessContent() {
           const verifyResult = await verifyResponse.json();
           if (!verifyResponse.ok) {
             console.warn('Mokėjimo patikra nepavyko:', verifyResult.error);
-          } else {
+          } else if (verifyResult.status === 'succeeded') {
             console.log('Mokėjimas patvirtintas serveriu:', verifyResult.paymentIntentId);
             bookingData.payment_status = 'paid';
-            // Persist payment status for non-webhook flow so email endpoint can send
-            try {
-              await supabase
-                .from('bookings')
-                .update({ payment_status: 'paid' })
-                .eq('id', bookingId);
-            } catch (e) {
-              console.warn('Nepavyko išsaugoti mokėjimo būsenos į DB:', e);
-            }
+            // verify-payment already marked the booking paid on the server
           }
         } catch (e) {
           console.warn('Klaida tikrinant mokėjimą:', e);
@@ -157,12 +149,7 @@ function PaymentSuccessContent() {
             if (verifyResponse.ok && verifyResult.status === 'succeeded') {
               console.log('✅ Payment verified as succeeded, updating booking and sending emails');
               bookingData.payment_status = 'paid';
-              try {
-                await supabase
-                  .from('bookings')
-                  .update({ payment_status: 'paid' })
-                  .eq('id', bookingId);
-              } catch {}
+              // verify-payment already marked the booking paid on the server
               await sendEmailsWithRetry(bookingId);
             } else {
               console.log('❌ Payment not succeeded yet, status:', verifyResult.status);
@@ -194,12 +181,7 @@ function PaymentSuccessContent() {
             const verifyResult = await verifyResponse.json();
             if (verifyResponse.ok && verifyResult.status === 'succeeded') {
               bookingData.payment_status = 'paid';
-              try {
-                await supabase
-                  .from('bookings')
-                  .update({ payment_status: 'paid' })
-                  .eq('id', bookingId);
-              } catch {}
+              // verify-payment already marked the booking paid on the server
             }
           } catch {}
         }

@@ -23,17 +23,12 @@ export default function ForgotPasswordPage() {
       redirectTo: "https://tiksliukai.lt/atnaujinti_slaptazodi",
     });
 
-    if (error) {
-      setStatus({ 
-        type: "error", 
-        message: "Nepavyko išsiųsti laiško. " + error.message 
-      });
-    } else {
-      setStatus({ 
-        type: "success", 
-        message: "Nuoroda slaptažodžio atkūrimui išsiųsta į jūsų el. paštą." 
-      });
-    }
+    // Same message whether or not the address has an account (no user enumeration)
+    if (error) console.warn("resetPasswordForEmail:", error.message);
+    setStatus({
+      type: "success",
+      message: "Jei šiuo el. paštu yra paskyra, išsiuntėme nuorodą slaptažodžiui atkurti.",
+    });
     setLoading(false);
   };
 

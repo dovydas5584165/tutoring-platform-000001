@@ -36,17 +36,8 @@ function TestStartLogic() {
         if (res.ok) {
           setStatus('Success');
           
-          // --- SMART LOOP FIX ---
-          const checkAndRedirect = () => {
-            // We look for YOUR variable name: 'test_session_token'
-            if (document.cookie.includes('test_session_token')) {
-              window.location.href = '/test';
-            } else {
-              setTimeout(checkAndRedirect, 100);
-            }
-          };
-          
-          checkAndRedirect();
+          // The session cookie is httpOnly (JS can't see it); the response already set it
+          window.location.href = '/test';
 
         } else {
           setStatus('Error');

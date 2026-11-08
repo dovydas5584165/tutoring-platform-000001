@@ -3,8 +3,8 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { getServerStripe } from "../../../../lib/stripe";
-import { supabase } from "../../../../lib/supabaseClient";
+import { getServerStripe, paymentCoversBooking } from "../../../../lib/stripe";
+import { supabaseAdmin as supabase } from "../../../../lib/supabaseAdmin";
 import {
   sendEmail,
   generatePaymentSuccessEmail,
@@ -17,7 +17,10 @@ const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 /** Verifies the Stripe signature and dispatches payment_intent events. */
 export async function POST(request: NextRequest) {
   const body = await request.text();
-  const signature = request.headers.get("stripe-signature")!;
+  const signature = request.headers.get("stripe-signature");
+  if (!signature || !webhookSecret) {
+    return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
+  }
   const stripe = getServerStripe();
 
   let event;
@@ -54,12 +57,27 @@ export async function POST(request: NextRequest) {
 
 /** Marks the booking paid, stores the payment once, emails student and tutor, creates the tutor notification. */
 async function handlePaymentSucceeded(paymentIntent: any) {
-  const bookingId = paymentIntent.metadata.booking_id;
+  // Career test purchases: just mark the purchase row paid
+  if (paymentIntent.metadata?.product_type === "career_test") {
+    await supabase.from("purchases").update({ status: "paid" }).eq("payment_intent_id", paymentIntent.id);
+    return;
+  }
+
+  const bookingId = paymentIntent.metadata?.booking_id;
+  if (!bookingId) return;
+
+  // Only mark paid if the amount actually covers the booking's price
+  const { data: priced } = await supabase
+    .from("bookings").select("id, total_price").eq("id", bookingId).maybeSingle();
+  if (!priced || !paymentCoversBooking(paymentIntent, priced)) {
+    console.error(`PaymentIntent ${paymentIntent.id} does not cover booking ${bookingId}; not marking paid`);
+    return;
+  }
 
   // Update booking status
   const { error: bookingError } = await supabase
     .from("bookings")
-    .update({ payment_status: "paid" })
+    .update({ payment_status: "paid", payment_intent_id: paymentIntent.id })
     .eq("id", bookingId);
 
   if (bookingError) {
@@ -188,7 +206,8 @@ async function handlePaymentSucceeded(paymentIntent: any) {
 
 /** Marks the booking's payment as failed. */
 async function handlePaymentFailed(paymentIntent: any) {
-  const bookingId = paymentIntent.metadata.booking_id;
+  const bookingId = paymentIntent.metadata?.booking_id;
+  if (!bookingId) return;
 
   // Update booking status
   await supabase

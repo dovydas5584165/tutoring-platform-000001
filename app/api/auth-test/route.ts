@@ -1,58 +1,47 @@
 /**
- * Career test: verifies a succeeded Stripe payment, records it and sets the `test_session_token` cookie.
+ * Career test: verifies a succeeded Stripe payment for the career test, records it and sets the signed
+ * `test_session_token` cookie.
  */
 
 import { NextResponse } from 'next/server';
-import Stripe from 'stripe';
-import { supabase } from '../../../lib/supabaseClient';
+import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { signTestSession, testCookieOptions, TEST_SESSION_SECONDS } from '../../../lib/testSession';
+import { clientIp, rateLimit, tooMany } from '../../../lib/security';
+import { getServerStripe, TEST_PRICE_CENTS } from '../../../lib/stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-01-27.acacia',
-});
-
-/** Body: { paymentIntentId }. Grants a 4-hour test session cookie if the payment succeeded. */
+/** Body: { paymentIntentId }. Grants a 4-hour test session cookie if the career-test payment succeeded. */
 export async function POST(req: Request) {
+  if (!rateLimit(`auth-test:${clientIp(req)}`, 20, 10 * 60_000)) return tooMany();
   try {
-    const body = await req.json();
-    const { paymentIntentId } = body;
-
-    if (!paymentIntentId) {
+    const { paymentIntentId } = await req.json().catch(() => ({}));
+    if (typeof paymentIntentId !== 'string' || !/^pi_[A-Za-z0-9]{8,64}$/.test(paymentIntentId)) {
       return NextResponse.json({ error: 'Missing ID' }, { status: 400 });
     }
 
-    const payment = await stripe.paymentIntents.retrieve(paymentIntentId);
+    const payment = await getServerStripe().paymentIntents.retrieve(paymentIntentId);
 
-    if (payment.status !== 'succeeded') {
+    // Must be a paid career-test intent for the full price, not some other (cheaper) payment
+    const isCareerTest =
+      payment.metadata?.product_type === 'career_test' &&
+      payment.currency === 'eur' &&
+      payment.amount_received >= TEST_PRICE_CENTS;
+    if (payment.status !== 'succeeded' || !isCareerTest) {
       return NextResponse.json({ error: 'Mokėjimas nebaigtas' }, { status: 403 });
     }
 
-    // 1. Log to Database
-    await supabase.from('purchases').upsert({ 
-      payment_intent_id: paymentIntentId,
-      amount: payment.amount,
-      status: 'paid'
-    }, { onConflict: 'payment_intent_id' });
+    await supabaseAdmin.from('purchases').upsert(
+      { payment_intent_id: paymentIntentId, amount: payment.amount, status: 'paid' },
+      { onConflict: 'payment_intent_id' }
+    );
 
-    // 2. CREATE RESPONSE OBJECT FIRST
     const response = NextResponse.json({ success: true });
-
-    // 3. FORCE COOKIE ONTO THE RESPONSE
-    // This bypasses 'cookies()' helper issues by writing directly to headers
     response.cookies.set({
-      name: 'test_session_token',
-      value: paymentIntentId,
-      httpOnly: false, // JavaScript can see it (vital for your debugging)
-      secure: true,    // HTTPS only
-      sameSite: 'lax', // vital for redirects
-      maxAge: 60 * 60 * 4,
-      path: '/',
+      ...testCookieOptions(TEST_SESSION_SECONDS),
+      value: await signTestSession(paymentIntentId, TEST_SESSION_SECONDS),
     });
-
-    // 4. Return the specific response with the cookie attached
     return response;
-
   } catch (error) {
-    console.error('API Error:', error);
+    console.error('auth-test error:', error);
     return NextResponse.json({ error: 'Server Error' }, { status: 500 });
   }
 }

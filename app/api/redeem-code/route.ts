@@ -4,11 +4,13 @@
 
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '../../../lib/supabaseAdmin';
-
-const SESSION_SECONDS = 60 * 60 * 4; // same as a paid session
+import { signTestSession, testCookieOptions, TEST_SESSION_SECONDS as SESSION_SECONDS } from '../../../lib/testSession';
+import { clientIp, rateLimit, tooMany } from '../../../lib/security';
 
 /** Body: { code }. Sets the test session cookie if the code exists, is active and hasn't expired. */
 export async function POST(req: Request) {
+  // Codes are guessable words, so limit guesses per IP
+  if (!rateLimit(`redeem:${clientIp(req)}`, 10, 15 * 60_000)) return tooMany();
   let code = '';
   try {
     const body = await req.json();
@@ -44,15 +46,8 @@ export async function POST(req: Request) {
   await supabaseAdmin.from('access_codes').update({ uses: (row.uses ?? 0) + 1 }).eq('code', code);
 
   const response = NextResponse.json({ url: '/test' });
-  response.cookies.set({
-    name: 'test_session_token',
-    value: `code:${code}`,
-    httpOnly: false,
-    secure: true,
-    sameSite: 'lax',
-    // Never let the session outlive the code itself
-    maxAge: Math.min(SESSION_SECONDS, secondsLeft),
-    path: '/',
-  });
+  // Never let the session outlive the code itself
+  const maxAge = Math.min(SESSION_SECONDS, secondsLeft);
+  response.cookies.set({ ...testCookieOptions(maxAge), value: await signTestSession(`code:${code}`, maxAge) });
   return response;
 }

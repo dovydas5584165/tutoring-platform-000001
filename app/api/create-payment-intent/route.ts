@@ -1,27 +1,33 @@
 /**
  * Creates Stripe PaymentIntents for a tutoring booking or for the career test.
+ * Amounts always come from the server (database / constant), never from the browser.
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerStripe } from '../../../lib/stripe'; // Keep your existing helper
-import { supabase } from '../../../lib/supabaseClient';
+import { getServerStripe, TEST_PRICE_CENTS } from '../../../lib/stripe';
+import { supabaseAdmin } from '../../../lib/supabaseAdmin';
+import { clientIp, rateLimit, tooMany } from '../../../lib/security';
+
+const BOOKING_ID_RE = /^[A-Za-z0-9-]{1,64}$/;
 
 /** Body: { bookingId } for a lesson booking, or { product_type: 'career_test', phone } for the career test. Returns { clientSecret }. */
 export async function POST(request: NextRequest) {
+  if (!rateLimit(`pi:${clientIp(request)}`, 20, 10 * 60_000)) return tooMany();
   try {
-    const body = await request.json();
+    const body = await request.json().catch(() => ({}));
     const { bookingId, product_type } = body;
 
     const stripe = getServerStripe();
 
-    const TEST_PRICE_CENTS = 11900; // 119.00 EUR (Pašaukimas: test + consultation)
-
     // ==========================================
-    // SCENARIO 1: Tutoring Booking (Existing Logic)
+    // SCENARIO 1: Tutoring Booking
     // ==========================================
     if (bookingId) {
-      // Get booking details from database
-      const { data: booking, error } = await supabase
+      if (typeof bookingId !== 'string' || !BOOKING_ID_RE.test(bookingId)) {
+        return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
+      }
+
+      const { data: booking, error } = await supabaseAdmin
         .from('bookings')
         .select(`
           *,
@@ -33,27 +39,29 @@ export async function POST(request: NextRequest) {
       if (error || !booking) {
         return NextResponse.json({ error: 'Booking not found' }, { status: 404 });
       }
-
-      // Check if payment intent already exists (Idempotency)
-      if (booking.payment_intent_id) {
-        const existingIntent = await stripe.paymentIntents.retrieve(booking.payment_intent_id);
-        return NextResponse.json({
-          clientSecret: existingIntent.client_secret,
-          paymentIntentId: existingIntent.id,
-        });
+      if (booking.payment_status === 'paid') {
+        return NextResponse.json({ error: 'Booking already paid' }, { status: 409 });
       }
 
-      // Validate Email
+      const amount = Math.round(parseFloat(String(booking.total_price)) * 100);
+      if (!Number.isFinite(amount) || amount < 100) {
+        console.error(`Refusing payment for booking ${bookingId}: bad total_price`, booking.total_price);
+        return NextResponse.json({ error: 'Neteisinga kaina' }, { status: 400 });
+      }
+
+      // Reuse the existing intent (idempotency), but only if it still charges the booking's price
+      if (booking.payment_intent_id) {
+        const existing = await stripe.paymentIntents.retrieve(booking.payment_intent_id);
+        if (existing.amount === amount && existing.currency === 'eur' && existing.status !== 'canceled') {
+          return NextResponse.json({ clientSecret: existing.client_secret, paymentIntentId: existing.id });
+        }
+      }
+
       const email = typeof booking.student_email === 'string' ? booking.student_email.trim() : '';
       const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
-      if (!isValidEmail) {
-        console.warn(`Omitting invalid receipt_email for booking ${bookingId}:`, booking.student_email);
-      }
-
-      // Create new payment intent for Booking
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(parseFloat(booking.total_price.toString()) * 100), // Convert to cents
+        amount,
         currency: 'eur',
         metadata: {
           booking_id: bookingId,
@@ -65,8 +73,7 @@ export async function POST(request: NextRequest) {
         ...(isValidEmail ? { receipt_email: email } : {}),
       });
 
-      // Update booking with payment intent ID so we don't create duplicates
-      await supabase
+      await supabaseAdmin
         .from('bookings')
         .update({ payment_intent_id: paymentIntent.id })
         .eq('id', bookingId);
@@ -80,20 +87,31 @@ export async function POST(request: NextRequest) {
     // ==========================================
     // SCENARIO 2: Career Test (Pašaukimas + consultation)
     // ==========================================
-    else if (product_type === 'career_test') {
-      // Fixed price: 119.00 EUR
-      const amount = TEST_PRICE_CENTS;
+    if (product_type === 'career_test') {
+      const phone = String(body.phone ?? '').trim();
+      if (!/^[+\d\s()-]{6,30}$/.test(phone)) {
+        return NextResponse.json({ error: 'Neteisingas telefono numeris' }, { status: 400 });
+      }
 
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: amount,
+        amount: TEST_PRICE_CENTS,
         currency: 'eur',
         automatic_payment_methods: { enabled: true },
         metadata: {
           product_type: 'career_test',
           product_name: 'Pašaukimas',
-          type: 'digital_good'
+          type: 'digital_good',
         },
       });
+
+      // Recorded here (service role) instead of from the browser, so `purchases` can stay closed to anon
+      const { error: insertError } = await supabaseAdmin.from('purchases').insert({
+        number: phone,
+        payment_intent_id: paymentIntent.id,
+        status: 'pending',
+        amount: TEST_PRICE_CENTS / 100,
+      });
+      if (insertError) console.error('purchases insert failed:', insertError);
 
       return NextResponse.json({
         clientSecret: paymentIntent.client_secret,
@@ -101,21 +119,9 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    // ==========================================
-    // FALLBACK: Invalid Request
-    // ==========================================
-    else {
-      return NextResponse.json(
-        { error: 'Missing bookingId or product_type' },
-        { status: 400 }
-      );
-    }
-
-  } catch (error: any) {
+    return NextResponse.json({ error: 'Missing bookingId or product_type' }, { status: 400 });
+  } catch (error) {
     console.error('Error creating payment intent:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create payment intent' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create payment intent' }, { status: 500 });
   }
 }

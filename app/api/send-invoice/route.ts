@@ -3,18 +3,20 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '../../../lib/supabaseClient';
-import { getServerStripe } from '../../../lib/stripe';
+import { supabaseAdmin as supabase } from '../../../lib/supabaseAdmin';
+import { getServerStripe, isBookingId, paymentCoversBooking } from '../../../lib/stripe';
+import { clientIp, rateLimit, tooMany } from '../../../lib/security';
 import { sendEmail, generatePaymentSuccessEmail, generateTutorOrderEmail } from '../../../lib/email';
 import { ensureBookingNotification } from '../../../lib/bookingNotification';
 
 /** Body: { bookingId }. Sends the payment confirmation to the student and the order email to the tutor. */
 export async function POST(request: NextRequest) {
+  // Public endpoint that sends email: cap it per IP so it can't be used to spam students/tutors
+  if (!rateLimit(`invoice:${clientIp(request)}`, 10, 10 * 60_000)) return tooMany();
   try {
-    const { bookingId } = await request.json();
-    console.log('📧 send-invoice called with bookingId:', bookingId);
+    const { bookingId } = await request.json().catch(() => ({}));
 
-    if (!bookingId) {
+    if (!isBookingId(bookingId)) {
       return NextResponse.json({ error: 'Rezervacijos ID būtinas' }, { status: 400 });
     }
 
@@ -40,18 +42,15 @@ export async function POST(request: NextRequest) {
         let paymentIntentId: string | null = booking.payment_intent_id || null;
         let paymentStatus: string | null = null;
 
-        if (paymentIntentId) {
-          const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
-          paymentStatus = pi.status;
-        } else {
-          const results = await stripe.paymentIntents.search({
-            query: `metadata['booking_id']:'${bookingId}'`,
-            limit: 1,
-          });
-          if (results.data?.length) {
-            paymentIntentId = results.data[0].id;
-            paymentStatus = results.data[0].status as string;
-          }
+        // bookingId is validated above, so it can't break out of the search query
+        const pi = paymentIntentId
+          ? await stripe.paymentIntents.retrieve(paymentIntentId)
+          : (await stripe.paymentIntents.search({ query: `metadata['booking_id']:'${bookingId}'`, limit: 1 })).data[0];
+
+        // Only a payment made for this booking, for its full price, counts
+        if (pi && paymentCoversBooking(pi, booking)) {
+          paymentIntentId = pi.id;
+          paymentStatus = 'succeeded';
         }
 
         if (paymentStatus === 'succeeded') {
@@ -146,8 +145,7 @@ export async function POST(request: NextRequest) {
     } else {
       console.error('Nepavyko išsiųsti el. laiško:', emailResult.error);
       return NextResponse.json({ 
-        error: 'Nepavyko išsiųsti sąskaitos', 
-        details: emailResult.error 
+        error: 'Nepavyko išsiųsti sąskaitos'
       }, { status: 500 });
     }
 

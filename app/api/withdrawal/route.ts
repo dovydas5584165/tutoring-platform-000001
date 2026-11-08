@@ -4,6 +4,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { sendEmail } from "../../../lib/email";
+import { clientIp, rateLimit, tooMany } from "../../../lib/security";
 import { CONTACT_EMAIL } from "../../../lib/site";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -16,6 +17,8 @@ const esc = (s: string) =>
  * on a durable medium (email) with the content, date and time of the withdrawal.
  */
 export async function POST(req: NextRequest) {
+  // Sends emails, so cap submissions per IP (spam / email bombing)
+  if (!rateLimit(`withdrawal:${clientIp(req)}`, 5, 10 * 60_000)) return tooMany();
   try {
     const body = await req.json();
     if (body.website) return NextResponse.json({ success: true }); // bot
