@@ -1,67 +1,55 @@
 "use client";
 
 /**
- * Admin page for adding, editing, ordering and linking tutor cards (password protected).
+ * Admin page for adding, editing, ordering and linking tutor cards.
  */
 
 import React, { useCallback, useEffect, useState } from "react";
-import { ArrowDown, ArrowUp, Eye, EyeOff, KeyRound, Pencil, Plus, Trash2, UserRound } from "lucide-react";
+import { ArrowDown, ArrowUp, Eye, EyeOff, Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import TeacherProfileForm, { EMPTY_TEACHER, type TeacherFormValues } from "@/components/TeacherProfileForm";
 
 type Teacher = TeacherFormValues & { id: string; user_id: string | null; sort_order: number; visible: boolean };
 type TutorAccount = { id: string; vardas: string | null; pavarde: string | null; email: string };
 
-const STORAGE_KEY = "admin_secret"; // shared with /admin_access_codes
+/** Calls the teachers API and throws with the server's error message on failure. */
+async function api(method: string, body?: unknown, path = "/api/teachers") {
+  const res = await fetch(path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || "Klaida");
+  return data;
+}
 
-/** Asks for the admin password, then manages the tutor cards. */
+// TeacherProfileForm still asks for auth headers; there are none to send any more
+const headers = async () => ({});
+
+/** Manages the tutor cards. */
 export default function TutorsAdmin() {
-  const [secret, setSecret] = useState("");
-  const [loggedIn, setLoggedIn] = useState(false);
   const [teachers, setTeachers] = useState<Teacher[]>([]);
   const [accounts, setAccounts] = useState<TutorAccount[]>([]);
   const [editing, setEditing] = useState<string | "new" | null>(null);
   const [error, setError] = useState("");
 
-  const api = useCallback(
-    async (method: string, body?: unknown, path = "/api/teachers", key = secret) => {
-      const res = await fetch(path, {
-        method,
-        headers: { "Content-Type": "application/json", "x-admin-secret": key },
-        body: body ? JSON.stringify(body) : undefined,
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || "Klaida");
-      return data;
-    },
-    [secret]
-  );
-
-  const load = useCallback(
-    async (key = secret) => {
-      setError("");
-      try {
-        const [t, a] = await Promise.all([
-          api("GET", undefined, "/api/teachers?all=1", key),
-          api("GET", undefined, "/api/teachers/tutor-accounts", key),
-        ]);
-        setTeachers(t.teachers);
-        setAccounts(a.tutors);
-        setLoggedIn(true);
-        try { sessionStorage.setItem(STORAGE_KEY, key); } catch {}
-      } catch (e) {
-        setLoggedIn(false);
-        setError((e as Error).message);
-      }
-    },
-    [api, secret]
-  );
+  const load = useCallback(async () => {
+    setError("");
+    try {
+      const [t, a] = await Promise.all([
+        api("GET", undefined, "/api/teachers?all=1"),
+        api("GET", undefined, "/api/teachers/tutor-accounts"),
+      ]);
+      setTeachers(t.teachers);
+      setAccounts(a.tutors);
+    } catch (e) {
+      setError((e as Error).message);
+    }
+  }, []);
 
   useEffect(() => {
-    let saved = "";
-    try { saved = sessionStorage.getItem(STORAGE_KEY) || ""; } catch {}
-    if (saved) { setSecret(saved); load(saved); }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    load();
+  }, [load]);
 
   const replace = (t: Teacher) => setTeachers((list) => list.map((x) => (x.id === t.id ? t : x)));
 
@@ -96,22 +84,6 @@ export default function TutorsAdmin() {
     setTeachers(list.map((t, k) => ({ ...t, sort_order: k + 1 })));
     await Promise.all(changed.map((c) => patch(c)));
   };
-
-  const headers = async () => ({ "x-admin-secret": secret });
-
-  if (!loggedIn) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-        <form onSubmit={(e) => { e.preventDefault(); load(); }} className="bg-white p-8 rounded-2xl shadow w-full max-w-sm space-y-4">
-          <h1 className="text-xl font-bold flex items-center gap-2"><KeyRound size={20} /> Mokytojų kortelės</h1>
-          <input type="password" value={secret} onChange={(e) => setSecret(e.target.value)}
-            placeholder="Administratoriaus slaptažodis" className="w-full border rounded-lg px-3 py-2" />
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button className="w-full bg-slate-900 text-white rounded-lg py-2 font-semibold">Prisijungti</button>
-        </form>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
