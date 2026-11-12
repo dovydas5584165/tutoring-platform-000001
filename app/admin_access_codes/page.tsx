@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * Admin page for managing career-test access codes.
+ * Admin page for managing career-test access codes (password protected).
  */
 
 import React, { useCallback, useEffect, useState } from "react";
-import { Copy, Check, Plus, RefreshCw } from "lucide-react";
+import { Copy, Check, KeyRound, Plus, RefreshCw } from "lucide-react";
 
 type AccessCode = {
   code: string;
@@ -16,22 +16,13 @@ type AccessCode = {
   uses: number;
 };
 
+const STORAGE_KEY = "admin_secret";
 const fmt = (d: string) => new Date(d).toLocaleDateString("lt-LT");
 
-/** Calls the access-codes API and throws with the server's error message on failure. */
-async function api(method: string, body?: unknown) {
-  const res = await fetch("/api/access-codes", {
-    method,
-    headers: { "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const data = await res.json().catch(() => ({}));
-  if (!res.ok) throw new Error(data.error || "Klaida");
-  return data;
-}
-
-/** Lists codes and lets the admin create, toggle and extend them. */
+/** Asks for the admin password, then lists codes and lets the admin create, toggle and extend them. */
 export default function AccessCodesAdmin() {
+  const [secret, setSecret] = useState("");
+  const [loggedIn, setLoggedIn] = useState(false);
   const [codes, setCodes] = useState<AccessCode[]>([]);
   const [company, setCompany] = useState("");
   const [customCode, setCustomCode] = useState("");
@@ -40,19 +31,42 @@ export default function AccessCodesAdmin() {
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState("");
 
-  const load = useCallback(async () => {
-    setError("");
-    try {
-      const data = await api("GET");
-      setCodes(data.codes);
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }, []);
+  const api = useCallback(
+    async (method: string, body?: unknown, key = secret) => {
+      const res = await fetch("/api/access-codes", {
+        method,
+        headers: { "Content-Type": "application/json", "x-admin-secret": key },
+        body: body ? JSON.stringify(body) : undefined,
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || "Klaida");
+      return data;
+    },
+    [secret]
+  );
+
+  const load = useCallback(
+    async (key = secret) => {
+      setError("");
+      try {
+        const data = await api("GET", undefined, key);
+        setCodes(data.codes);
+        setLoggedIn(true);
+        try { sessionStorage.setItem(STORAGE_KEY, key); } catch {}
+      } catch (e) {
+        setLoggedIn(false);
+        setError((e as Error).message);
+      }
+    },
+    [api, secret]
+  );
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let saved = "";
+    try { saved = sessionStorage.getItem(STORAGE_KEY) || ""; } catch {}
+    if (saved) { setSecret(saved); load(saved); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const create = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,6 +99,28 @@ export default function AccessCodesAdmin() {
     setCopied(code);
     setTimeout(() => setCopied(""), 1500);
   };
+
+  if (!loggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <form
+          onSubmit={(e) => { e.preventDefault(); load(); }}
+          className="bg-white p-8 rounded-2xl shadow w-full max-w-sm space-y-4"
+        >
+          <h1 className="text-xl font-bold flex items-center gap-2"><KeyRound size={20} /> Prieigos kodai</h1>
+          <input
+            type="password"
+            value={secret}
+            onChange={(e) => setSecret(e.target.value)}
+            placeholder="Administratoriaus slaptažodis"
+            className="w-full border rounded-lg px-3 py-2"
+          />
+          {error && <p className="text-sm text-red-600">{error}</p>}
+          <button className="w-full bg-slate-900 text-white rounded-lg py-2 font-semibold">Prisijungti</button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-8">
